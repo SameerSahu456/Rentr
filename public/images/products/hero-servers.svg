@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <!-- Server Tower 1 (left) -->
+  <rect x="60" y="80" width="100" height="340" rx="6" fill="#2d2d2d" stroke="#404040" stroke-width="2"/>
+  <rect x="72" y="100" width="76" height="10" rx="2" fill="#1a1a1a"/>
+  <circle cx="82" cy="105" r="2.5" fill="#4ade80"/>
+  <rect x="72" y="118" width="76" height="10" rx="2" fill="#1a1a1a"/>
+  <circle cx="82" cy="123" r="2.5" fill="#60a5fa"/>
+  <rect x="72" y="136" width="76" height="10" rx="2" fill="#1a1a1a"/>
+  <circle cx="82" cy="141" r="2.5" fill="#4ade80"/>
+  <rect x="72" y="160" width="76" height="30" rx="3" fill="#1a1a1a"/>
+  <rect x="72" y="200" width="76" height="180" rx="3" fill="#1a1a1a"/>
+  <circle cx="110" cy="370" r="10" fill="#333" stroke="#555" stroke-width="1"/>
+
+  <!-- Server Tower 2 (center, larger) -->
+  <rect x="200" y="40" width="120" height="380" rx="8" fill="#333" stroke="#505050" stroke-width="2"/>
+  <rect x="215" y="60" width="90" height="12" rx="2" fill="#1a1a1a"/>
+  <circle cx="230" cy="66" r="3" fill="#4ade80"/>
+  <circle cx="242" cy="66" r="3" fill="#60a5fa"/>
+  <rect x="215" y="82" width="90" height="12" rx="2" fill="#1a1a1a"/>
+  <circle cx="230" cy="88" r="3" fill="#4ade80"/>
+  <circle cx="242" cy="88" r="3" fill="#f97316"/>
+  <rect x="215" y="104" width="90" height="12" rx="2" fill="#1a1a1a"/>
+  <circle cx="230" cy="110" r="3" fill="#4ade80"/>
+  <rect x="215" y="126" width="90" height="12" rx="2" fill="#1a1a1a"/>
+  <rect x="215" y="150" width="90" height="40" rx="4" fill="#1a1a1a"/>
+  <rect x="215" y="200" width="90" height="200" rx="3" fill="#1a1a1a"/>
+  <circle cx="260" cy="390" r="12" fill="#333" stroke="#555" stroke-width="1"/>
+
+  <!-- Laptop (right top) -->
+  <rect x="370" y="60" width="180" height="110" rx="6" fill="#2d2d2d" stroke="#404040" stroke-width="2"/>
+  <rect x="380" y="68" width="160" height="94" rx="3" fill="#1e3a5f"/>
+  <text x="460" y="120" text-anchor="middle" fill="#60a5fa" font-size="12" font-family="sans-serif">RENTR</text>
+  <path d="M350 175 L370 170 L550 170 L570 175 L575 182 Q575 188 570 188 L350 188 Q345 188 345 182 Z" fill="#3d3d3d"/>
+
+  <!-- Rack Server (right bottom) -->
+  <rect x="360" y="220" width="200" height="120" rx="4" fill="#2d2d2d" stroke="#404040" stroke-width="2"/>
+  <rect x="372" y="232" width="176" height="22" rx="2" fill="#1a1a1a"/>
+  <circle cx="387" cy="243" r="3" fill="#4ade80"/>
+  <circle cx="399" cy="243" r="3" fill="#60a5fa"/>
+  <rect x="420" y="238" width="60" height="10" rx="2" fill="#333"/>
+  <rect x="372" y="262" width="176" height="22" rx="2" fill="#1a1a1a"/>
+  <circle cx="387" cy="273" r="3" fill="#4ade80"/>
+  <circle cx="399" cy="273" r="3" fill="#f97316"/>
+  <rect x="372" y="292" width="176" height="22" rx="2" fill="#1a1a1a"/>
+  <circle cx="387" cy="303" r="3" fill="#4ade80"/>
+  <rect x="372" y="322" width="176" height="10" rx="2" fill="#1a1a1a"/>
+
+  <!-- Desktop Monitor (bottom left) -->
+  <rect x="80" y="440" width="120" height="50" rx="4" fill="transparent"/>
+</svg>
