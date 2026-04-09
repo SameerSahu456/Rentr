@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { handleImgError } from '../../constants/images'
 import HeroSection from './HeroSection'
@@ -10,14 +10,24 @@ import ProductCarouselSection from '../../components/modules/landing/ProductCaro
 import SaveBanner from '../../components/modules/landing/SaveBanner'
 import BrandPartners from '../../components/modules/landing/BrandPartners'
 import {
-  PRODUCT_TABS, CATEGORIES, BEST_SELLERS, EDUCATION_PRODUCTS
+  PRODUCT_TABS, CATEGORIES
 } from '../../constants/landing'
+import { saleorProducts } from '../../services/saleor'
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Products')
 
-  const bestSellers = BEST_SELLERS
-  const educationProducts = EDUCATION_PRODUCTS
+  const [bestSellers, setBestSellers] = useState([])
+  const [educationProducts, setEducationProducts] = useState([])
+
+  useEffect(() => {
+    saleorProducts.getFeatured(6)
+      .then(setBestSellers)
+      .catch(err => console.error('[Saleor] Failed to fetch featured:', err))
+    saleorProducts.list({ pageSize: 6, sortBy: 'newest' })
+      .then(r => setEducationProducts(r.products))
+      .catch(err => console.error('[Saleor] Failed to fetch products:', err))
+  }, [])
 
   return (
     <div>

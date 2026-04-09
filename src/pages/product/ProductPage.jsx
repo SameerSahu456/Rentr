@@ -6,10 +6,11 @@ import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 
 import {
-  PRODUCT, SERVER_DETAILS, ITEM_DETAILS, SPEC_TABLE,
+  PRODUCT as FALLBACK_PRODUCT, SERVER_DETAILS, ITEM_DETAILS, SPEC_TABLE,
   TESTIMONIALS, FAQ_ITEMS,
-  BYO_CATEGORIES, BENEFITS_MARQUEE, SERVER_IMG, SIMILAR_PRODUCTS,
+  BYO_CATEGORIES, BENEFITS_MARQUEE, SERVER_IMG, SIMILAR_PRODUCTS as FALLBACK_SIMILAR,
 } from '../../constants/product'
+import { saleorProducts } from '../../services/saleor'
 
 import ProductImageGallery from '../../components/modules/product/ProductImageGallery'
 import RentalSidebar from '../../components/modules/product/RentalSidebar'
@@ -26,11 +27,26 @@ export default function ProductPage() {
   const { user } = useAuth()
   const { addItem } = useCart()
 
-  /* Demo mode: use hardcoded product data */
-  const [product] = useState({ ...PRODUCT, slug, id: 1 })
-  const [similarProducts] = useState(SIMILAR_PRODUCTS)
-  const [loading] = useState(false)
+  /* Fetch product from Saleor */
+  const [product, setProduct] = useState(null)
+  const [similarProducts, setSimilarProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [addingToCart, setAddingToCart] = useState(false)
+
+  useEffect(() => {
+    setLoading(true)
+    saleorProducts.getBySlug(slug)
+      .then(p => {
+        setProduct(p)
+        return saleorProducts.list({ category: p?.category, pageSize: 6 })
+      })
+      .then(result => setSimilarProducts(result?.products || []))
+      .catch(err => {
+        console.error('[Saleor] Failed to fetch product:', err)
+        setProduct(null)
+      })
+      .finally(() => setLoading(false))
+  }, [slug])
 
   /* Image gallery */
   const [selectedImage, setSelectedImage] = useState(0)

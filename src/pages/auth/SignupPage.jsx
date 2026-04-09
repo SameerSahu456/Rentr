@@ -26,7 +26,7 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
-  const { login } = useAuth()
+  const { register } = useAuth()
   const navigate = useNavigate()
 
   /* Auto-rotate carousel */
@@ -60,10 +60,25 @@ export default function SignupPage() {
     }
     setError('')
     setLoading(true)
-    // Demo mode: skip backend, login immediately with selected role
-    await login(activeTab)
-    navigate(activeTab === 'distributor' ? '/distributor/dashboard' : '/')
-    setLoading(false)
+    try {
+      await register({
+        email: formData.companyEmail,
+        password: formData.password,
+        firstName: formData.fullName.split(' ')[0] || '',
+        lastName: formData.fullName.split(' ').slice(1).join(' ') || '',
+        phone: formData.phoneNumber,
+        companyName: formData.companyName,
+        role: activeTab,
+        industry: formData.industry,
+        gstin: formData.gstTin,
+        companyPan: formData.companyPan,
+      })
+      navigate(activeTab === 'distributor' ? '/distributor/dashboard' : '/')
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

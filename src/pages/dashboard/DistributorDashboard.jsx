@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { saleorOrders as saleorOrdersApi } from '../../services/saleor'
 import { handleImgError } from '../../constants/images'
 import {
   Crown,
@@ -67,7 +68,18 @@ const SIDEBAR_ITEMS = [
 
 // ─── Component ───
 export default function DistributorDashboard() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
+
+  // Saleor order history
+  const [saleorOrders, setSaleorOrders] = useState([])
+
+  useEffect(() => {
+    if (token) {
+      saleorOrdersApi.getMyOrders(token)
+        .then(result => setSaleorOrders(result.orders))
+        .catch(err => console.error('[Saleor] Failed to fetch orders:', err))
+    }
+  }, [token])
 
   // Sidebar
   const [activeTab, setActiveTab] = useState('subscription')
@@ -492,7 +504,7 @@ export default function DistributorDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {PREVIOUS_ORDERS.map((o, i) => (
+                  {(saleorOrders.length > 0 ? saleorOrders : PREVIOUS_ORDERS).map((o, i) => (
                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-3.5 text-dark font-medium">{o.item}</td>
                       <td className="px-5 py-3.5 text-right text-gray-2">{o.qty}</td>

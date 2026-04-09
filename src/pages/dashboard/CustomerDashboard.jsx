@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { saleorOrders } from '../../services/saleor'
 import { handleImgError } from '../../constants/images'
 // Demo mode: using mock data from constants
 import {
@@ -65,7 +66,7 @@ const SIDEBAR_ITEMS = [
 
 // ─── Component ───
 export default function CustomerDashboard() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [activeTab, setActiveTab] = useState('subscription')
   const [mobileView, setMobileView] = useState(null)
   const [subTab, setSubTab] = useState('ledger')
@@ -92,8 +93,16 @@ export default function CustomerDashboard() {
 
   const displayName = user?.full_name || 'Santosh'
 
-  // Demo mode: no API orders needed, using mock data from constants
-  const [apiOrders] = useState([])
+  // Fetch orders from Saleor
+  const [apiOrders, setApiOrders] = useState([])
+
+  useEffect(() => {
+    if (token) {
+      saleorOrders.getMyOrders(token)
+        .then(result => setApiOrders(result.orders))
+        .catch(err => console.error('[Saleor] Failed to fetch orders:', err))
+    }
+  }, [token])
 
   const copyReferralCode = () => {
     navigator.clipboard?.writeText('RENTRRFFRL')

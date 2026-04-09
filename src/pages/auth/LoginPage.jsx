@@ -39,20 +39,26 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    // Demo mode: skip backend, login immediately
-    await login(loginRole)
-    navigate(loginRole === 'distributor' ? '/distributor/dashboard' : '/')
-    setLoading(false)
+    try {
+      await login(email, password, loginRole)
+      navigate(loginRole === 'distributor' ? '/distributor/dashboard' : '/')
+    } catch (err) {
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleOtpLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    // Demo mode: skip backend, login immediately
-    await login(loginRole)
-    navigate(loginRole === 'distributor' ? '/distributor/dashboard' : '/')
-    setLoading(false)
+    try {
+      // OTP login not natively supported by Saleor — placeholder
+      setError('OTP login is not available yet. Please use email/password.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const sendOtp = async () => {

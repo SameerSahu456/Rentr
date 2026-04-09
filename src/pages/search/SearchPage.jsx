@@ -4,7 +4,8 @@ import { handleImgError } from '../../constants/images'
 import {
   Grid3X3, List, ChevronDown, ChevronRight, ChevronLeft, SlidersHorizontal,
 } from 'lucide-react'
-import { SORT_OPTIONS, BANNER_SLIDES, SUB_NAV_TABS, SAMPLE_PRODUCTS, TOTAL_PRODUCTS, TOTAL_PAGES } from '../../constants/search'
+import { SORT_OPTIONS, BANNER_SLIDES, SUB_NAV_TABS } from '../../constants/search'
+import { saleorProducts } from '../../services/saleor'
 import SearchFilterSidebar from '../../components/modules/search/SearchFilterSidebar'
 import { SearchProductCardGrid, SearchProductCardList } from '../../components/modules/search/SearchProductCard'
 import ContactForm from '../../components/modules/search/ContactForm'
@@ -57,50 +58,29 @@ export default function SearchPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  /* Map frontend sort values to backend params */
-  const getSortParams = useCallback((sort) => {
-    switch (sort) {
-      case 'price-low': return { sort_by: 'price_per_month', sort_order: 'asc' }
-      case 'price-high': return { sort_by: 'price_per_month', sort_order: 'desc' }
-      case 'newest': return { sort_by: 'created_at', sort_order: 'desc' }
-      case 'popularity': return { sort_by: 'name', sort_order: 'asc' }
-      default: return { sort_by: 'created_at', sort_order: 'desc' }
-    }
-  }, [])
-
-  /* Demo mode: filter/sort mock data locally */
+  /* Fetch products from Saleor */
   useEffect(() => {
     setLoading(true)
-    let filtered = [...SAMPLE_PRODUCTS]
-
-    // Filter by search query
-    if (query) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-    }
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase())
-    }
-    // Filter by brand
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.brand))
-    }
-    // Filter by price range
-    if (priceRange[0]) filtered = filtered.filter(p => p.price >= priceRange[0])
-    if (priceRange[1]) filtered = filtered.filter(p => p.price <= priceRange[1])
-
-    // Sort
-    const { sort_by, sort_order } = getSortParams(sortBy)
-    if (sort_by === 'price_per_month') {
-      filtered.sort((a, b) => sort_order === 'asc' ? a.price - b.price : b.price - a.price)
-    }
-
-    setTotalProducts(filtered.length)
-    setTotalPages(Math.ceil(filtered.length / PAGE_SIZE))
-    const start = (currentPage - 1) * PAGE_SIZE
-    setProducts(filtered.slice(start, start + PAGE_SIZE))
-    setLoading(false)
-  }, [query, currentPage, sortBy, selectedCategory, selectedBrands, priceRange, getSortParams])
+    saleorProducts.list({
+      search: query || undefined,
+      category: selectedCategory || undefined,
+      brands: selectedBrands.length > 0 ? selectedBrands : undefined,
+      priceMin: priceRange[0] || undefined,
+      priceMax: priceRange[1] || undefined,
+      sortBy,
+      page: currentPage,
+      pageSize: PAGE_SIZE,
+    }).then(result => {
+      setProducts(result.products)
+      setTotalProducts(result.totalCount)
+      setTotalPages(result.totalPages)
+    }).catch(err => {
+      console.error('[Saleor] Failed to fetch products:', err)
+      setProducts([])
+      setTotalProducts(0)
+      setTotalPages(0)
+    }).finally(() => setLoading(false))
+  }, [query, currentPage, sortBy, selectedCategory, selectedBrands, priceRange])
 
   // Reset page when filters change
   useEffect(() => {

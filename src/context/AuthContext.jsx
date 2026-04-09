@@ -1,18 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { saleorAuth } from '../services/saleor'
 
 const AuthContext = createContext(null)
-
-// Hardcoded demo user for offline demo
-const DEMO_USER = {
-  id: 1,
-  email: 'sameer@rentr.com',
-  full_name: 'sameer sahu',
-  phone: '+919876543210',
-  role: 'customer',
-  company_name: 'Rentr Demo Corp',
-  company_gst: 'GST1234567890',
-  created_at: '2025-01-01T00:00:00Z',
-}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -21,36 +10,68 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      // Restore demo user from token without hitting backend
-      const savedRole = localStorage.getItem('demo-role') || 'customer'
-      setUser({ ...DEMO_USER, role: savedRole })
-      setLoading(false)
+      saleorAuth.getMe(token)
+        .then(saleorUser => {
+          setUser(saleorUser)
+        })
+        .catch(() => {
+          // Token expired — try refresh
+          const refreshTk = localStorage.getItem('refreshToken')
+          if (refreshTk) {
+            saleorAuth.refreshToken(refreshTk)
+              .then(result => {
+                localStorage.setItem('token', result.token)
+                setToken(result.token)
+                return saleorAuth.getMe(result.token)
+              })
+              .then(saleorUser => setUser(saleorUser))
+              .catch(() => {
+                logout()
+              })
+          } else {
+            logout()
+          }
+        })
+        .finally(() => setLoading(false))
     } else {
       setLoading(false)
     }
-  }, [token])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchUser() {
-    // Demo mode: just set the hardcoded user
-    setUser(DEMO_USER)
+    if (!token) return
+    const saleorUser = await saleorAuth.getMe(token)
+    setUser(saleorUser)
   }
 
-  async function login(role = 'customer') {
-    const fakeToken = 'demo-token-rentr'
-    localStorage.setItem('token', fakeToken)
-    localStorage.setItem('demo-role', role)
-    setToken(fakeToken)
-    setUser({ ...DEMO_USER, role })
+  async function login(email, password, role = 'customer') {
+    const result = await saleorAuth.login(email, password)
+    localStorage.setItem('token', result.token)
+    localStorage.setItem('refreshToken', result.refreshToken)
+    setToken(result.token)
+    // Override role from login selection if Saleor doesn't have it
+    const userWithRole = { ...result.user, role: result.user.role || role }
+    setUser(userWithRole)
+  }
+
+  async function register({ email, password, firstName, lastName, phone, companyName, role, industry, gstin, companyPan }) {
+    const result = await saleorAuth.register({
+      email, password, firstName, lastName, phone, companyName, role, industry, gstin, companyPan,
+    })
+    // Auto-login after registration
+    await login(email, password, role)
+    return result
   }
 
   function logout() {
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     setToken(null)
     setUser(null)
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, fetchUser }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, register, fetchUser }}>
       {children}
     </AuthContext.Provider>
   )

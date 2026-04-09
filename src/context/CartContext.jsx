@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
+import { saleorCheckout } from '../services/saleor'
 
 const CartContext = createContext(null)
 
@@ -67,8 +68,24 @@ export function CartProvider({ children }) {
     setCart(EMPTY_CART)
   }
 
+  async function applyPromoCode(promoCode) {
+    try {
+      const result = await saleorCheckout.applyPromoCode(cart.checkoutId, promoCode)
+      if (result.discount) {
+        setCart(prev => ({
+          ...prev,
+          discount: result.discount.amount,
+          total_with_discount: result.totalPrice?.amount || prev.total_monthly,
+        }))
+      }
+      return result
+    } catch (err) {
+      throw err
+    }
+  }
+
   return (
-    <CartContext.Provider value={{ cart, loading, fetchCart, addItem, updateItem, removeItem, clearCart }}>
+    <CartContext.Provider value={{ cart, loading, fetchCart, addItem, updateItem, removeItem, clearCart, applyPromoCode }}>
       {children}
     </CartContext.Provider>
   )
