@@ -9,11 +9,11 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
     return (
       <>
         {invoiceSubTab === 'invoices' && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
+                  <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Item</th>
                     <th className="hidden sm:table-cell text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Item</th>
                     <th className="hidden md:table-cell text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Start Date - End Date</th>
@@ -44,11 +44,11 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
           </div>
         )}
         {invoiceSubTab === 'payments' && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
+                  <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Date</th>
                     <th className="text-right px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Amount</th>
                   </tr>
@@ -66,11 +66,11 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
           </div>
         )}
         {invoiceSubTab === 'credits' && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
+                  <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Date</th>
                     <th className="text-right px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Credit Amount</th>
                   </tr>
@@ -97,14 +97,14 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
       {invoiceSubTab === 'invoices' && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="bg-[#f8f8f8] border-y border-gray-200">
+            <thead><tr className="bg-[#f8f8f8] border-y border-gray-300">
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Period</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Amount</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Invoice</th>
             </tr></thead>
             <tbody>
               {invoicesData.map((inv, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{inv.period}</td>
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{inv.amount}</td>
                   <td className="px-4 sm:px-6 py-4 flex items-center gap-2">
@@ -121,13 +121,13 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
       {invoiceSubTab === 'payments' && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="bg-[#f8f8f8] border-y border-gray-200">
+            <thead><tr className="bg-[#f8f8f8] border-y border-gray-300">
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Date</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Amount</th>
             </tr></thead>
             <tbody>
               {paymentsData.map((p, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{p.date}</td>
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{p.amount}</td>
                 </tr>
@@ -140,13 +140,13 @@ export default function InvoiceTable({ variant = 'customer', invoiceSubTab, invo
       {invoiceSubTab === 'credits' && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="bg-[#f8f8f8] border-y border-gray-200">
+            <thead><tr className="bg-[#f8f8f8] border-y border-gray-300">
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Date</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Amount</th>
             </tr></thead>
             <tbody>
               {creditsData.map((c, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{c.date}</td>
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{c.amount}</td>
                 </tr>

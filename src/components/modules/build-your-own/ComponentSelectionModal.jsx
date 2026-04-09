@@ -46,7 +46,7 @@ export default function ComponentSelectionModal({
         className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
       >
         {/* Modal header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
               <CategoryIcon type={modalCategory.icon} size={18} className="text-primary" />
@@ -84,7 +84,7 @@ export default function ComponentSelectionModal({
               placeholder="Search components..."
               value={modalSearch}
               onChange={(e) => setModalSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+              className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
             />
             {modalSearch && (
               <button
@@ -114,7 +114,7 @@ export default function ComponentSelectionModal({
                   className={`rounded-xl border p-4 transition-all ${
                     isSelected
                       ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                      : 'border-gray-100 hover:border-gray-200'
+                      : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   {/* Option name & SKU */}
@@ -161,7 +161,7 @@ export default function ComponentSelectionModal({
         </div>
 
         {/* Modal footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between shrink-0">
           <div className="text-sm text-gray-500">
             <span className="font-semibold text-dark">{tempTotalQty}</span> of {modalCategory.maxQty} selected
           </div>

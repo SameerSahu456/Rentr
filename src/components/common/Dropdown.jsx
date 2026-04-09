@@ -35,7 +35,7 @@ export default function Dropdown({
     <div ref={ref} className={`relative ${className}`}>
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center justify-between gap-2 w-full px-4 py-2.5 text-sm font-body border border-[#e0e0e0] rounded-lg bg-white hover:border-[#6d5ed6] transition-colors cursor-pointer ${buttonClassName}`}
+        className={`flex items-center justify-between gap-2 w-full px-4 py-2.5 text-sm font-body border border-gray-300 rounded-lg bg-white hover:border-[#6d5ed6] transition-colors cursor-pointer ${buttonClassName}`}
       >
         <span className={value ? 'text-[#333]' : 'text-[#828282]'}>{label}</span>
         <ChevronDown
@@ -45,7 +45,7 @@ export default function Dropdown({
 
       {open && (
         <div
-          className={`absolute z-20 top-full mt-1 w-full bg-white border border-[#e0e0e0] rounded-lg shadow-lg max-h-60 overflow-y-auto ${menuClassName}`}
+          className={`absolute z-20 top-full mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto ${menuClassName}`}
         >
           {options.map((opt) => {
             const val = typeof opt === 'string' ? opt : opt.value

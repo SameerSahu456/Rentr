@@ -22,7 +22,7 @@ export default function RentalSidebar({
   addingToCart,
 }) {
   return (
-    <div className="w-full lg:w-[395px] shrink-0 lg:border-l border-t lg:border-t-0 border-gray-200 bg-white">
+    <div className="w-full lg:w-[395px] shrink-0 lg:border-l border-t lg:border-t-0 border-gray-300 bg-white">
       <div className="sticky top-20 p-6">
         {/* Product name */}
         <h2 className="font-heading text-lg font-bold text-dark">{product.name}</h2>
@@ -35,7 +35,7 @@ export default function RentalSidebar({
             className={`flex-1 py-2.5 text-sm font-semibold rounded-l-lg border transition-colors ${
               rentalType === 'rent'
                 ? 'bg-primary text-white border-primary'
-                : 'bg-white text-gray-500 border-gray-200'
+                : 'bg-white text-gray-500 border-gray-300'
             }`}
           >
             Rent it
@@ -45,7 +45,7 @@ export default function RentalSidebar({
             className={`flex-1 py-2.5 text-sm font-semibold rounded-r-lg border border-l-0 transition-colors ${
               rentalType === 'lease'
                 ? 'bg-primary text-white border-primary'
-                : 'bg-white text-gray-500 border-gray-200'
+                : 'bg-white text-gray-500 border-gray-300'
             }`}
           >
             Lease it
@@ -61,7 +61,7 @@ export default function RentalSidebar({
               placeholder="DD/MM/YY"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
             />
           </div>
           <div>
@@ -71,7 +71,7 @@ export default function RentalSidebar({
               placeholder="DD/MM/YY"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
             />
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function RentalSidebar({
         <div className="flex items-center gap-4 mb-3">
           <div className="flex items-center gap-1">
             <span className="text-sm text-gray-600">Qty</span>
-            <div className="border border-gray-200 rounded px-3 py-1 ml-2">
+            <div className="border border-gray-300 rounded px-3 py-1 ml-2">
               <span className="text-sm">{qty}</span>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function RentalSidebar({
         </div>
 
         {/* Special Offer */}
-        <div className="mt-5 border-t border-gray-100 pt-5">
+        <div className="mt-5 border-t border-gray-200 pt-5">
           <h4 className="text-sm font-semibold text-dark mb-2">Special Offer</h4>
           <div className="flex gap-2">
             <div className="flex items-center gap-2 flex-1">
@@ -188,7 +188,7 @@ export default function RentalSidebar({
                 placeholder="RENTR"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value)}
-                className="border border-gray-200 rounded px-3 py-1.5 text-sm w-24 focus:outline-none focus:border-primary"
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm w-24 focus:outline-none focus:border-primary"
               />
               <button className="text-primary text-sm font-medium border border-primary rounded px-3 py-1.5 hover:bg-primary hover:text-white transition-colors">
                 Copy

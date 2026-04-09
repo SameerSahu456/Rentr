@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { handleImgError } from '../../constants/images'
-import { ordersApi } from '../../services/api'
+// Demo mode: using mock data from constants
 import {
   Crown,
   Package,
@@ -92,15 +92,8 @@ export default function CustomerDashboard() {
 
   const displayName = user?.full_name || 'Santosh'
 
-  // Fetch real orders from API
-  const [apiOrders, setApiOrders] = useState([])
-  useEffect(() => {
-    if (user) {
-      ordersApi.list({ page_size: 50 })
-        .then(data => setApiOrders(data.items || []))
-        .catch(() => {})
-    }
-  }, [user])
+  // Demo mode: no API orders needed, using mock data from constants
+  const [apiOrders] = useState([])
 
   const copyReferralCode = () => {
     navigator.clipboard?.writeText('RENTRRFFRL')
@@ -190,7 +183,7 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      <div className="bg-white px-5 py-5 border-b border-gray-100">
+      <div className="bg-white px-5 py-5 border-b border-gray-200">
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-sm font-bold text-gray-1">Company name</span>
@@ -235,7 +228,7 @@ export default function CustomerDashboard() {
 
   const renderSubscriptionLedger = () => (
     <div>
-      <div className="hidden sm:block bg-[#fcfcfc] border border-gray-100 rounded-2xl shadow-[0_0_45px_rgba(0,0,0,0.02)] p-6 mb-6">
+      <div className="hidden sm:block bg-[#fcfcfc] border border-gray-200 rounded-2xl shadow-[0_0_45px_rgba(0,0,0,0.02)] p-6 mb-6">
         <div className="flex flex-wrap items-end gap-8">
           <div>
             <p className="text-xs text-gray-2 uppercase font-medium mb-8">Rental due</p>
@@ -259,7 +252,7 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      <div className="sm:hidden bg-[#fcfcfc] border border-gray-100 rounded-xl p-5 mb-6">
+      <div className="sm:hidden bg-[#fcfcfc] border border-gray-200 rounded-xl p-5 mb-6">
         <h4 className="font-heading text-base font-bold text-gray-1 mb-4">Summary</h4>
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
@@ -274,7 +267,7 @@ export default function CustomerDashboard() {
             <span className="text-gray-3">Late fees</span>
             <span className="text-gray-1">Rs 100</span>
           </div>
-          <div className="flex justify-between text-sm font-bold border-t border-gray-200 pt-3">
+          <div className="flex justify-between text-sm font-bold border-t border-gray-300 pt-3">
             <span className="text-gray-1">Total amount</span>
             <span className="text-gray-1">Rs 100</span>
           </div>
@@ -284,7 +277,7 @@ export default function CustomerDashboard() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#f8f8f8] border-y border-gray-200">
+            <tr className="bg-[#f8f8f8] border-y border-gray-300">
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Month</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Rent</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase hidden sm:table-cell">Discount</th>
@@ -296,7 +289,7 @@ export default function CustomerDashboard() {
           </thead>
           <tbody>
             {LEDGER_DATA.map((row, i) => (
-              <tr key={i} className="border-b border-gray-100">
+              <tr key={i} className="border-b border-gray-200">
                 <td className="px-4 sm:px-6 py-4 text-gray-1">{row.month}</td>
                 <td className="px-4 sm:px-6 py-4 text-gray-1">₹{row.rent.toLocaleString()}</td>
                 <td className="px-4 sm:px-6 py-4 text-gray-1 hidden sm:table-cell">₹{row.discount}</td>
@@ -318,7 +311,7 @@ export default function CustomerDashboard() {
   )
 
   const renderRefundSummary = () => (
-    <div className="bg-[#fcfcfc] border border-gray-100 rounded-xl p-5">
+    <div className="bg-[#fcfcfc] border border-gray-200 rounded-xl p-5">
       <h4 className="font-heading text-base sm:text-lg font-bold text-gray-1 mb-1">Refund Summary</h4>
       <div className="w-8 h-0.5 bg-primary mb-3" />
       <p className="text-sm text-gray-1 mb-4">
@@ -337,7 +330,7 @@ export default function CustomerDashboard() {
           <span className="text-gray-3">Delivery deduction</span>
           <span className="text-gray-1">- ₹{REFUND_SUMMARY.delivery.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between border-t border-gray-200 pt-3 font-semibold">
+        <div className="flex justify-between border-t border-gray-300 pt-3 font-semibold">
           <span className="text-gray-1">Total expected refund</span>
           <span className="text-gray-1">₹{REFUND_SUMMARY.total.toLocaleString()}</span>
         </div>
@@ -371,7 +364,7 @@ export default function CustomerDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#f8f8f8] border-y border-gray-200">
+              <tr className="bg-[#f8f8f8] border-y border-gray-300">
                 <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Item</th>
                 <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase hidden sm:table-cell">Sales Person</th>
                 <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase hidden md:table-cell">Rental Period</th>
@@ -385,7 +378,7 @@ export default function CustomerDashboard() {
                 rentalPeriod: `${o.rental_months} months`,
                 unitPrice: `₹${o.total_amount?.toLocaleString('en-IN')}`,
               })) : PREVIOUS_ORDERS).map((o, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="px-4 sm:px-6 py-4">
                     <p className="text-gray-1 font-medium">{o.item}</p>
                   </td>
@@ -445,7 +438,7 @@ export default function CustomerDashboard() {
         { title: 'Renewal / Extend Subscription', desc: 'If you want to renew subscription and extend tenure for purchased assets/products, Your current membership will continue until April 18, 2021 after which you will be charged as per the updated plan', actions: [{ label: 'New Request', variant: 'primary', onClick: () => setShowExtendModal(true) }] },
         { title: 'Cancel Subscription', desc: 'In case of early termination of your subscription, we provide a smooth and hassle-free account termination process. you can request for closure by informing us 15 days prior to the selected preferred date, settle your dues if any, and we\'ll arrange for the pickup to be completed.', actions: [{ label: 'New Request', variant: 'primary', onClick: () => setShowCancelModal(true) }] },
       ].map((section) => (
-        <div key={section.title} className="bg-[#fcfcfc] border border-gray-100 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <div key={section.title} className="bg-[#fcfcfc] border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-sm">
           <h3 className="font-heading text-base sm:text-lg font-bold text-gray-1">{section.title}</h3>
           <p className="text-sm text-gray-3 mt-2">{section.desc}</p>
           <div className="flex flex-wrap gap-3 mt-4">
@@ -483,7 +476,7 @@ export default function CustomerDashboard() {
       ) : (
         <>
           <h2 className="font-heading text-xl font-bold text-gray-1 uppercase tracking-wide">Turn on Auto Debit</h2>
-          <div className="border border-gray-200 rounded-lg p-4 sm:p-6">
+          <div className="border border-gray-300 rounded-lg p-4 sm:p-6">
             <h3 className="font-heading text-base font-bold text-gray-1">Select Payment Method</h3>
             <div className="w-10 h-0.5 bg-primary mt-1 mb-1" />
             <p className="text-xs text-gray-3 mb-6">Step 1 of 2</p>
@@ -552,13 +545,13 @@ export default function CustomerDashboard() {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead><tr className="bg-[#f8f8f8] border-y border-gray-200">
+            <thead><tr className="bg-[#f8f8f8] border-y border-gray-300">
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Date</th>
               <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Amount</th>
             </tr></thead>
             <tbody>
               {CREDITS_DATA.map((c, i) => (
-                <tr key={i} className="border-b border-gray-100">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{c.date}</td>
                   <td className="px-4 sm:px-6 py-4 text-gray-1">{c.amount}</td>
                 </tr>
@@ -604,18 +597,18 @@ export default function CustomerDashboard() {
               </div>
             </div>
             <div className="hidden lg:flex flex-wrap gap-2 mb-6">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">
                 <Star size={12} className="text-primary" /> Extend Subscription <ChevronRight size={12} />
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">
                 <Phone size={12} className="text-gray-3" /> Support Request <ChevronRight size={12} />
               </button>
               <button onClick={() => setShowCancelModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-sm font-medium text-[#eb5757] hover:bg-red-50 transition-colors cursor-pointer">
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-[#eb5757] hover:bg-red-50 transition-colors cursor-pointer">
                 Cancel Subscription
               </button>
             </div>
-            <div className="bg-[#fcfcfc] border border-gray-100 rounded-2xl shadow-[0_0_45px_rgba(0,0,0,0.02)] overflow-hidden">
+            <div className="bg-[#fcfcfc] border border-gray-200 rounded-2xl shadow-[0_0_45px_rgba(0,0,0,0.02)] overflow-hidden">
               <div className="px-4 sm:px-6 pt-6">
                 <SubTabs
                   tabs={[{ key: 'ledger', label: 'Ledger' }, { key: 'details', label: 'Subscription details' }, { key: 'refund', label: 'Refund' }, { key: 'support', label: 'Support tickets' }]}
@@ -665,7 +658,7 @@ export default function CustomerDashboard() {
             <p className="text-sm text-gray-1 mb-4">Select one or more Asset</p>
             <div className="space-y-6">
               {SUBSCRIPTION_DATA.map((asset) => (
-                <div key={asset.id} className="flex flex-col md:flex-row gap-4 border border-gray-200 rounded-lg p-4">
+                <div key={asset.id} className="flex flex-col md:flex-row gap-4 border border-gray-300 rounded-lg p-4">
                   <div className="w-full md:w-40 h-32 bg-gray-50 rounded flex items-center justify-center shrink-0 overflow-hidden p-3">
                     <img src={asset.image} alt={asset.name} className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />
                   </div>
@@ -702,7 +695,7 @@ export default function CustomerDashboard() {
             <div className="flex gap-3 mt-6 justify-center">
               <button className="bg-primary text-white px-8 py-2.5 rounded-full text-sm font-medium hover:bg-primary-dark transition-colors">Place request</button>
               <button onClick={() => setShowExtendModal(false)}
-                className="px-8 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">Close</button>
+                className="px-8 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">Close</button>
             </div>
           </div>
         </div>

@@ -59,7 +59,7 @@ export function CustomerProfileVerification({
                 value={profile.fullName}
                 onChange={onProfileChange}
                 placeholder="John Doe"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -73,7 +73,7 @@ export function CustomerProfileVerification({
                 value={profile.website}
                 onChange={onProfileChange}
                 placeholder="www.example.com"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -87,7 +87,7 @@ export function CustomerProfileVerification({
                 value={profile.companyEmail}
                 onChange={onProfileChange}
                 placeholder="you@company.com"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -101,7 +101,7 @@ export function CustomerProfileVerification({
                 value={profile.phoneNumber}
                 onChange={onProfileChange}
                 placeholder="+91 98765 43210"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -115,7 +115,7 @@ export function CustomerProfileVerification({
                 value={profile.companyName}
                 onChange={onProfileChange}
                 placeholder="Acme Corp"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -129,7 +129,7 @@ export function CustomerProfileVerification({
                 value={profile.industry}
                 onChange={onProfileChange}
                 placeholder="Technology"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -143,7 +143,7 @@ export function CustomerProfileVerification({
                 value={profile.gstin}
                 onChange={onProfileChange}
                 placeholder="22AAAAA0000A1Z5"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -157,7 +157,7 @@ export function CustomerProfileVerification({
                 value={profile.companyPan}
                 onChange={onProfileChange}
                 placeholder="ABCDE1234F"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
           </div>
@@ -167,7 +167,7 @@ export function CustomerProfileVerification({
             <label className="block text-xs font-['Poppins'] font-medium text-[#4f4f4f] mb-1.5">
               Upload Proof for verification
             </label>
-            <div className="border-2 border-dashed border-[#e0e0e0] rounded-lg p-4 flex items-center justify-center gap-2 text-[#828282] text-sm font-['Poppins'] cursor-pointer hover:border-[#6d5ed6] transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center gap-2 text-[#828282] text-sm font-['Poppins'] cursor-pointer hover:border-[#6d5ed6] transition-colors">
               <Upload size={18} />
               <span>Click to upload or drag and drop</span>
             </div>
@@ -201,7 +201,7 @@ export function CustomerProfileVerification({
               value={profile.referralCode}
               onChange={onProfileChange}
               placeholder="Enter referral code"
-              className="w-full max-w-[280px] px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full max-w-[280px] px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export function CustomerProfileVerification({
                   type="tel"
                   value={verifyPhone}
                   onChange={(e) => onVerifyPhoneChange(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                  className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] focus:outline-none focus:border-[#6d5ed6] transition-colors"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ export function CustomerProfileVerification({
                 onChange={(e) => onOtpChange(e.target.value)}
                 placeholder="Enter OTP"
                 maxLength={6}
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors tracking-widest"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors tracking-widest"
               />
             </div>
 
@@ -300,7 +300,7 @@ export function DistributorProfileVerification({
           className={`px-6 py-2.5 text-sm font-medium rounded-l-full border transition-colors ${
             customerType === 'customer'
               ? 'bg-primary text-white border-primary'
-              : 'bg-white text-gray-2 border-gray-200 hover:bg-gray-50'
+              : 'bg-white text-gray-2 border-gray-300 hover:bg-gray-50'
           }`}
         >
           Customer
@@ -310,7 +310,7 @@ export function DistributorProfileVerification({
           className={`px-6 py-2.5 text-sm font-medium rounded-r-full border-y border-r flex items-center gap-2 transition-colors ${
             customerType === 'distributor'
               ? 'bg-primary text-white border-primary'
-              : 'bg-white text-gray-2 border-gray-200 hover:bg-gray-50'
+              : 'bg-white text-gray-2 border-gray-300 hover:bg-gray-50'
           }`}
         >
           Distributor
@@ -332,7 +332,7 @@ export function DistributorProfileVerification({
                 value={profile.fullName}
                 onChange={onProfileChange}
                 placeholder="Your full name"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
             </div>
             <div>
@@ -343,7 +343,7 @@ export function DistributorProfileVerification({
                 value={profile.companyEmail}
                 onChange={onProfileChange}
                 placeholder="email@company.com"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
             </div>
             <div>
@@ -357,7 +357,7 @@ export function DistributorProfileVerification({
                 value={profile.companyName}
                 onChange={onProfileChange}
                 placeholder="Company name"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
             </div>
             <div className="sm:col-span-2">
@@ -368,7 +368,7 @@ export function DistributorProfileVerification({
                 value={profile.regAddress}
                 onChange={onProfileChange}
                 placeholder="Registered address"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
             </div>
             <div>
@@ -379,7 +379,7 @@ export function DistributorProfileVerification({
                 value={profile.gstNo}
                 onChange={onProfileChange}
                 placeholder="GST Number"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
               <button className="flex items-center gap-1 text-xs text-primary font-medium mt-1.5 hover:underline">
                 <Upload size={12} /> Upload Proof for verification
@@ -393,7 +393,7 @@ export function DistributorProfileVerification({
                 value={profile.companyPan}
                 onChange={onProfileChange}
                 placeholder="PAN Number"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
               />
             </div>
           </div>
@@ -422,7 +422,7 @@ export function DistributorProfileVerification({
               value={referralId}
               onChange={(e) => onReferralIdChange(e.target.value)}
               placeholder="Enter referral ID (optional)"
-              className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 max-w-sm"
+              className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 max-w-sm"
             />
           </div>
         </div>
@@ -439,7 +439,7 @@ export function DistributorProfileVerification({
 
             <label className="block text-sm font-medium text-gray-2 mb-1">Phone Number</label>
             <div className="flex gap-2 mb-2">
-              <div className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 text-sm text-gray-600 shrink-0 bg-white h-[48px]">
+              <div className="flex items-center gap-1.5 border border-gray-300 rounded-lg px-3 text-sm text-gray-600 shrink-0 bg-white h-[48px]">
                 <span>+91</span>
               </div>
               <input
@@ -447,7 +447,7 @@ export function DistributorProfileVerification({
                 value={phoneNumber}
                 onChange={(e) => onPhoneNumberChange(e.target.value)}
                 placeholder="98765 43210"
-                className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 bg-white"
+                className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 bg-white"
                 maxLength={10}
               />
             </div>
@@ -475,7 +475,7 @@ export function DistributorProfileVerification({
                       e.target.nextElementSibling.focus()
                     }
                   }}
-                  className="w-12 h-12 text-center text-lg font-semibold border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white"
+                  className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white"
                 />
               ))}
             </div>

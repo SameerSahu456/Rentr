@@ -117,7 +117,7 @@ function StatusHeader({ icon: Icon, iconColor, iconBg, heading, subtitle, subtit
 
 function DetailRow({ label, value, isBold }) {
   return (
-    <div className="flex justify-between items-start py-3 border-b border-gray-100 last:border-b-0">
+    <div className="flex justify-between items-start py-3 border-b border-gray-200 last:border-b-0">
       <span style={{ fontSize: '14px', color: '#828282' }}>{label}</span>
       <span
         className="text-right max-w-[55%]"
@@ -132,7 +132,7 @@ function DetailRow({ label, value, isBold }) {
 function SummaryRow({ label, value, isBold, isTotal }) {
   return (
     <div
-      className={`flex justify-between items-center py-2 ${isTotal ? 'border-t border-gray-200 mt-1 pt-3' : ''}`}
+      className={`flex justify-between items-center py-2 ${isTotal ? 'border-t border-gray-300 mt-1 pt-3' : ''}`}
     >
       <span
         style={{
@@ -240,21 +240,21 @@ function ContactUs() {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100">
+        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200">
           <Phone size={20} style={{ color: '#6d5ed6' }} />
           <div>
             <p className="text-xs" style={{ color: '#828282' }}>Phone</p>
             <p className="text-sm font-medium" style={{ color: '#333' }}>+91 98765 43210</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100">
+        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200">
           <Mail size={20} style={{ color: '#6d5ed6' }} />
           <div>
             <p className="text-xs" style={{ color: '#828282' }}>Email</p>
             <p className="text-sm font-medium" style={{ color: '#333' }}>support@rentr.in</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-100">
+        <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200">
           <MapPin size={20} style={{ color: '#6d5ed6' }} />
           <div>
             <p className="text-xs" style={{ color: '#828282' }}>Office</p>
@@ -290,13 +290,13 @@ function RecommendedProducts() {
         <div className="flex gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <ChevronLeft size={18} style={{ color: '#333' }} />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <ChevronRight size={18} style={{ color: '#333' }} />
           </button>
@@ -311,7 +311,7 @@ function RecommendedProducts() {
         {RECOMMENDED_PRODUCTS.map((product) => (
           <div
             key={product.id}
-            className="min-w-[220px] bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex-shrink-0"
+            className="min-w-[220px] bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex-shrink-0"
           >
             <img
               src={product.image}
@@ -369,7 +369,7 @@ export function OrderDetailsCard({ title, children, summaryItems }) {
 
       {summaryItems && (
         <>
-          <div className="border-t border-gray-200 pt-4 mt-2">
+          <div className="border-t border-gray-300 pt-4 mt-2">
             <h4
               className="font-heading font-semibold mb-3"
               style={{ fontSize: '15px', color: '#17113e' }}

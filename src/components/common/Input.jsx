@@ -21,7 +21,7 @@ const Input = forwardRef(function Input(
   ref
 ) {
   const baseInput =
-    'w-full border border-gray-200 text-sm font-body focus:outline-none focus:border-[#6d5ed6] focus:ring-1 focus:ring-[#6d5ed6] transition-colors placeholder-gray-400'
+    'w-full border border-gray-300 text-sm font-body focus:outline-none focus:border-[#6d5ed6] focus:ring-1 focus:ring-[#6d5ed6] transition-colors placeholder-gray-400'
 
   const errorInput = error
     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'

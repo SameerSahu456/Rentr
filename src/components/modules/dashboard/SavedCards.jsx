@@ -11,7 +11,7 @@ export default function SavedCards({ cards, variant = 'customer', onAddPayment }
         <h4 className="font-heading text-sm font-bold text-dark uppercase tracking-wide mb-3">Saved Cards</h4>
         <div className="grid gap-4 sm:grid-cols-2">
           {cards.map((card) => (
-            <div key={card.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div key={card.id} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <CreditCard size={18} className="text-primary" />
@@ -38,7 +38,7 @@ export default function SavedCards({ cards, variant = 'customer', onAddPayment }
       <div className="w-10 h-0.5 bg-primary mt-1 mb-4" />
       <div className="space-y-3">
         {cards.map((card) => (
-          <div key={card.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 sm:px-5 py-4">
+          <div key={card.id} className="flex items-center justify-between border border-gray-300 rounded-lg px-4 sm:px-5 py-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="bg-[#FFD700] text-[10px] font-bold px-2 py-1 rounded text-gray-1 shrink-0">RuPay</span>
               <p className="text-sm text-gray-1 truncate"><span className="font-semibold">{card.bank}</span> ending in {card.last4}</p>

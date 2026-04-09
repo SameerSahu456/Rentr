@@ -80,7 +80,7 @@ export default function OtpModal({ type, value, onClose, onVerify, step = 'verif
           </button>
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-full border border-[#e0e0e0] text-[#4f4f4f] font-body font-medium text-sm hover:bg-[#f2f2f2] cursor-pointer transition-colors"
+            className="flex-1 py-3 rounded-full border border-gray-300 text-[#4f4f4f] font-body font-medium text-sm hover:bg-[#f2f2f2] cursor-pointer transition-colors"
           >
             Cancel
           </button>

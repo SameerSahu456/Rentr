@@ -5,7 +5,7 @@ import { DEFAULT_PRODUCT_IMAGE, handleImgError } from '../../../constants/images
 
 export default function PaymentPendingCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 mb-6 shadow-sm">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 mb-6 shadow-sm">
       <div className="flex gap-4">
         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-lg shrink-0 overflow-hidden flex items-center justify-center p-1">
           <img src={DEFAULT_PRODUCT_IMAGE} alt="Product" className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />

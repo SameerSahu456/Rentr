@@ -63,7 +63,7 @@ export default function ProductImageGallery({
             className={`w-16 h-16 border-2 rounded-lg overflow-hidden bg-white flex items-center justify-center p-1 transition-all shrink-0 ${
               selectedImage === i
                 ? 'border-primary'
-                : 'border-gray-200 hover:border-gray-300'
+                : 'border-gray-300 hover:border-gray-300'
             }`}
           >
             <img src={img} alt="" className="max-h-full object-contain" onError={handleImgError} />

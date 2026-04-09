@@ -4,7 +4,7 @@ import { Search, ShoppingCart, ChevronDown, Menu, Phone } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 import { useClickOutside } from '../../hooks'
-import { searchApi } from '../../services/api'
+// Demo mode: search is handled locally, no backend needed
 import { CITIES } from '../../constants/navbar'
 import Logo from './Logo'
 import SearchDropdown from './SearchDropdown'
@@ -35,16 +35,7 @@ export default function Navbar() {
   useClickOutside(cartRef, useCallback(() => setCartOpen(false), []))
   useClickOutside(cityRef, useCallback(() => setCityOpen(false), []))
 
-  // Fetch search history when user is logged in and search is focused
-  useEffect(() => {
-    if (user && searchFocused) {
-      searchApi.getHistory()
-        .then(data => {
-          setSearchHistory((data.queries || []).map(q => ({ name: q, image: null })))
-        })
-        .catch(() => {})
-    }
-  }, [user, searchFocused])
+  // Demo mode: no search history from backend
 
   function handleSearch(e) {
     e.preventDefault()
@@ -61,9 +52,6 @@ export default function Navbar() {
   }
 
   function handleClearHistory() {
-    if (user) {
-      searchApi.clearHistory().catch(() => {})
-    }
     setSearchHistory([])
   }
 
@@ -72,7 +60,7 @@ export default function Navbar() {
   return (
     <>
       {/* Promo Banner */}
-      <div className="bg-white text-center py-2.5 text-sm font-medium border-b border-gray-100">
+      <div className="bg-white text-center py-2.5 text-sm font-medium border-b border-gray-200">
         <span className="text-primary">Go rent free for 4 months! Get flat 50 % off per month. Hurry! Offer ends at midnight.</span>
         {' '}
         <Link to="/benefits" className="text-accent-orange hover:text-orange-600 font-semibold ml-1">

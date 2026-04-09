@@ -32,7 +32,7 @@ export function DistributorOrderSummary({
       </div>
 
       {/* Delivery Address Card */}
-      <div className="bg-white rounded-xl p-5 mb-6 border border-gray-100">
+      <div className="bg-white rounded-xl p-5 mb-6 border border-gray-200">
         <div className="flex items-start justify-between">
           <div>
             <h4 className="font-heading font-semibold text-dark text-sm mb-1">
@@ -62,7 +62,7 @@ export function DistributorOrderSummary({
           <span className="text-gray-3">GST (18%)</span>
           <span className="text-dark">{'\u20B9'}{gstAmount.toLocaleString('en-IN')}</span>
         </div>
-        <div className="flex items-center justify-between font-semibold pt-2 border-t border-gray-100">
+        <div className="flex items-center justify-between font-semibold pt-2 border-t border-gray-200">
           <span className="text-dark">Total Monthly Rent</span>
           <span className="text-dark">{'\u20B9'}{totalWithGst.toLocaleString('en-IN')}</span>
         </div>
@@ -92,7 +92,7 @@ export function DistributorOrderSummary({
             value={coupon}
             onChange={(e) => onCouponChange(e.target.value)}
             placeholder="Enter coupon code"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 max-w-xs"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400 max-w-xs"
           />
           <button className="btn-primary !px-6 !py-2.5 text-sm">
             Apply
@@ -127,7 +127,7 @@ export function DistributorOrderSummary({
 
 export function DistributorItemSummary({ cartItems }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mt-6">
       <h4 className="font-heading font-semibold text-dark mb-4">Item Summary</h4>
       <div className="space-y-5">
         {cartItems.map((item) => (

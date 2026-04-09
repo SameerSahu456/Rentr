@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
-import { ordersApi } from '../../services/api'
+// Demo mode: orders handled locally
 import {
   CUSTOMER_TOP_STEPS,
   CUSTOMER_SECTION_STEPS,
@@ -116,23 +116,17 @@ export default function CustomerCheckout() {
 
     setSubmitting(true)
     setError('')
-    try {
-      const rentalMonths = cart.items[0]?.rental_months || 12
-      const order = await ordersApi.create(rentalMonths, {
-        line1: address.address1,
-        line2: address.address2 || undefined,
-        city: address.townCity,
-        state: address.state,
-        pincode: address.pinCode,
-        phone: profile.phoneNumber || undefined,
-      })
-      // Navigate first, then refresh cart in background
-      navigate('/order-success', { state: { order } })
-      fetchCart()
-    } catch (err) {
-      setError(err.data?.detail || err.message || 'Failed to place order')
-      setSubmitting(false)
+    // Demo mode: fake order creation
+    const order = {
+      id: 'ORD-DEMO-' + Date.now(),
+      status: 'confirmed',
+      total_monthly: cart.total_monthly,
+      items: cart.items,
+      created_at: new Date().toISOString(),
     }
+    navigate('/order-success', { state: { order } })
+    fetchCart()
+    setSubmitting(false)
   }
 
   const fmt = (n) => n.toLocaleString('en-IN')
@@ -177,7 +171,7 @@ export default function CustomerCheckout() {
                   className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold font-['Space_Grotesk'] transition-colors ${
                     activeSection === i
                       ? 'bg-[#3b3b3b] text-white'
-                      : 'bg-white border border-[#e0e0e0] text-[#828282]'
+                      : 'bg-white border border-gray-300 text-[#828282]'
                   }`}
                 >
                   {s.number}

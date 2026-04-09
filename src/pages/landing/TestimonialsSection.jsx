@@ -45,13 +45,13 @@ export default function TestimonialsSection() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={goUp}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
               >
                 <ChevronUp size={18} className="text-gray-500" />
               </button>
               <button
                 onClick={goDown}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
               >
                 <ChevronDown size={18} className="text-gray-500" />
               </button>

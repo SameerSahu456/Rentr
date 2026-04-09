@@ -2,6 +2,18 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
 
+// Hardcoded demo user for offline demo
+const DEMO_USER = {
+  id: 1,
+  email: 'sameer@rentr.com',
+  full_name: 'sameer sahu',
+  phone: '+919876543210',
+  role: 'customer',
+  company_name: 'Rentr Demo Corp',
+  company_gst: 'GST1234567890',
+  created_at: '2025-01-01T00:00:00Z',
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(localStorage.getItem('token'))
@@ -9,44 +21,26 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      fetchUser()
+      // Restore demo user from token without hitting backend
+      const savedRole = localStorage.getItem('demo-role') || 'customer'
+      setUser({ ...DEMO_USER, role: savedRole })
+      setLoading(false)
     } else {
       setLoading(false)
     }
   }, [token])
 
   async function fetchUser() {
-    try {
-      const res = await fetch('/api/v1/users/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setUser(data)
-      } else {
-        logout()
-      }
-    } catch {
-      logout()
-    } finally {
-      setLoading(false)
-    }
+    // Demo mode: just set the hardcoded user
+    setUser(DEMO_USER)
   }
 
-  async function login(newToken) {
-    localStorage.setItem('token', newToken)
-    setToken(newToken)
-    try {
-      const res = await fetch('/api/v1/users/me', {
-        headers: { Authorization: `Bearer ${newToken}` }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setUser(data)
-      }
-    } catch {
-      // user will be fetched on next page load via useEffect
-    }
+  async function login(role = 'customer') {
+    const fakeToken = 'demo-token-rentr'
+    localStorage.setItem('token', fakeToken)
+    localStorage.setItem('demo-role', role)
+    setToken(fakeToken)
+    setUser({ ...DEMO_USER, role })
   }
 
   function logout() {

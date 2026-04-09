@@ -85,11 +85,25 @@ const SERVER_IMG = PRODUCT_IMAGES.poweredgeT30
 
 export const SAMPLE_PRODUCTS = Array.from({ length: PRODUCTS_PER_PAGE }, (_, i) => ({
   id: i + 1,
-  name: 'PowerEdge T30 Mini Tower Server',
-  slug: `poweredge-t30-${i + 1}`,
+  name: ['PowerEdge T30 Mini Tower Server', 'Inspiron 24 5000 All-In-One Desktop', 'Dell PowerEdge R730xd Rack Server', 'HP ProLiant DL380 Gen10 Server', 'Dell Latitude 3420 Laptop', 'Lenovo ThinkStation P340 Workstation', 'HP EliteDesk 800 G6 Desktop', 'Dell OptiPlex 7090 Tower'][i % 8],
+  slug: `product-${i + 1}`,
   price: [3000, 5000, 12000, 8000, 15000, 3000, 5000, 3000][i % 8],
-  category: 'Servers',
-  brand: i % 2 === 0 ? 'Dell' : 'HP',
+  price_per_month: [3000, 5000, 12000, 8000, 15000, 3000, 5000, 3000][i % 8],
+  category: ['Servers', 'Desktops', 'Servers', 'Servers', 'Laptops', 'Workstations', 'Desktops', 'Desktops'][i % 8],
+  brand: ['Dell', 'Dell', 'Dell', 'HP', 'Dell', 'Lenovo', 'HP', 'Dell'][i % 8],
   image: SERVER_IMG,
+  image_url: SERVER_IMG,
   description: 'Competitive Price, Long-Lasting, High Quality, Ultra-Flexible Wire, Easy to Install, Hi power Rating Complaint, Pluggable On Other Units, Promotes Better, Active Quick Shipping.',
 }))
+
+export const MOCK_CATEGORIES = [
+  { id: 1, name: 'Servers', children: [{ id: 11, name: 'Tower Servers' }, { id: 12, name: 'Rack Servers' }] },
+  { id: 2, name: 'Desktops', children: [{ id: 21, name: 'All-In-One' }, { id: 22, name: 'Mini Tower' }] },
+  { id: 3, name: 'Laptops', children: [{ id: 31, name: 'Business Laptops' }, { id: 32, name: 'Workstation Laptops' }] },
+  { id: 4, name: 'Workstations', children: [] },
+  { id: 5, name: 'Accessories', children: [] },
+  { id: 6, name: 'Storage', children: [] },
+  { id: 7, name: 'Network', children: [] },
+]
+
+export const MOCK_BRANDS = ['Dell', 'HP', 'Lenovo', 'Cisco', 'IBM']

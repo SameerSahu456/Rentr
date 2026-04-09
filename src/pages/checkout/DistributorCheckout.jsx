@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
-import { ordersApi } from '../../services/api'
+// Demo mode: orders handled locally
 import {
   DISTRIBUTOR_STEPS,
   DISTRIBUTOR_INITIAL_CART,
@@ -195,26 +195,9 @@ export default function DistributorCheckout() {
   }
 
   async function handlePayNow() {
-    // If we have real cart items, create a real order
-    if (cart.items.length > 0) {
-      try {
-        const rentalMonths = cart.items[0]?.rental_months || 12
-        await ordersApi.create(rentalMonths, {
-          line1: billingAddress.address1 || 'N/A',
-          line2: billingAddress.address2 || undefined,
-          city: billingAddress.townCity || 'N/A',
-          state: billingAddress.state || 'N/A',
-          pincode: billingAddress.pinCode || '000000',
-          phone: phoneNumber || undefined,
-        })
-        setResultScreen('success')
-        fetchCart()
-      } catch {
-        setResultScreen('failure')
-      }
-    } else {
-      setResultScreen('success')
-    }
+    // Demo mode: always succeed
+    setResultScreen('success')
+    if (cart.items.length > 0) fetchCart()
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -243,7 +226,7 @@ export default function DistributorCheckout() {
     const isAccessible = index <= step
 
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <button
           onClick={() => isAccessible && toggleSection(index)}
           className={`w-full flex items-center gap-4 p-5 text-left transition-colors ${
@@ -263,7 +246,7 @@ export default function DistributorCheckout() {
           )}
         </button>
         {isExpanded && (
-          <div className="px-5 pb-6 pt-2 border-t border-gray-100">
+          <div className="px-5 pb-6 pt-2 border-t border-gray-200">
             {children}
           </div>
         )}
@@ -281,7 +264,7 @@ export default function DistributorCheckout() {
         <DistributorStepperBar steps={DISTRIBUTOR_STEPS} step={4} />
         <div className="section-container py-12">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center">
               <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 size={40} className="text-green-500" />
               </div>
@@ -340,7 +323,7 @@ export default function DistributorCheckout() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
                 <Link
                   to="/distributor/dashboard"
-                  className="px-6 py-3 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   View Dashboard
                 </Link>
@@ -364,7 +347,7 @@ export default function DistributorCheckout() {
         <DistributorStepperBar steps={DISTRIBUTOR_STEPS} step={4} />
         <div className="section-container py-12">
           <div className="max-w-lg mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center">
               <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle size={40} className="text-red-500" />
               </div>
@@ -377,7 +360,7 @@ export default function DistributorCheckout() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={() => setResultScreen(null)}
-                  className="px-6 py-3 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Try Again
                 </button>
@@ -398,7 +381,7 @@ export default function DistributorCheckout() {
         <DistributorStepperBar steps={DISTRIBUTOR_STEPS} step={4} />
         <div className="section-container py-12">
           <div className="max-w-lg mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center">
               <div className="w-20 h-20 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-6">
                 <Frown size={40} className="text-orange-500" />
               </div>
@@ -415,7 +398,7 @@ export default function DistributorCheckout() {
                     setStep(0)
                     setExpandedSections([0])
                   }}
-                  className="px-6 py-3 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Start Over
                 </button>
@@ -437,7 +420,7 @@ export default function DistributorCheckout() {
         <DistributorStepperBar steps={DISTRIBUTOR_STEPS} step={0} />
         <div className="section-container py-12">
           <div className="max-w-lg mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
               <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-6">
                 <ShoppingCart size={40} className="text-gray-300" />
               </div>

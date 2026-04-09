@@ -18,7 +18,7 @@ export default function QuoteModal({ onClose }) {
   }
 
   const inputClass =
-    'w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6d5ed6] focus:ring-1 focus:ring-[#6d5ed6] transition-colors placeholder-gray-400 font-body'
+    'w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#6d5ed6] focus:ring-1 focus:ring-[#6d5ed6] transition-colors placeholder-gray-400 font-body'
 
   return (
     <Modal onClose={onClose} maxWidth="max-w-2xl">

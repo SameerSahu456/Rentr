@@ -15,7 +15,7 @@ function CollapsibleSection({ title, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className="border-b border-gray-200 last:border-b-0">
+    <div className="border-b border-gray-300 last:border-b-0">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-5 text-left gap-4"
@@ -91,7 +91,7 @@ export default function PolicyPageLayout({ title, subtitle, sections }) {
       {/* Content Sections */}
       <section className="py-12 bg-white">
         <div className="section-container max-w-3xl">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 sm:px-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-6 sm:px-8">
             {sections.map((section, i) => (
               <CollapsibleSection
                 key={i}
@@ -112,7 +112,7 @@ export default function PolicyPageLayout({ title, subtitle, sections }) {
       {/* Contact Us Card */}
       <section className="py-12 bg-gray-50">
         <div className="section-container max-w-3xl">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
             <h2
               className="font-heading font-bold mb-6"
               style={{ fontSize: '22px', color: '#17113e' }}
@@ -165,7 +165,7 @@ export default function PolicyPageLayout({ title, subtitle, sections }) {
             {trustBadges.map((badge, i) => (
               <div
                 key={i}
-                className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100"
+                className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-200"
               >
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <badge.icon size={22} className="text-primary" />

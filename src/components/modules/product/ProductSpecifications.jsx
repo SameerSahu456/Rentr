@@ -17,7 +17,7 @@ export default function ProductSpecifications({
   return (
     <>
       {/* ═══════ TABS: Product Description | Specifications ═══════ */}
-      <div className="mt-8 border-b border-gray-200">
+      <div className="mt-8 border-b border-gray-300">
         <div className="flex">
           {[
             { key: 'description', label: 'Product Description' },
@@ -152,11 +152,11 @@ export default function ProductSpecifications({
       {/* ═══════ SERVER DETAILS ═══════ */}
       <div className="mt-4">
         <h3 className="font-heading font-bold text-sm text-dark uppercase tracking-wide mb-3">Server Details</h3>
-        <div className="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+        <div className="border border-gray-300 rounded-lg overflow-hidden overflow-x-auto">
           <table className="w-full">
             <tbody>
               {serverDetails.map((item, i) => (
-                <tr key={i} className="border-b border-gray-100 last:border-b-0">
+                <tr key={i} className="border-b border-gray-200 last:border-b-0">
                   <td className="px-4 py-2.5 text-sm text-gray-500 w-32 sm:w-40">• {item.label}</td>
                   <td className="px-4 py-2.5 text-sm text-dark">{item.value}</td>
                 </tr>
@@ -172,11 +172,11 @@ export default function ProductSpecifications({
           <h3 className="font-heading font-bold text-sm text-dark uppercase tracking-wide mb-3">
             {activeTab === 'specifications' ? 'Technical Details' : 'Item Details'}
           </h3>
-          <div className="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+          <div className="border border-gray-300 rounded-lg overflow-hidden overflow-x-auto">
             <table className="w-full">
               <tbody>
                 {specTable.map((item, i) => (
-                  <tr key={i} className="border-b border-gray-100 last:border-b-0">
+                  <tr key={i} className="border-b border-gray-200 last:border-b-0">
                     <td className="px-4 py-2.5 text-sm text-gray-500 w-36 sm:w-48">• {item.label}</td>
                     <td className="px-4 py-2.5 text-sm text-dark">{item.value}</td>
                   </tr>
@@ -190,11 +190,11 @@ export default function ProductSpecifications({
       {activeTab === 'description' && (
         <div className="mt-6">
           <h3 className="font-heading font-bold text-sm text-dark uppercase tracking-wide mb-3">Item Details</h3>
-          <div className="border border-gray-200 rounded-lg overflow-hidden overflow-x-auto">
+          <div className="border border-gray-300 rounded-lg overflow-hidden overflow-x-auto">
             <table className="w-full">
               <tbody>
                 {itemDetails.map((item, i) => (
-                  <tr key={i} className="border-b border-gray-100 last:border-b-0">
+                  <tr key={i} className="border-b border-gray-200 last:border-b-0">
                     <td className="px-4 py-2.5 text-sm text-gray-500 w-32 sm:w-40">• {item.label}</td>
                     <td className="px-4 py-2.5 text-sm text-dark">{item.value}</td>
                   </tr>
@@ -303,7 +303,7 @@ function BuildYourOwnSection({ byoExpanded, setByoExpanded, byoCategories }) {
       </button>
 
       {byoExpanded && (
-        <div className="border border-gray-200 border-t-0 rounded-b-xl bg-white overflow-hidden">
+        <div className="border border-gray-300 border-t-0 rounded-b-xl bg-white overflow-hidden">
           <div className="p-5 space-y-4">
             {byoCategories.map((cat) => {
               const selectedId = selections[cat.id]
@@ -320,7 +320,7 @@ function BuildYourOwnSection({ byoExpanded, setByoExpanded, byoCategories }) {
                           className={`relative text-left p-3 rounded-xl border-2 transition-all cursor-pointer ${
                             isSelected
                               ? 'border-primary bg-primary/5 shadow-sm'
-                              : 'border-gray-100 hover:border-gray-200 bg-white'
+                              : 'border-gray-200 hover:border-gray-300 bg-white'
                           }`}
                         >
                           {isSelected && (
@@ -345,7 +345,7 @@ function BuildYourOwnSection({ byoExpanded, setByoExpanded, byoCategories }) {
 
           {/* Summary footer */}
           {totalAddon > 0 && (
-            <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+            <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
               <div className="text-sm text-gray-600">
                 Add-on total: <span className="font-bold text-dark">₹{totalAddon.toLocaleString('en-IN')}/mo</span>
               </div>

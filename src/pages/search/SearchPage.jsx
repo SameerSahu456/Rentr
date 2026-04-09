@@ -4,8 +4,7 @@ import { handleImgError } from '../../constants/images'
 import {
   Grid3X3, List, ChevronDown, ChevronRight, ChevronLeft, SlidersHorizontal,
 } from 'lucide-react'
-import { SORT_OPTIONS, BANNER_SLIDES, SUB_NAV_TABS } from '../../constants/search'
-import { productsApi, searchApi } from '../../services/api'
+import { SORT_OPTIONS, BANNER_SLIDES, SUB_NAV_TABS, SAMPLE_PRODUCTS, TOTAL_PRODUCTS, TOTAL_PAGES } from '../../constants/search'
 import SearchFilterSidebar from '../../components/modules/search/SearchFilterSidebar'
 import { SearchProductCardGrid, SearchProductCardList } from '../../components/modules/search/SearchProductCard'
 import ContactForm from '../../components/modules/search/ContactForm'
@@ -69,51 +68,39 @@ export default function SearchPage() {
     }
   }, [])
 
-  /* Fetch products from API */
+  /* Demo mode: filter/sort mock data locally */
   useEffect(() => {
-    let cancelled = false
     setLoading(true)
+    let filtered = [...SAMPLE_PRODUCTS]
 
-    const sortParams = getSortParams(sortBy)
-    const params = {
-      page: currentPage,
-      page_size: PAGE_SIZE,
-      ...sortParams,
+    // Filter by search query
+    if (query) {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
+    }
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase())
+    }
+    // Filter by brand
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(p => selectedBrands.includes(p.brand))
+    }
+    // Filter by price range
+    if (priceRange[0]) filtered = filtered.filter(p => p.price >= priceRange[0])
+    if (priceRange[1]) filtered = filtered.filter(p => p.price <= priceRange[1])
+
+    // Sort
+    const { sort_by, sort_order } = getSortParams(sortBy)
+    if (sort_by === 'price_per_month') {
+      filtered.sort((a, b) => sort_order === 'asc' ? a.price - b.price : b.price - a.price)
     }
 
-    if (selectedCategory) params.category = selectedCategory
-    if (selectedBrands.length === 1) params.brand = selectedBrands[0]
-    if (priceRange[0]) params.min_price = priceRange[0]
-    if (priceRange[1]) params.max_price = priceRange[1]
-
-    let fetchPromise
-    if (isSearchMode) {
-      params.q = query
-      fetchPromise = searchApi.results(params)
-    } else {
-      if (query) params.q = query
-      fetchPromise = productsApi.list(params)
-    }
-
-    fetchPromise
-      .then((data) => {
-        if (cancelled) return
-        setProducts(data.items || [])
-        setTotalProducts(data.total || 0)
-        setTotalPages(data.pages || 0)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setProducts([])
-        setTotalProducts(0)
-        setTotalPages(0)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => { cancelled = true }
-  }, [query, currentPage, sortBy, selectedCategory, selectedBrands, priceRange, isSearchMode, getSortParams])
+    setTotalProducts(filtered.length)
+    setTotalPages(Math.ceil(filtered.length / PAGE_SIZE))
+    const start = (currentPage - 1) * PAGE_SIZE
+    setProducts(filtered.slice(start, start + PAGE_SIZE))
+    setLoading(false)
+  }, [query, currentPage, sortBy, selectedCategory, selectedBrands, priceRange, getSortParams])
 
   // Reset page when filters change
   useEffect(() => {
@@ -157,7 +144,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumb + Sub-nav */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-300">
         <div className="section-container">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-3 gap-2">
             <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
@@ -253,13 +240,13 @@ export default function SearchPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className="lg:hidden flex items-center gap-2 text-sm text-gray-600 border border-gray-200 rounded-lg px-3 py-2 cursor-pointer"
+              className="lg:hidden flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer"
             >
               <SlidersHorizontal size={16} />
               Filters
             </button>
 
-            <div className="hidden md:flex items-center border border-gray-200 rounded-lg overflow-hidden">
+            <div className="hidden md:flex items-center border border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 transition-colors cursor-pointer ${
@@ -282,7 +269,7 @@ export default function SearchPage() {
             <div className="relative">
               <button
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-600 bg-white hover:border-primary transition-colors cursor-pointer"
+                className="flex items-center gap-2 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-600 bg-white hover:border-primary transition-colors cursor-pointer"
               >
                 Sort by: {SORT_OPTIONS.find(o => o.value === sortBy)?.label.replace('Sort by ', '') || 'Default'}
                 <ChevronDown size={14} />
@@ -290,7 +277,7 @@ export default function SearchPage() {
               {showSortDropdown && (
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setShowSortDropdown(false)} />
-                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-2 w-56 z-30">
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg py-2 w-56 z-30">
                     {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
@@ -361,7 +348,7 @@ export default function SearchPage() {
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft size={14} /> Prev
                   </button>
@@ -387,7 +374,7 @@ export default function SearchPage() {
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   >
                     Next <ChevronRight size={14} />
                   </button>

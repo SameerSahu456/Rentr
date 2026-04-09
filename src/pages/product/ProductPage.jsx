@@ -2,14 +2,13 @@ import { useState, useRef, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 
-import { productsApi } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
 
 import {
-  SERVER_DETAILS, ITEM_DETAILS, SPEC_TABLE,
+  PRODUCT, SERVER_DETAILS, ITEM_DETAILS, SPEC_TABLE,
   TESTIMONIALS, FAQ_ITEMS,
-  BYO_CATEGORIES, BENEFITS_MARQUEE, SERVER_IMG,
+  BYO_CATEGORIES, BENEFITS_MARQUEE, SERVER_IMG, SIMILAR_PRODUCTS,
 } from '../../constants/product'
 
 import ProductImageGallery from '../../components/modules/product/ProductImageGallery'
@@ -27,50 +26,11 @@ export default function ProductPage() {
   const { user } = useAuth()
   const { addItem } = useCart()
 
-  /* API data */
-  const [product, setProduct] = useState(null)
-  const [similarProducts, setSimilarProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+  /* Demo mode: use hardcoded product data */
+  const [product] = useState({ ...PRODUCT, slug, id: 1 })
+  const [similarProducts] = useState(SIMILAR_PRODUCTS)
+  const [loading] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
-
-  useEffect(() => {
-    setLoading(true)
-    productsApi.getBySlug(slug)
-      .then((data) => {
-        // Adapt API response to existing component shape
-        setProduct({
-          ...data,
-          parentCategory: 'Products',
-          pricePerMonth: data.price_per_month,
-          images: data.image_url
-            ? [data.image_url, data.image_url, data.image_url]
-            : [SERVER_IMG, SERVER_IMG, SERVER_IMG],
-          monthlyRentalApprox: data.price_per_month,
-          totalApprox: data.price_per_month * 12,
-          model: `${data.brand || ''} ${data.name}`,
-          features: data.specs ? Object.values(data.specs).slice(0, 4) : [],
-          sizeAndDimensions: data.specs?.form_factor || 'N/A',
-          weight: data.specs?.weight || 'N/A',
-          whatsNew: data.description || '',
-          productCode: data.slug,
-        })
-      })
-      .catch(() => navigate('/search'))
-      .finally(() => setLoading(false))
-
-    // Fetch similar products
-    productsApi.list({ page_size: 6 })
-      .then((data) => {
-        setSimilarProducts((data.items || []).map(p => ({
-          id: p.id,
-          name: p.name,
-          price: p.price_per_month,
-          image: p.image_url || SERVER_IMG,
-          slug: p.slug,
-        })))
-      })
-      .catch(() => {})
-  }, [slug, navigate])
 
   /* Image gallery */
   const [selectedImage, setSelectedImage] = useState(0)
@@ -191,7 +151,7 @@ export default function ProductPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* BREADCRUMB */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-300">
         <div className="section-container py-3 flex items-center gap-2 text-sm text-gray-500 flex-wrap">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight size={14} />

@@ -11,7 +11,7 @@ export default function ContactForm() {
   }
 
   const inputClass =
-    'w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary'
+    'w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary'
 
   return (
     <div className="section-container py-10">

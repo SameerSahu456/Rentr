@@ -90,7 +90,7 @@ export function DistributorPaymentSection({
                     onChange={onCardChange}
                     placeholder="0000 0000 0000 0000"
                     maxLength={19}
-                    className="w-full border border-gray-200 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                    className="w-full border border-gray-300 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
                   />
                   <CardIcon size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
@@ -104,7 +104,7 @@ export function DistributorPaymentSection({
                   value={cardDetails.cardHolder}
                   onChange={onCardChange}
                   placeholder="Name on card"
-                  className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                  className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
                 />
               </div>
 
@@ -119,7 +119,7 @@ export function DistributorPaymentSection({
                       onChange={onCardChange}
                       placeholder="MM/YY"
                       maxLength={5}
-                      className="w-full border border-gray-200 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                      className="w-full border border-gray-300 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
                     />
                     <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   </div>
@@ -134,7 +134,7 @@ export function DistributorPaymentSection({
                       onChange={onCardChange}
                       placeholder="***"
                       maxLength={4}
-                      className="w-full border border-gray-200 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+                      className="w-full border border-gray-300 rounded-lg h-[48px] px-4 pr-12 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
                     />
                     <Lock size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   </div>
@@ -149,7 +149,7 @@ export function DistributorPaymentSection({
               </button>
 
               {/* Card network logos */}
-              <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-200">
                 <span className="text-xs font-bold text-blue-800 bg-blue-50 px-2 py-1 rounded">RuPay</span>
                 <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">VISA</span>
                 <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">Mastercard</span>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { handleImgError } from '../../constants/images'
 import HeroSection from './HeroSection'
@@ -9,38 +9,15 @@ import CTABanner from './CTABanner'
 import ProductCarouselSection from '../../components/modules/landing/ProductCarouselSection'
 import SaveBanner from '../../components/modules/landing/SaveBanner'
 import BrandPartners from '../../components/modules/landing/BrandPartners'
-import { productsApi } from '../../services/api'
 import {
   PRODUCT_TABS, CATEGORIES, BEST_SELLERS, EDUCATION_PRODUCTS
 } from '../../constants/landing'
 
-function mapProductsForCarousel(items) {
-  return items.map(p => ({
-    id: p.id,
-    name: p.name,
-    slug: p.slug,
-    image: p.image_url || '/images/products/server-tower.svg',
-    price: p.price_per_month?.toLocaleString('en-IN') || '0',
-  }))
-}
-
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState('Products')
-  const [featuredProducts, setFeaturedProducts] = useState([])
-  const [allProducts, setAllProducts] = useState([])
 
-  useEffect(() => {
-    productsApi.getFeatured()
-      .then(data => setFeaturedProducts(mapProductsForCarousel(data)))
-      .catch(() => {})
-
-    productsApi.list({ page_size: 12 })
-      .then(data => setAllProducts(mapProductsForCarousel(data.items || [])))
-      .catch(() => {})
-  }, [])
-
-  const bestSellers = allProducts.length > 0 ? allProducts.slice(0, 6) : BEST_SELLERS
-  const educationProducts = featuredProducts.length > 0 ? featuredProducts.slice(0, 6) : EDUCATION_PRODUCTS
+  const bestSellers = BEST_SELLERS
+  const educationProducts = EDUCATION_PRODUCTS
 
   return (
     <div>
@@ -48,10 +25,10 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* 2. Product Categories Section */}
-      <section className="py-8 bg-white border-b border-gray-100">
+      <section className="py-8 bg-white border-b border-gray-200">
         <div className="section-container">
           {/* Tabs */}
-          <div className="flex items-center gap-4 sm:gap-8 mb-8 border-b border-gray-100 overflow-x-auto">
+          <div className="flex items-center gap-4 sm:gap-8 mb-8 border-b border-gray-200 overflow-x-auto">
             {PRODUCT_TABS.map((tab) => (
               <button
                 key={tab}
@@ -75,7 +52,7 @@ export default function LandingPage() {
                 to={`/products/${cat.name.toLowerCase()}`}
                 className="flex flex-col items-center gap-3 shrink-0"
               >
-                <div className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border border-gray-200 shadow-sm">
+                <div className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border border-gray-300 shadow-sm">
                   <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" onError={handleImgError} loading="lazy" />
                 </div>
                 <span className="text-xs md:text-sm text-gray-secondary font-medium">{cat.name}</span>

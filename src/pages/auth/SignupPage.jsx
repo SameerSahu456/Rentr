@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Info, Upload, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { authApi } from '../../services/api'
+// Demo mode: no backend API needed
 import { CAROUSEL_SLIDES } from '../../constants/auth'
 import SignupCarousel from '../../components/modules/auth/SignupCarousel'
 
@@ -60,33 +60,15 @@ export default function SignupPage() {
     }
     setError('')
     setLoading(true)
-    try {
-      const body = {
-        email: formData.companyEmail,
-        password: formData.password,
-        full_name: formData.fullName,
-        phone: formData.phoneNumber || undefined,
-        role: activeTab,
-        company_name: formData.companyName || undefined,
-        industry: formData.industry || undefined,
-        gst_no: formData.gstTin || undefined,
-        company_pan: formData.companyPan || undefined,
-      }
-      await authApi.register(body)
-      // Auto-login after successful registration
-      const loginData = await authApi.login(formData.companyEmail, formData.password)
-      await login(loginData.access_token)
-      navigate(activeTab === 'distributor' ? '/distributor/dashboard' : '/')
-    } catch (err) {
-      setError(err.data?.detail || err.message || 'Registration failed')
-    } finally {
-      setLoading(false)
-    }
+    // Demo mode: skip backend, login immediately with selected role
+    await login(activeTab)
+    navigate(activeTab === 'distributor' ? '/distributor/dashboard' : '/')
+    setLoading(false)
   }
 
   return (
     <div className="min-h-[calc(100vh-120px)] bg-white flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[1100px] bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex">
+      <div className="w-full max-w-[1100px] bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex">
         {/* Left side - Form */}
         <div className="flex-1 p-5 sm:p-8 md:p-10 lg:p-12">
           <h1 className="font-heading text-2xl font-bold text-gray-900 mb-6">Create new account</h1>

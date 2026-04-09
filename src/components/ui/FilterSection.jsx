@@ -10,7 +10,7 @@ export function FilterSection({
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className={`border-b border-[#e0e0e0] ${className}`}>
+    <div className={`border-b border-gray-300 ${className}`}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-3 cursor-pointer"
@@ -53,7 +53,7 @@ export function CheckboxFilter({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="w-full pl-8 pr-3 py-2 text-xs border border-[#e0e0e0] rounded-lg outline-none focus:border-[#6d5ed6] font-body"
+            className="w-full pl-8 pr-3 py-2 text-xs border border-gray-300 rounded-lg outline-none focus:border-[#6d5ed6] font-body"
           />
         </div>
       )}
@@ -78,7 +78,7 @@ export function CheckboxFilter({
                     : [...selected, value]
                   onChange(next)
                 }}
-                className="w-4 h-4 rounded border-[#e0e0e0] text-[#6d5ed6] focus:ring-[#6d5ed6] cursor-pointer"
+                className="w-4 h-4 rounded border-gray-300 text-[#6d5ed6] focus:ring-[#6d5ed6] cursor-pointer"
               />
               <span className="text-sm font-body text-[#4f4f4f] group-hover:text-[#333]">
                 {label}

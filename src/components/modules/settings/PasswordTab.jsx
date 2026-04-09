@@ -24,29 +24,13 @@ export default function PasswordTab() {
       return
     }
     setSaving(true)
-    try {
-      const res = await fetch('/api/v1/users/me/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ current_password: currentPwd, new_password: newPwd }),
-      })
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.detail || 'Failed to update password')
-      } else {
-        setSuccess(true)
-        setCurrentPwd('')
-        setNewPwd('')
-        setConfirmPwd('')
-      }
-    } catch {
-      setError('Something went wrong')
-    } finally {
-      setSaving(false)
-    }
+    // Demo mode: fake save delay
+    await new Promise(r => setTimeout(r, 500))
+    setSuccess(true)
+    setCurrentPwd('')
+    setNewPwd('')
+    setConfirmPwd('')
+    setSaving(false)
   }
 
   const PasswordField = ({ label, value, onChange, placeholder, show, setShow }) => (
@@ -58,7 +42,7 @@ export default function PasswordTab() {
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full px-4 py-3 pr-11 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+          className="w-full px-4 py-3 pr-11 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
         />
         <button
           type="button"

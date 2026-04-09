@@ -59,9 +59,9 @@ export const BRAND_IMAGES = {
 // ── Avatars ───────────────────────────────────────────────────
 export const AVATAR_IMAGES = {
   avatar1: '/images/avatars/customer-avatar.png',
-  avatar2: '/images/avatars/customer-avatar.png',
-  avatar3: '/images/avatars/customer-avatar.png',
-  avatar4: '/images/avatars/customer-avatar.png',
+  avatar2: '/images/avatars/customer-avatar-2.png',
+  avatar3: '/images/avatars/customer-avatar-3.png',
+  avatar4: '/images/avatars/customer-avatar-4.png',
 }
 
 // ── Misc ──────────────────────────────────────────────────────

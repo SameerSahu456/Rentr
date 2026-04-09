@@ -14,7 +14,7 @@ export default function CartDropdown({ onClose }) {
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={item.id} className="flex items-start gap-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+              <div key={item.id} className="flex items-start gap-3 pb-3 border-b border-gray-200 last:border-0 last:pb-0">
                 <div className="w-14 h-14 bg-gray-100 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
                   {item.product_image && (
                     <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover"
@@ -32,7 +32,7 @@ export default function CartDropdown({ onClose }) {
         )}
       </div>
       {items.length > 0 && (
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-200">
           <Link to="/checkout" onClick={onClose}
             className="block w-full bg-primary hover:bg-primary-dark text-white text-sm font-semibold text-center py-2.5 rounded-lg transition-colors">
             Proceed with payment

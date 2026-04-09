@@ -166,7 +166,7 @@ export default function DistributorDashboard() {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h3 className="font-heading text-lg font-bold text-dark">Renew / Extend Subscription</h3>
             <button
               onClick={() => setShowRenewModal(false)}
@@ -177,7 +177,7 @@ export default function DistributorDashboard() {
           </div>
 
           {/* Active / Expired tabs */}
-          <div className="flex border-b border-gray-100">
+          <div className="flex border-b border-gray-200">
             <button
               onClick={() => setRenewModalTab('active')}
               className={`flex-1 py-3 text-sm font-semibold text-center ${renewModalTab === 'active' ? 'text-primary border-b-2 border-primary' : 'text-gray-3'}`}
@@ -194,7 +194,7 @@ export default function DistributorDashboard() {
 
           <div className="p-6 space-y-5">
             {(renewModalTab === 'active' ? activeAssets : expiredAssets).map((asset) => (
-              <div key={asset.id} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <div key={asset.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-4 mb-3">
                   <img src={asset.image} alt={asset.brand} className="w-12 h-12 rounded-lg object-cover" onError={handleImgError} loading="lazy" />
                   <div className="flex-1 min-w-0">
@@ -253,7 +253,7 @@ export default function DistributorDashboard() {
   const renderPartialReturnModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h3 className="font-heading text-lg font-bold text-dark">Partial Return</h3>
           <button
             onClick={() => setShowPartialReturnModal(false)}
@@ -324,7 +324,7 @@ export default function DistributorDashboard() {
 
       {/* Company Info + Due Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
             <div>
               <p className="text-[11px] uppercase tracking-wider text-gray-3 font-semibold mb-1">Company Name</p>
@@ -352,7 +352,7 @@ export default function DistributorDashboard() {
         </div>
 
         {/* Total Due Card */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <p className="text-[11px] uppercase tracking-wider text-gray-3 font-semibold mb-2">Total Due</p>
           <p className="font-heading text-3xl font-bold text-dark mb-1">{formatCurrency(INVOICE_SUMMARY.totalDue)}<span className="text-red-500">-</span></p>
           <button className="btn-primary w-full py-2.5 text-sm font-semibold mt-3 mb-2">Pay now</button>
@@ -423,11 +423,11 @@ export default function DistributorDashboard() {
 
   // ─── Ledger ───
   const renderSubscriptionLedger = () => (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-100">
+            <tr className="bg-gray-50 border-b border-gray-200">
               <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Month</th>
               <th className="text-right px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Rent</th>
               <th className="hidden sm:table-cell text-right px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Discount</th>
@@ -478,11 +478,11 @@ export default function DistributorDashboard() {
             formatCurrency={formatCurrency}
           />
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
+                  <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Item</th>
                     <th className="text-right px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Qty</th>
                     <th className="hidden md:table-cell text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Sales Person</th>
@@ -515,11 +515,11 @@ export default function DistributorDashboard() {
   const renderClients = () => (
     <div className="space-y-4">
       <h3 className="font-heading text-lg font-bold text-dark uppercase tracking-wide">All Clients</h3>
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Customer</th>
                 <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Item</th>
                 <th className="hidden sm:table-cell text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Start Date - End Date</th>
@@ -602,7 +602,7 @@ export default function DistributorDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {/* Support Request */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <LifeBuoy size={20} className="text-primary" />
@@ -624,7 +624,7 @@ export default function DistributorDashboard() {
         </div>
 
         {/* Partial Return */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <RotateCcw size={20} className="text-primary" />
@@ -643,7 +643,7 @@ export default function DistributorDashboard() {
         </div>
 
         {/* Renewal / Extend */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <PenLine size={20} className="text-primary" />
@@ -662,7 +662,7 @@ export default function DistributorDashboard() {
         </div>
 
         {/* Cancel Subscription */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
               <X size={20} className="text-red-500" />
@@ -688,7 +688,7 @@ export default function DistributorDashboard() {
     <div className="space-y-6">
       {paymentView === 'main' ? (
         <>
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
             <h3 className="font-heading text-lg font-bold text-dark uppercase tracking-wide mb-1">Turn on Auto Debit</h3>
             <p className="text-sm text-gray-3 mb-4">Select Payment Method <span className="text-primary font-medium">Step 1 of 2</span></p>
 
@@ -777,7 +777,7 @@ export default function DistributorDashboard() {
               <div className="max-w-md space-y-4">
                 <div className="space-y-2">
                   {['Paytm', 'PhonePe', 'Amazon Pay', 'Freecharge'].map((w) => (
-                    <label key={w} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer border border-gray-100">
+                    <label key={w} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer border border-gray-200">
                       <input type="radio" name="wallet" className="text-primary focus:ring-primary" />
                       <span className="text-sm text-dark font-medium">{w}</span>
                     </label>
@@ -857,7 +857,7 @@ export default function DistributorDashboard() {
                 if (item.key === 'invoice') setInvoiceSubTab('invoices')
                 if (item.key === 'refund') setRefundSubTab('track')
               }}
-              className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-primary/30 transition-all"
+              className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 shadow-sm hover:border-primary/30 transition-all"
             >
               <Icon size={18} className="text-primary" />
               <span className="text-sm font-medium text-dark">{item.label}</span>

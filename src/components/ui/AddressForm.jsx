@@ -9,7 +9,7 @@ export default function AddressForm({
   }
 
   const inputClass =
-    'w-full border border-[#e0e0e0] rounded-lg px-4 py-3 text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors'
+    'w-full border border-gray-300 rounded-lg px-4 py-3 text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors'
 
   return (
     <div className={className}>

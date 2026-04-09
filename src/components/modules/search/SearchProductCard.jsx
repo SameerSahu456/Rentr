@@ -17,7 +17,7 @@ export function SearchProductCardGrid({ product }) {
   return (
     <Link
       to={`/product/${product.slug}`}
-      className="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-200"
+      className="group bg-white border border-gray-300 rounded-lg overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-200"
     >
       <div className="aspect-square bg-gray-50 flex items-center justify-center p-6">
         <img
@@ -58,10 +58,10 @@ export function SearchProductCardList({ product }) {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-4 py-5 border-b border-gray-100 group">
+    <div className="flex flex-col sm:flex-row items-start gap-4 py-5 border-b border-gray-200 group">
       <Link
         to={`/product/${product.slug}`}
-        className="w-full sm:w-40 h-32 bg-gray-50 rounded-lg flex items-center justify-center p-4 shrink-0 border border-gray-100"
+        className="w-full sm:w-40 h-32 bg-gray-50 rounded-lg flex items-center justify-center p-4 shrink-0 border border-gray-200"
       >
         <img
           src={getProductImage(product)}

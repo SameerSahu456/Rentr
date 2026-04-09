@@ -30,12 +30,12 @@ function DistributorReadView({ user, onEdit }) {
       </div>
 
       {/* Card with read-only rows */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         {rows.map((row, i) => (
           <div
             key={row.label}
             className={`flex flex-col sm:flex-row sm:items-center px-6 sm:px-8 py-4 ${
-              i < rows.length - 1 ? 'border-b border-gray-100' : ''
+              i < rows.length - 1 ? 'border-b border-gray-200' : ''
             }`}
           >
             <span className="text-sm text-gray-500 sm:w-56 shrink-0">{row.label}</span>

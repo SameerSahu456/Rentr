@@ -30,7 +30,7 @@ export function CustomerAddressSection({
                 name="country"
                 value={address.country}
                 onChange={onAddressChange}
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] focus:outline-none focus:border-[#6d5ed6] transition-colors bg-white"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] focus:outline-none focus:border-[#6d5ed6] transition-colors bg-white"
               >
                 <option value="India">India</option>
               </select>
@@ -46,7 +46,7 @@ export function CustomerAddressSection({
                 value={address.address1}
                 onChange={onAddressChange}
                 placeholder="Street address, P.O. box"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -60,7 +60,7 @@ export function CustomerAddressSection({
                 value={address.address2}
                 onChange={onAddressChange}
                 placeholder="Apartment, suite, unit, building, floor"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -74,7 +74,7 @@ export function CustomerAddressSection({
                 value={address.pinCode}
                 onChange={onAddressChange}
                 placeholder="110001"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -88,7 +88,7 @@ export function CustomerAddressSection({
                 value={address.area}
                 onChange={onAddressChange}
                 placeholder="Enter area or colony"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -102,7 +102,7 @@ export function CustomerAddressSection({
                 value={address.townCity}
                 onChange={onAddressChange}
                 placeholder="Enter city"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -116,7 +116,7 @@ export function CustomerAddressSection({
                 value={address.state}
                 onChange={onAddressChange}
                 placeholder="Select state"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
           </div>
@@ -142,7 +142,7 @@ export function CustomerAddressSection({
                 value={reference.name}
                 onChange={onReferenceChange}
                 placeholder="Contact person name"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -156,7 +156,7 @@ export function CustomerAddressSection({
                 value={reference.contactNumber}
                 onChange={onReferenceChange}
                 placeholder="+91 98765 43210"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -170,7 +170,7 @@ export function CustomerAddressSection({
                 value={reference.email}
                 onChange={onReferenceChange}
                 placeholder="contact@company.com"
-                className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
 
@@ -195,7 +195,7 @@ export function CustomerAddressSection({
                     value={reference.designation}
                     onChange={onReferenceChange}
                     placeholder="e.g. IT Manager"
-                    className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
                   />
                 </div>
 
@@ -209,7 +209,7 @@ export function CustomerAddressSection({
                     value={reference.department}
                     onChange={onReferenceChange}
                     placeholder="e.g. Information Technology"
-                    className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
                   />
                 </div>
 
@@ -223,7 +223,7 @@ export function CustomerAddressSection({
                     value={reference.skypeId}
                     onChange={onReferenceChange}
                     placeholder="live:example"
-                    className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
                   />
                 </div>
 
@@ -237,7 +237,7 @@ export function CustomerAddressSection({
                     value={reference.fax}
                     onChange={onReferenceChange}
                     placeholder="+91-11-12345678"
-                    className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
                   />
                 </div>
               </div>
@@ -268,7 +268,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             name="country"
             value={address.country}
             onChange={onChange}
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
           >
             <option value="India">India</option>
             <option value="USA">United States</option>
@@ -283,7 +283,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             value={address.address1}
             onChange={onChange}
             placeholder="Building, Street"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <div className="sm:col-span-2">
@@ -294,7 +294,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             value={address.address2}
             onChange={onChange}
             placeholder="Landmark, Area (optional)"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <div>
@@ -306,7 +306,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             onChange={onChange}
             placeholder="500001"
             maxLength={6}
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <div>
@@ -317,7 +317,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             value={address.area}
             onChange={onChange}
             placeholder="Area / Colony / Street"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <div>
@@ -328,7 +328,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             value={address.townCity}
             onChange={onChange}
             placeholder="Town / City"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <div>
@@ -339,7 +339,7 @@ export function DistributorAddressForm({ title, address, onChange }) {
             value={address.state}
             onChange={onChange}
             placeholder="Telangana"
-            className="w-full border border-gray-200 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] px-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
       </div>

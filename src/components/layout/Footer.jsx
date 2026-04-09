@@ -30,7 +30,7 @@ const companyLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-white/50 border-t border-gray-100">
+    <footer className="bg-white/50 border-t border-gray-200">
       <div className="section-container py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-8">
           {/* Logo + company links */}
@@ -87,7 +87,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="border-t border-gray-300 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <span className="text-sm text-black font-heading font-medium">Copyright &copy; 2019 ComprintComputers. All Rights Reserved.</span>
         </div>
       </div>

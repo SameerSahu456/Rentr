@@ -13,7 +13,7 @@ export default function ProductFAQ({
         <h2 className="font-heading text-xl font-bold text-dark mb-4">Customer Questions & Answers</h2>
         <div className="space-y-0">
           {faqItems.map((faq, i) => (
-            <div key={i} className="border-b border-gray-100">
+            <div key={i} className="border-b border-gray-200">
               <button
                 onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
                 className="w-full flex items-center justify-between py-4 text-left"
@@ -44,7 +44,7 @@ export default function ProductFAQ({
           <input
             type="text"
             placeholder="Post your Question..."
-            className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+            className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
             onFocus={() => setShowPostQuestionModal(true)}
           />
         </div>

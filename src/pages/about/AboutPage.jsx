@@ -86,9 +86,9 @@ const benefitCards = [
 
 const avatarImages = [
   '/images/avatars/customer-avatar.png',
-  '/images/avatars/customer-avatar.png',
-  '/images/avatars/customer-avatar.png',
-  '/images/avatars/customer-avatar.png',
+  '/images/avatars/customer-avatar-2.png',
+  '/images/avatars/customer-avatar-3.png',
+  '/images/avatars/customer-avatar-4.png',
 ]
 
 const testimonials = [
@@ -176,7 +176,7 @@ const faqs = {
 
 function FAQItem({ question, answer, isOpen, onToggle }) {
   return (
-    <div className="py-5 border-b border-gray-100 last:border-b-0">
+    <div className="py-5 border-b border-gray-200 last:border-b-0">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between text-left group"
@@ -384,7 +384,7 @@ export default function AboutPage() {
                 className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border ${
                   activeFaqCategory === cat
                     ? 'bg-[#3b3b3b] text-white border-[#3b3b3b]'
-                    : 'bg-white text-[#4f4f4f] border-gray-200 hover:border-gray-400'
+                    : 'bg-white text-[#4f4f4f] border-gray-300 hover:border-gray-400'
                 }`}
               >
                 {cat}

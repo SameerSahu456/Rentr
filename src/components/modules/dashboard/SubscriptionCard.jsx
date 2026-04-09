@@ -63,7 +63,7 @@ export default function SubscriptionCard({ data, variant = 'customer', onExtend,
     return (
       <div className="space-y-5">
         {data.map((asset) => (
-          <div key={asset.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div key={asset.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
             <div className="flex items-start gap-4">
               <img src={asset.image} alt={asset.brand} className="w-16 h-16 rounded-xl object-cover shrink-0" onError={handleImgError} loading="lazy" />
               <div className="flex-1 min-w-0">
@@ -120,7 +120,7 @@ export default function SubscriptionCard({ data, variant = 'customer', onExtend,
   return (
     <div className="space-y-6">
       {data.map((asset) => (
-        <div key={asset.id} className="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-6 last:border-0">
+        <div key={asset.id} className="flex flex-col md:flex-row gap-6 border-b border-gray-200 pb-6 last:border-0">
           <div className="w-full md:w-48 h-40 bg-gray-50 rounded-lg flex items-center justify-center shrink-0 overflow-hidden p-3">
             <img src={asset.image} alt={asset.name} className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />
           </div>

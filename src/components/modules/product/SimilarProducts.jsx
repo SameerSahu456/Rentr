@@ -8,7 +8,7 @@ export default function SimilarProducts({
   scrollCarousel,
 }) {
   return (
-    <div className="bg-white border-t border-gray-200">
+    <div className="bg-white border-t border-gray-300">
       <div className="section-container py-10">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-heading text-lg font-bold text-dark uppercase tracking-wide">
@@ -17,13 +17,13 @@ export default function SimilarProducts({
           <div className="flex items-center gap-2">
             <button
               onClick={() => scrollCarousel(-1)}
-              className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
+              className="w-9 h-9 rounded-full border border-gray-300 bg-white flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={() => scrollCarousel(1)}
-              className="w-9 h-9 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
+              className="w-9 h-9 rounded-full border border-gray-300 bg-white flex items-center justify-center hover:border-primary hover:text-primary transition-colors"
             >
               <ChevronRight size={18} />
             </button>
@@ -39,7 +39,7 @@ export default function SimilarProducts({
             <Link
               key={p.id}
               to={`/product/${p.slug}`}
-              className="shrink-0 w-[200px] md:w-[226px] bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow group"
+              className="shrink-0 w-[200px] md:w-[226px] bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow group"
             >
               <div className="aspect-square bg-gray-50 p-4 flex items-center justify-center">
                 <img

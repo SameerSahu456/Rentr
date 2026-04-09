@@ -22,11 +22,11 @@ export default function SupportTickets({ tickets, variant = 'customer', ticketFi
             </button>
           ))}
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100">
+                <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Item</th>
                   <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Client</th>
                   <th className="hidden md:table-cell text-left px-5 py-3 text-[11px] uppercase tracking-wider text-gray-3 font-semibold">Created By</th>
@@ -61,7 +61,7 @@ export default function SupportTickets({ tickets, variant = 'customer', ticketFi
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-[#f8f8f8] border-y border-gray-200">
+          <tr className="bg-[#f8f8f8] border-y border-gray-300">
             <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Item</th>
             <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase hidden sm:table-cell">Client</th>
             <th className="text-left px-4 sm:px-6 py-3 text-xs font-medium text-gray-2 uppercase">Status</th>
@@ -70,7 +70,7 @@ export default function SupportTickets({ tickets, variant = 'customer', ticketFi
         </thead>
         <tbody>
           {tickets.map((t, i) => (
-            <tr key={i} className="border-b border-gray-100">
+            <tr key={i} className="border-b border-gray-200">
               <td className="px-4 sm:px-6 py-4 text-gray-1 font-medium">{t.item}</td>
               <td className="px-4 sm:px-6 py-4 text-gray-3 hidden sm:table-cell">{t.client}</td>
               <td className="px-4 sm:px-6 py-4">

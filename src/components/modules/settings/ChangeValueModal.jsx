@@ -17,7 +17,7 @@ export default function ChangeValueModal({ type, onClose, onSubmit }) {
         </label>
         {isPhone ? (
           <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-[#e0e0e0] bg-[#f2f2f2] text-[#828282] text-sm font-body">
+            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-300 bg-[#f2f2f2] text-[#828282] text-sm font-body">
               +91
             </span>
             <input
@@ -25,7 +25,7 @@ export default function ChangeValueModal({ type, onClose, onSubmit }) {
               value={value}
               onChange={(e) => setValue(e.target.value.replace(/\D/g, '').slice(0, 10))}
               placeholder="Enter mobile number"
-              className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
         ) : (
@@ -34,7 +34,7 @@ export default function ChangeValueModal({ type, onClose, onSubmit }) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Enter your new email id here"
-            className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
           />
         )}
       </div>
@@ -49,7 +49,7 @@ export default function ChangeValueModal({ type, onClose, onSubmit }) {
         </button>
         <button
           onClick={onClose}
-          className="flex-1 py-3 rounded-full border border-[#e0e0e0] text-[#4f4f4f] font-body font-medium text-sm hover:bg-[#f2f2f2] cursor-pointer transition-colors"
+          className="flex-1 py-3 rounded-full border border-gray-300 text-[#4f4f4f] font-body font-medium text-sm hover:bg-[#f2f2f2] cursor-pointer transition-colors"
         >
           Cancel
         </button>

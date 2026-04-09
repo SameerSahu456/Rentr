@@ -36,7 +36,7 @@ export default function Tabs({
 
   if (variant === 'underline') {
     return (
-      <div className={`flex border-b border-[#e0e0e0] ${className}`}>
+      <div className={`flex border-b border-gray-300 ${className}`}>
         {tabs.map((tab) => {
           const key = typeof tab === 'string' ? tab : tab.key
           const label = typeof tab === 'string' ? tab : tab.label

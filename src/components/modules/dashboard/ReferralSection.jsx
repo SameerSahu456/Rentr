@@ -8,7 +8,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
     return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-heading text-lg font-bold text-dark uppercase tracking-wide">Referral Points Earned</h3>
             <span className="font-heading text-2xl font-bold text-primary">{formatCurrency(2000)}/-</span>
@@ -23,7 +23,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
         </div>
 
         {/* Email invite */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <div className="flex gap-3 mb-5">
             <input
               type="email"
@@ -40,7 +40,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
           {/* Referral code */}
           <div className="flex items-center gap-3 mb-5">
             <span className="text-sm text-gray-2">Your referral Code:</span>
-            <div className="inline-flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 border border-gray-200">
+            <div className="inline-flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 border border-gray-300">
               <span className="font-heading font-bold text-primary tracking-widest">RENTRFFRL</span>
               <button onClick={copyReferralCode} className="text-gray-3 hover:text-primary transition-colors">
                 {codeCopied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
@@ -53,7 +53,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
           <div>
             <p className="text-sm font-semibold text-dark mb-3">Invite your contacts</p>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-gray-2 text-sm font-medium hover:bg-gray-50 transition-colors">
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-2 text-sm font-medium hover:bg-gray-50 transition-colors">
                 <Mail size={16} />
                 Invite email contacts
               </button>
@@ -76,7 +76,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
             { num: '2', icon: UserCheck, title: 'They Sign Up', desc: 'Your friend signs up on rentr using your referral code and subscribes to a plan.' },
             { num: '3', icon: Star, title: 'Earn Rewards', desc: 'You earn referral points redeemable against your monthly rental payments.' },
           ].map((step) => (
-            <div key={step.num} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm text-center">
+            <div key={step.num} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm text-center">
               <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3 font-heading font-bold text-lg">
                 {step.num}
               </div>
@@ -88,7 +88,7 @@ export default function ReferralSection({ variant = 'customer', referralEmail, s
         </div>
 
         {/* Terms */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
           <h4 className="font-heading text-sm font-bold text-dark uppercase tracking-wide mb-3">Referral Terms and Conditions</h4>
           <ul className="space-y-2 text-xs text-gray-3 leading-relaxed list-disc list-inside">
             <li>Referral points are earned only when the referred party completes their first subscription payment.</li>

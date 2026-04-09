@@ -173,7 +173,7 @@ export default function BuildYourOwn() {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* ═══════ BREADCRUMB ═══════ */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-gray-300 bg-white">
         <div className="section-container py-3 flex items-center gap-2 text-sm text-gray-500">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight size={14} />
@@ -210,7 +210,7 @@ export default function BuildYourOwn() {
                   className={`relative group text-left p-4 rounded-2xl border-2 transition-all cursor-pointer ${
                     isActive
                       ? 'border-primary bg-primary/5 shadow-md'
-                      : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                   }`}
                 >
                   {isActive && (
@@ -261,7 +261,7 @@ export default function BuildYourOwn() {
               return (
                 <div
                   key={cat.id}
-                  className="bg-white border border-gray-100 rounded-2xl overflow-hidden transition-shadow hover:shadow-sm"
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden transition-shadow hover:shadow-sm"
                 >
                   {/* Category header */}
                   <div className="px-5 py-4 flex items-center justify-between">
@@ -325,8 +325,8 @@ export default function BuildYourOwn() {
 
           {/* ─── RIGHT: ORDER SUMMARY SIDEBAR ─── */}
           <div>
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 sticky top-24">
-              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 sticky top-24">
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
                 {(() => {
                   const Icon = TYPE_ICONS[selectedType] || Server
                   return (
@@ -374,7 +374,7 @@ export default function BuildYourOwn() {
                 })}
               </div>
 
-              <hr className="border-gray-100 mb-4" />
+              <hr className="border-gray-200 mb-4" />
 
               {/* Tenure selection */}
               <div className="mb-5">

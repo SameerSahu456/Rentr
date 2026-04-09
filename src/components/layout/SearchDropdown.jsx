@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Search, Package } from 'lucide-react'
-import { searchApi } from '../../services/api'
 import { SUGGESTIONS, CURATED_CATEGORIES } from '../../constants/navbar'
 import { handleImgError } from '../../constants/images'
 
@@ -32,11 +31,12 @@ export default function SearchDropdown({
       return
     }
 
+    // Demo mode: filter suggestions locally
     const timer = setTimeout(() => {
-      searchApi.autocomplete(searchQuery.trim())
-        .then(data => setSuggestions(data.suggestions || []))
-        .catch(() => setSuggestions([]))
-    }, 300)
+      const q = searchQuery.trim().toLowerCase()
+      const matches = SUGGESTIONS.filter(s => s.toLowerCase().includes(q))
+      setSuggestions(matches)
+    }, 150)
 
     return () => clearTimeout(timer)
   }, [searchQuery, searchFocused])
@@ -85,7 +85,7 @@ export default function SearchDropdown({
         ))}
         {remainingSuggestions.length > 0 && (
           <>
-            <hr className="my-2 border-gray-100" />
+            <hr className="my-2 border-gray-200" />
             <div className="px-4 pb-1"><span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Suggestions</span></div>
             {remainingSuggestions.map((s, i) => (
               <button key={`sug-${i}`} onClick={() => onSelect(s)}
@@ -111,7 +111,7 @@ export default function SearchDropdown({
       ))}
       {CURATED_CATEGORIES.length > 0 && (
         <>
-          <hr className="my-2 border-gray-100" />
+          <hr className="my-2 border-gray-200" />
           <div className="px-4 pb-1"><span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Categories</span></div>
           {CURATED_CATEGORIES.map((cat, i) => (
             <button key={`cat-${i}`} onClick={() => onSelect(cat.name)}

@@ -47,7 +47,7 @@ export default function Accordion({
           icon={item.icon}
           isOpen={openIndex === i}
           onToggle={() => onChange(openIndex === i ? -1 : i)}
-          className={divided && i < items.length - 1 ? 'border-b border-[#e0e0e0]' : ''}
+          className={divided && i < items.length - 1 ? 'border-b border-gray-300' : ''}
           titleClassName={item.titleClassName}
           contentClassName={item.contentClassName}
         >

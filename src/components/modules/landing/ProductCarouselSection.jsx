@@ -29,7 +29,7 @@ export default function ProductCarouselSection({ title, products }) {
           {/* Left arrow */}
           <button
             onClick={() => scroll('left')}
-            className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
+            className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-300 items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft size={18} className="text-gray-500" />
           </button>
@@ -60,7 +60,7 @@ export default function ProductCarouselSection({ title, products }) {
           {/* Right arrow */}
           <button
             onClick={() => scroll('right')}
-            className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-200 items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
+            className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white border border-gray-300 items-center justify-center shadow-sm hover:bg-gray-50 transition-colors"
           >
             <ChevronRight size={18} className="text-gray-500" />
           </button>

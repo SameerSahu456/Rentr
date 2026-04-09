@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { authApi } from '../../services/api'
 import OtpInput from '../../components/ui/OtpInput'
 
 export default function LoginPage() {
+  const [loginRole, setLoginRole] = useState('customer')
   const [mode, setMode] = useState('email')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -39,48 +39,28 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    try {
-      const data = await authApi.login(email, password)
-      await login(data.access_token)
-      navigate('/')
-    } catch (err) {
-      setError(err.data?.detail || err.message || 'Invalid credentials')
-    } finally {
-      setLoading(false)
-    }
+    // Demo mode: skip backend, login immediately
+    await login(loginRole)
+    navigate(loginRole === 'distributor' ? '/distributor/dashboard' : '/')
+    setLoading(false)
   }
 
   const handleOtpLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    try {
-      const otpCode = otp.join('')
-      if (otpCode.length < 4) {
-        setError('Please enter the complete OTP')
-        setLoading(false)
-        return
-      }
-      const data = await authApi.verifyOtp('+91' + mobile, otpCode)
-      await login(data.access_token)
-      navigate('/')
-    } catch (err) {
-      setError(err.data?.detail || err.message || 'Invalid OTP')
-    } finally {
-      setLoading(false)
-    }
+    // Demo mode: skip backend, login immediately
+    await login(loginRole)
+    navigate(loginRole === 'distributor' ? '/distributor/dashboard' : '/')
+    setLoading(false)
   }
 
   const sendOtp = async () => {
     if (mobile.length === 10) {
-      try {
-        await authApi.requestOtp('+91' + mobile)
-        setOtpSent(true)
-        setError('')
-        startTimer()
-      } catch (err) {
-        setError(err.data?.detail || err.message || 'Failed to send OTP')
-      }
+      // Demo mode: skip backend, just show OTP input
+      setOtpSent(true)
+      setError('')
+      startTimer()
     }
   }
 
@@ -93,10 +73,36 @@ export default function LoginPage() {
   return (
     <div className="min-h-[calc(100vh-120px)] bg-white flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 md:p-12">
-          <h1 className="font-heading text-2xl md:text-[28px] font-bold text-center text-gray-900 mb-10">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 md:p-12">
+          <h1 className="font-heading text-2xl md:text-[28px] font-bold text-center text-gray-900 mb-6">
             Welcome Back
           </h1>
+
+          {/* Role toggle */}
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <button
+              type="button"
+              onClick={() => setLoginRole('customer')}
+              className={`px-6 py-2.5 rounded-full text-sm font-heading font-medium transition-all cursor-pointer ${
+                loginRole === 'customer'
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Customer
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginRole('distributor')}
+              className={`px-6 py-2.5 rounded-full text-sm font-heading font-medium transition-all cursor-pointer ${
+                loginRole === 'distributor'
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Distributor
+            </button>
+          </div>
 
           {mode === 'email' ? (
             <form onSubmit={handleEmailLogin} className="space-y-5">
@@ -208,7 +214,7 @@ export default function LoginPage() {
 
           <button
             onClick={() => { setMode(mode === 'email' ? 'otp' : 'email'); setError('') }}
-            className="w-full mt-4 py-3.5 rounded-full border border-gray-200 text-gray-700 font-heading font-medium text-base hover:bg-gray-50 transition-colors cursor-pointer">
+            className="w-full mt-4 py-3.5 rounded-full border border-gray-300 text-gray-700 font-heading font-medium text-base hover:bg-gray-50 transition-colors cursor-pointer">
             {mode === 'email' ? 'Sign in using OTP' : 'Sign in using password'}
           </button>
 

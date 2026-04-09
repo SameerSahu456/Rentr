@@ -84,7 +84,7 @@ export default function ProductModals({
                   placeholder="Enter your name"
                   value={enquiryName}
                   onChange={(e) => setEnquiryName(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                   required
                 />
               </div>
@@ -95,7 +95,7 @@ export default function ProductModals({
                   placeholder="+91"
                   value={enquiryPhone}
                   onChange={(e) => setEnquiryPhone(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                   required
                 />
               </div>
@@ -106,7 +106,7 @@ export default function ProductModals({
                   placeholder="How can we help ?"
                   value={enquiryHelp}
                   onChange={(e) => setEnquiryHelp(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                 />
               </div>
               <button
@@ -179,7 +179,7 @@ export default function ProductModals({
                   placeholder="Enter your name"
                   value={ltName}
                   onChange={(e) => setLtName(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
@@ -189,7 +189,7 @@ export default function ProductModals({
                   placeholder="+91"
                   value={ltPhone}
                   onChange={(e) => setLtPhone(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                 />
               </div>
               <button
@@ -252,7 +252,7 @@ export default function ProductModals({
                   placeholder="Enter your question here"
                   value={questionText}
                   onChange={(e) => setQuestionText(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary h-20 resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary h-20 resize-none"
                   required
                 />
               </div>
@@ -269,7 +269,7 @@ export default function ProductModals({
                     placeholder="Enter your name here"
                     value={questionName}
                     onChange={(e) => setQuestionName(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                     required
                   />
                 </div>
@@ -280,7 +280,7 @@ export default function ProductModals({
                     placeholder="Eg. SBI Mutual"
                     value={questionCompany}
                     onChange={(e) => setQuestionCompany(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function ProductModals({
                     placeholder="+91"
                     value={questionPhone}
                     onChange={(e) => setQuestionPhone(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                     required
                   />
                 </div>
@@ -303,7 +303,7 @@ export default function ProductModals({
                     placeholder="example@email.com"
                     value={questionEmail}
                     onChange={(e) => setQuestionEmail(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary"
                     required
                   />
                 </div>
@@ -390,10 +390,10 @@ export default function ProductModals({
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-heading text-lg font-bold text-dark uppercase tracking-wide">Choose Variant</h3>
               <div className="flex items-center gap-2">
-                <button className="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center hover:border-primary">
+                <button className="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center hover:border-primary">
                   <ChevronLeft size={16} />
                 </button>
-                <button className="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center hover:border-primary">
+                <button className="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center hover:border-primary">
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -401,7 +401,7 @@ export default function ProductModals({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((v) => (
-                <div key={v} className="border border-gray-200 rounded-lg overflow-hidden">
+                <div key={v} className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 p-4 flex items-center justify-center h-36">
                     <img src={serverImg} alt="" className="max-h-full object-contain" onError={handleImgError} loading="lazy" />
                   </div>
@@ -476,7 +476,7 @@ export default function ProductModals({
 
       {/* Toast Notification */}
       {showToast && (
-        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-white border border-gray-200 shadow-lg rounded-lg px-4 py-3 animate-[slideInRight_0.3s_ease-out]">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-white border border-gray-300 shadow-lg rounded-lg px-4 py-3 animate-[slideInRight_0.3s_ease-out]">
           <CheckCircle size={18} className="text-green-500" />
           <span className="text-sm text-dark">Thanks! Your question has been submitted.</span>
           <button onClick={() => setShowToast(false)} className="text-gray-400 hover:text-dark ml-2">

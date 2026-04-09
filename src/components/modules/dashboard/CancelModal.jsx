@@ -26,7 +26,7 @@ export default function CancelModal({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h3 className="font-heading text-lg font-bold text-dark">Cancel Subscription</h3>
             <button
               onClick={onClose}
@@ -100,8 +100,8 @@ export default function CancelModal({
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-bold text-gray-2 uppercase tracking-wider">Assets</p>
               <div className="flex gap-2">
-                <button className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center text-gray-3 hover:bg-gray-50 cursor-pointer"><ChevronLeft size={14} /></button>
-                <button className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center text-gray-3 hover:bg-gray-50 cursor-pointer"><ChevronRight size={14} /></button>
+                <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-3 hover:bg-gray-50 cursor-pointer"><ChevronLeft size={14} /></button>
+                <button className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-3 hover:bg-gray-50 cursor-pointer"><ChevronRight size={14} /></button>
               </div>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2">
@@ -195,7 +195,7 @@ export default function CancelModal({
             <p className="text-xs text-gray-1">*Delivery charges are to be paid by the customer and will be included in the final invoice</p>
           </div>
 
-          <div className="flex items-center justify-between border-t border-gray-200 pt-4 mb-4">
+          <div className="flex items-center justify-between border-t border-gray-300 pt-4 mb-4">
             <div className="flex items-center gap-2 text-sm text-gray-1"><span>🚚</span> Delivery charges</div>
             <span className="font-semibold text-gray-1">₹2000</span>
           </div>
@@ -203,7 +203,7 @@ export default function CancelModal({
           <div className="flex gap-3">
             <button className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium flex-1 hover:bg-primary-dark transition-colors">Place request</button>
             <button onClick={onClose}
-              className="px-6 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">Close</button>
+              className="px-6 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-1 hover:bg-gray-50 transition-colors cursor-pointer">Close</button>
           </div>
         </div>
       </div>

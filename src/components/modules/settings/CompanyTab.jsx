@@ -65,26 +65,9 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
 
   const handleUpdate = async () => {
     setSaving(true)
-    try {
-      await fetch('/api/v1/users/me/company', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          company_name: companyName, industry, gst_no: gst, company_pan: pan,
-          refTitle, refContactName: refName, refContactEmail: refEmail,
-          refContactPhone: refPersonalPhone, refWorkPhone, refDesignation, refDepartment, refSkype,
-          billAttention, billCountry, billAddress1, billAddress2, billCity, billState, billZip, billPhone, billFax,
-          shipAttention, shipCountry, shipAddress1, shipAddress2, shipCity, shipState, shipZip, shipPhone, shipFax,
-        }),
-      })
-    } catch {
-      // handle error
-    } finally {
-      setSaving(false)
-    }
+    // Demo mode: fake save delay
+    await new Promise(r => setTimeout(r, 500))
+    setSaving(false)
   }
 
   const AddressField = ({ label, value, onChange, type = 'text' }) => (
@@ -95,7 +78,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
         value={value}
         onChange={onChange}
         placeholder={label}
-        className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
       />
     </div>
   )
@@ -123,7 +106,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="Enter company name"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
             <FileUpload
               file={companyProof}
@@ -139,7 +122,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
               placeholder="e.g. Technology, Manufacturing"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
 
@@ -150,7 +133,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={gst}
               onChange={(e) => setGst(e.target.value)}
               placeholder="Enter GST number"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
             <FileUpload
               file={gstProof}
@@ -166,7 +149,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={pan}
               onChange={(e) => setPan(e.target.value)}
               placeholder="Enter company PAN"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
             <FileUpload
               file={panProof}
@@ -198,7 +181,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               <select
                 value={refTitle}
                 onChange={(e) => setRefTitle(e.target.value)}
-                className="w-24 px-3 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] outline-none focus:border-[#6d5ed6] transition-colors cursor-pointer"
+                className="w-24 px-3 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] outline-none focus:border-[#6d5ed6] transition-colors cursor-pointer"
               >
                 <option value="Mr">Mr</option>
                 <option value="Mrs">Mrs</option>
@@ -209,7 +192,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
                 value={refName}
                 onChange={(e) => setRefName(e.target.value)}
                 placeholder="Enter name"
-                className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
           </div>
@@ -221,14 +204,14 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={refEmail}
               onChange={(e) => setRefEmail(e.target.value)}
               placeholder="Enter email address"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
 
           <div>
             <label className="block text-sm font-semibold font-body text-[#333] mb-1.5">Personal Contact Number</label>
             <div className="flex">
-              <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-[#e0e0e0] bg-[#f2f2f2] text-[#828282] text-sm font-body">
+              <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-300 bg-[#f2f2f2] text-[#828282] text-sm font-body">
                 +91
               </span>
               <input
@@ -236,7 +219,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
                 value={refPersonalPhone}
                 onChange={(e) => setRefPersonalPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 placeholder="Enter personal contact number"
-                className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
           </div>
@@ -244,7 +227,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
           <div>
             <label className="block text-sm font-semibold font-body text-[#333] mb-1.5">Work contact number</label>
             <div className="flex">
-              <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-[#e0e0e0] bg-[#f2f2f2] text-[#828282] text-sm font-body">
+              <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-300 bg-[#f2f2f2] text-[#828282] text-sm font-body">
                 +91
               </span>
               <input
@@ -252,7 +235,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
                 value={refWorkPhone}
                 onChange={(e) => setRefWorkPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 placeholder="Enter work contact number"
-                className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
           </div>
@@ -264,7 +247,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={refDesignation}
               onChange={(e) => setRefDesignation(e.target.value)}
               placeholder="Enter designation"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
 
@@ -275,7 +258,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={refDepartment}
               onChange={(e) => setRefDepartment(e.target.value)}
               placeholder="Enter department"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
 
@@ -286,7 +269,7 @@ export default function CompanyTab({ user, activeSubTab = 'company', entityLabel
               value={refSkype}
               onChange={(e) => setRefSkype(e.target.value)}
               placeholder="Enter skype number"
-              className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
             />
           </div>
 

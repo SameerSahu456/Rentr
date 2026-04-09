@@ -18,7 +18,7 @@ export default function Timeline({ steps, className = '' }) {
                     ? 'bg-[#6d5ed6] text-white'
                     : isCurrent
                     ? 'border-2 border-[#6d5ed6] bg-white'
-                    : 'border-2 border-[#e0e0e0] bg-white'
+                    : 'border-2 border-gray-300 bg-white'
                 }`}
               >
                 {isCompleted && <Check className="h-3.5 w-3.5" />}

@@ -44,7 +44,7 @@ export default function RefundTracking({
         <h3 className="font-heading text-lg font-bold text-dark uppercase tracking-wide">Track Return and Refund</h3>
 
         {refundTrackData.map((refund, idx) => (
-          <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div key={idx} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <div className="flex items-start gap-4 mb-5">
               <img src={refund.image} alt={refund.item} className="w-14 h-14 rounded-xl object-cover shrink-0" onError={handleImgError} loading="lazy" />
               <div className="flex-1">
@@ -86,7 +86,7 @@ export default function RefundTracking({
 
   // Customer variant - Track
   const renderRefundSummary = () => (
-    <div className="bg-[#fcfcfc] border border-gray-100 rounded-xl p-5">
+    <div className="bg-[#fcfcfc] border border-gray-200 rounded-xl p-5">
       <h4 className="font-heading text-base sm:text-lg font-bold text-gray-1 mb-1">Refund Summary</h4>
       <div className="w-8 h-0.5 bg-primary mb-3" />
       <p className="text-sm text-gray-1 mb-4">
@@ -105,7 +105,7 @@ export default function RefundTracking({
           <span className="text-gray-3">Delivery deduction</span>
           <span className="text-gray-1">- ₹{refundSummary.delivery.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between border-t border-gray-200 pt-3 font-semibold">
+        <div className="flex justify-between border-t border-gray-300 pt-3 font-semibold">
           <span className="text-gray-1">Total expected refund</span>
           <span className="text-gray-1">₹{refundSummary.total.toLocaleString()}</span>
         </div>
@@ -118,7 +118,7 @@ export default function RefundTracking({
       <div className="flex flex-col lg:flex-row gap-8 mb-8">
         <div className="flex-1"><RefundTimeline steps={refundSteps} /></div>
         <div className="w-full lg:w-72 shrink-0 space-y-4">
-          <div className="border border-gray-200 rounded-lg p-4">
+          <div className="border border-gray-300 rounded-lg p-4">
             <div className="h-32 bg-gray-50 rounded mb-3 flex items-center justify-center overflow-hidden p-3">
               <img src={DEFAULT_PRODUCT_IMAGE} alt="PowerEdge T30" className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />
             </div>
@@ -129,18 +129,18 @@ export default function RefundTracking({
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="border border-gray-200 rounded-lg p-5">
+        <div className="border border-gray-300 rounded-lg p-5">
           <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped with rentr</h4>
           <div className="w-8 h-0.5 bg-primary mb-4" />
           <Link to="#" className="text-primary text-sm font-medium hover:underline">Request Cancellation &gt;</Link>
           <p className="text-sm text-gray-1 mt-3">Tracking ID : <span className="font-semibold">2323948394874wt</span></p>
         </div>
-        <div className="border border-gray-200 rounded-lg p-5">
+        <div className="border border-gray-300 rounded-lg p-5">
           <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped Address</h4>
           <div className="w-8 h-0.5 bg-primary mb-4" />
           <p className="text-sm text-gray-1">Flat No 302, Nensey Society, Plot no.16, Bandra., Maharashtra - 400050</p>
         </div>
-        <div className="border border-gray-200 rounded-lg p-5">
+        <div className="border border-gray-300 rounded-lg p-5">
           <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Order Info</h4>
           <div className="w-8 h-0.5 bg-primary mb-4" />
           <button className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-dark transition-colors">

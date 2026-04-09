@@ -18,7 +18,7 @@ export default function SupportModal({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h3 className="font-heading text-lg font-bold text-dark">New Support Request</h3>
             <button
               onClick={onClose}
@@ -86,7 +86,7 @@ export default function SupportModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4">
       <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-300">
           <h3 className="font-heading text-lg sm:text-xl font-bold text-gray-1">Support Request</h3>
           <button onClick={onClose} className="text-gray-3 hover:text-gray-1 cursor-pointer"><X size={20} /></button>
         </div>

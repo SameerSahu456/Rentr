@@ -91,7 +91,7 @@ export default function OrderTracking({
         )}
 
         {/* Timeline + Product */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Timeline */}
             <div className="flex-1">
@@ -110,7 +110,7 @@ export default function OrderTracking({
 
         {/* Bottom info cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <Truck size={16} className="text-primary" />
               <h5 className="text-sm font-semibold text-dark">Shipped with rentr</h5>
@@ -118,14 +118,14 @@ export default function OrderTracking({
             <p className="text-xs text-gray-3">Tracking ID: <span className="text-dark font-medium">{order.trackingId}</span></p>
             <button className="text-xs text-red-500 hover:underline mt-2 font-medium">Request Cancellation</button>
           </div>
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <MapPin size={16} className="text-primary" />
               <h5 className="text-sm font-semibold text-dark">Shipped Address</h5>
             </div>
             <p className="text-xs text-gray-2 leading-relaxed">{order.shippedAddress}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <FileText size={16} className="text-primary" />
               <h5 className="text-sm font-semibold text-dark">Order Info</h5>
@@ -138,7 +138,7 @@ export default function OrderTracking({
         </div>
       </div>
     ) : (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
         <Package size={48} className="mx-auto text-gray-300 mb-4" />
         <p className="text-gray-3 text-lg mb-2">No ongoing orders</p>
         <Link to="/search" className="inline-flex items-center gap-2 mt-3 btn-primary px-6 py-3 text-sm font-medium">
@@ -157,7 +157,7 @@ export default function OrderTracking({
           className="lg:hidden flex items-center gap-1 text-sm text-gray-3 mb-4 cursor-pointer">
           <ChevronLeft size={14} /> Back to orders
         </button>
-        <div className="border border-gray-200 rounded-lg p-4 mb-6 flex items-center gap-4">
+        <div className="border border-gray-300 rounded-lg p-4 mb-6 flex items-center gap-4">
           <div className="w-14 h-14 bg-gray-50 rounded flex items-center justify-center shrink-0 overflow-hidden p-1">
             <img src={DEFAULT_PRODUCT_IMAGE} alt={order.productName} className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />
           </div>
@@ -168,18 +168,18 @@ export default function OrderTracking({
         </div>
         <CustomerTimeline steps={order.steps} />
         <div className="space-y-4 mt-8">
-          <div className="border border-gray-200 rounded-lg p-5">
+          <div className="border border-gray-300 rounded-lg p-5">
             <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped with rentr</h4>
             <div className="w-8 h-0.5 bg-primary mb-4" />
             <Link to="#" className="text-primary text-sm font-medium hover:underline">Request Cancellation &gt;</Link>
             <p className="text-sm text-gray-1 mt-3">Tracking ID : <span className="font-semibold">{order.trackingId}</span></p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-5">
+          <div className="border border-gray-300 rounded-lg p-5">
             <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped Address</h4>
             <div className="w-8 h-0.5 bg-primary mb-4" />
             <p className="text-sm text-gray-1">{order.address}</p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-5">
+          <div className="border border-gray-300 rounded-lg p-5">
             <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Order Info</h4>
             <div className="w-8 h-0.5 bg-primary mb-4" />
             <button className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-dark transition-colors">
@@ -212,7 +212,7 @@ export default function OrderTracking({
             <div className="flex gap-8 mb-8">
               <div className="flex-1"><CustomerTimeline steps={order.steps} /></div>
               <div className="w-64 shrink-0">
-                <div className="border border-gray-200 rounded-lg p-4">
+                <div className="border border-gray-300 rounded-lg p-4">
                   <div className="h-32 bg-gray-50 rounded mb-3 flex items-center justify-center overflow-hidden p-3">
                     <img src={DEFAULT_PRODUCT_IMAGE} alt="Product" className="max-h-full max-w-full object-contain" onError={handleImgError} loading="lazy" />
                   </div>
@@ -222,18 +222,18 @@ export default function OrderTracking({
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div className="border border-gray-200 rounded-lg p-5">
+              <div className="border border-gray-300 rounded-lg p-5">
                 <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped with rentr</h4>
                 <div className="w-8 h-0.5 bg-primary mb-4" />
                 <Link to="#" className="text-primary text-sm font-medium hover:underline">Request Cancellation &gt;</Link>
                 <p className="text-sm text-gray-1 mt-3">Tracking ID : <span className="font-semibold">{order.trackingId}</span></p>
               </div>
-              <div className="border border-gray-200 rounded-lg p-5">
+              <div className="border border-gray-300 rounded-lg p-5">
                 <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Shipped Address</h4>
                 <div className="w-8 h-0.5 bg-primary mb-4" />
                 <p className="text-sm text-gray-1">{order.address}</p>
               </div>
-              <div className="border border-gray-200 rounded-lg p-5">
+              <div className="border border-gray-300 rounded-lg p-5">
                 <h4 className="font-heading text-base font-bold text-gray-1 mb-1">Order Info</h4>
                 <div className="w-8 h-0.5 bg-primary mb-4" />
                 <button className="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-dark transition-colors">

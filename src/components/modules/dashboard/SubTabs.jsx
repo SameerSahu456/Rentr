@@ -5,7 +5,7 @@
 export default function SubTabs({ tabs, active, onChange, variant = 'customer' }) {
   if (variant === 'distributor') {
     return (
-      <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
+      <div className="flex border-b border-gray-300 mb-6 overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -25,7 +25,7 @@ export default function SubTabs({ tabs, active, onChange, variant = 'customer' }
 
   // Customer variant
   return (
-    <div className="flex gap-4 sm:gap-6 border-b border-gray-200 mb-6 overflow-x-auto">
+    <div className="flex gap-4 sm:gap-6 border-b border-gray-300 mb-6 overflow-x-auto">
       {tabs.map((t) => (
         <button
           key={t.key}

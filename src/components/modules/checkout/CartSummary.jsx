@@ -46,7 +46,7 @@ export function CustomerCartSummary({
                 {'\u20B9'}{fmt(addonsRent)}/mo
               </span>
             </div>
-            <div className="border-t border-[#e0e0e0] pt-3">
+            <div className="border-t border-gray-300 pt-3">
               <div className="flex items-center justify-between font-['Poppins']">
                 <span className="text-[#333] font-semibold">
                   Total Monthly Rent
@@ -121,7 +121,7 @@ export function CustomerCartSummary({
                 value={coupon}
                 onChange={(e) => onCouponChange(e.target.value)}
                 placeholder="Apply Coupon"
-                className="w-full pl-9 pr-3 py-2.5 border border-[#e0e0e0] rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
+                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm font-['Poppins'] text-[#333] placeholder:text-[#bdbdbd] focus:outline-none focus:border-[#6d5ed6] transition-colors"
               />
             </div>
             <button className="bg-[#6d5ed6] text-white text-sm font-['Poppins'] font-medium px-5 py-2.5 rounded-lg hover:bg-[#5b4ec4] transition-colors">
@@ -130,7 +130,7 @@ export function CustomerCartSummary({
           </div>
 
           {/* Bottom total + Proceed */}
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#e0e0e0]">
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-300">
             <div>
               <p className="font-['Space_Grotesk'] text-xl font-bold text-[#17113e]">
                 {'\u20B9'}{fmt(totalMonthly)}/Mo
@@ -165,7 +165,7 @@ export function DistributorCartTable({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-200">
               <th className="text-left py-3 pr-4 font-medium text-gray-3">Product</th>
               <th className="text-right py-3 px-4 font-medium text-gray-3">Monthly Rent</th>
               <th className="text-right py-3 px-4 font-medium text-gray-3">Addons Rent</th>
@@ -228,7 +228,7 @@ export function DistributorCartTable({
             value={coupon}
             onChange={(e) => onCouponChange(e.target.value)}
             placeholder="Apply Coupon"
-            className="w-full border border-gray-200 rounded-lg h-[48px] pl-10 pr-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
+            className="w-full border border-gray-300 rounded-lg h-[48px] pl-10 pr-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400"
           />
         </div>
         <button className="text-primary font-semibold text-sm hover:underline">
@@ -247,7 +247,7 @@ export function DistributorCartSidebar({
 }) {
   return (
     <div className="lg:w-80 shrink-0">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
         <h4 className="font-heading font-semibold text-dark mb-4">Cart Items</h4>
         <div className="space-y-3 mb-5">
           {cartItems.map((item) => (
@@ -274,7 +274,7 @@ export function DistributorCartSidebar({
           ))}
         </div>
 
-        <hr className="border-gray-100 mb-4" />
+        <hr className="border-gray-200 mb-4" />
 
         <div className="flex items-baseline justify-between mb-1">
           <span className="font-heading text-2xl font-bold text-dark">

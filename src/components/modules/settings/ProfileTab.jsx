@@ -16,20 +16,9 @@ export default function ProfileTab({ user }) {
 
   const handleUpdate = async () => {
     setSaving(true)
-    try {
-      await fetch('/api/v1/users/me', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ full_name: fullName }),
-      })
-    } catch {
-      // handle error
-    } finally {
-      setSaving(false)
-    }
+    // Demo mode: fake save delay
+    await new Promise(r => setTimeout(r, 500))
+    setSaving(false)
   }
 
   const handleChangeClick = (type) => {
@@ -65,7 +54,7 @@ export default function ProfileTab({ user }) {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#333] placeholder-[#bdbdbd] outline-none focus:border-[#6d5ed6] transition-colors"
           />
         </div>
 
@@ -78,7 +67,7 @@ export default function ProfileTab({ user }) {
               type="text"
               value={email}
               readOnly
-              className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#828282] bg-[#f2f2f2] outline-none"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#828282] bg-[#f2f2f2] outline-none"
             />
             <button
               onClick={() => handleChangeClick('email')}
@@ -98,7 +87,7 @@ export default function ProfileTab({ user }) {
               type="text"
               value={mobile}
               readOnly
-              className="flex-1 px-4 py-3 border border-[#e0e0e0] rounded-xl text-sm font-body text-[#828282] bg-[#f2f2f2] outline-none"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm font-body text-[#828282] bg-[#f2f2f2] outline-none"
             />
             <button
               onClick={() => handleChangeClick('phone')}

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ChevronDown, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { productsApi } from '../../../services/api'
+import { MOCK_CATEGORIES, MOCK_BRANDS } from '../../../constants/search'
 
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen)
@@ -34,7 +34,7 @@ function CheckboxFilter({ items, selected, onToggle, searchable = false }) {
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg pl-3 pr-8 py-2 text-xs focus:outline-none focus:border-primary"
+            className="w-full border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-xs focus:outline-none focus:border-primary"
           />
           <Search size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
@@ -70,13 +70,8 @@ export default function SearchFilterSidebar({
   priceRange,
   onPriceChange,
 }) {
-  const [categories, setCategories] = useState([])
-  const [brands, setBrands] = useState([])
-
-  useEffect(() => {
-    productsApi.getCategories().then(setCategories).catch(() => {})
-    productsApi.getBrands().then(setBrands).catch(() => {})
-  }, [])
+  const [categories] = useState(MOCK_CATEGORIES)
+  const [brands] = useState(MOCK_BRANDS)
 
   return (
     <aside className={`${showMobileFilters ? 'fixed inset-0 z-40 bg-white overflow-y-auto p-4 lg:static lg:z-auto lg:bg-transparent lg:p-0' : 'hidden'} lg:block w-full lg:w-56 shrink-0`}>
@@ -138,7 +133,7 @@ export default function SearchFilterSidebar({
             placeholder="Min"
             value={priceRange?.[0] || ''}
             onChange={(e) => onPriceChange?.([e.target.value ? Number(e.target.value) : '', priceRange?.[1] || ''])}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary"
+            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary"
           />
           <span>—</span>
           <input
@@ -146,7 +141,7 @@ export default function SearchFilterSidebar({
             placeholder="Max"
             value={priceRange?.[1] || ''}
             onChange={(e) => onPriceChange?.([priceRange?.[0] || '', e.target.value ? Number(e.target.value) : ''])}
-            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary"
+            className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary"
           />
         </div>
       </FilterSection>
