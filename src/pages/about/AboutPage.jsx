@@ -85,10 +85,10 @@ const benefitCards = [
 ]
 
 const avatarImages = [
-  '/images/avatars/avatar-1.svg',
-  '/images/avatars/avatar-2.svg',
-  '/images/avatars/avatar-3.svg',
-  '/images/avatars/avatar-4.svg',
+  '/images/avatars/customer-avatar.png',
+  '/images/avatars/customer-avatar.png',
+  '/images/avatars/customer-avatar.png',
+  '/images/avatars/customer-avatar.png',
 ]
 
 const testimonials = [
