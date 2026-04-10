@@ -8,10 +8,7 @@ if (!SALEOR_API_URL) {
 }
 
 const client = new GraphQLClient(SALEOR_API_URL || '', {
-  headers: {
-    'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
-  },
+  headers: { 'Content-Type': 'application/json' },
 })
 
 export class SaleorError extends Error {
