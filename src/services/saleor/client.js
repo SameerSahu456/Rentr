@@ -8,12 +8,15 @@ if (!SALEOR_API_URL) {
 }
 
 const client = new GraphQLClient(SALEOR_API_URL || '', {
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
+  },
 })
 
 export class SaleorError extends Error {
   constructor(errors) {
-    const message = errors.map(e => e.message || e.field).join(', ')
+    const message = errors.map(e => e.field ? `${e.field}: ${e.message}` : e.message).join(', ')
     super(message)
     this.name = 'SaleorError'
     this.errors = errors
@@ -33,6 +36,18 @@ export async function saleorRequest(query, variables = {}, token = null) {
 
   const data = await client.request(query, vars, headers)
   return data
+}
+
+// Base URL for rewriting thumbnail/media URLs from localhost to the public tunnel
+const SALEOR_BASE_URL = SALEOR_API_URL ? SALEOR_API_URL.replace('/graphql/', '') : ''
+
+export function rewriteMediaUrl(url) {
+  if (!url) return ''
+  // Replace localhost:8000 references with the public Saleor base URL
+  if (url.includes('localhost:8000') || url.includes('localhost:8001')) {
+    return url.replace(/http:\/\/localhost:800[01]/, SALEOR_BASE_URL)
+  }
+  return url
 }
 
 export { SALEOR_CHANNEL }
