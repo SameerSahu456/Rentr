@@ -181,7 +181,7 @@ export default function AssetDetail() {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
               <InfoItem icon={HardDrive} label="OEM / Model" value={[asset.oem, asset.model].filter(Boolean).join(' / ') || '-'} />
-              <InfoItem icon={Package} label="Specs" value={asset.specs || '-'} />
+              <InfoItem icon={Package} label="Specs" value={asset.specs && typeof asset.specs === 'object' ? Object.entries(asset.specs).map(([k, v]) => `${k}: ${v}`).join(', ') : (asset.specs || '-')} />
               <InfoItem icon={FileText} label="Serial Number" value={asset.serial_number || '-'} />
               <InfoItem icon={CreditCard} label="Acquisition Cost" value={`₹${fmt(asset.acquisition_cost)}`} />
               <InfoItem icon={Calendar} label="Acquisition Date" value={asset.acquisition_date ? new Date(asset.acquisition_date).toLocaleDateString('en-IN') : '-'} />

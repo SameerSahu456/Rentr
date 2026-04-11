@@ -63,7 +63,7 @@ def list_orders(
             "source": "crm" if cust_record and cust_record.customer_type == "partner" else "website",
             "customer_name": customer.full_name if customer else "Unknown",
             "customer_email": customer.email if customer else "",
-            "customer_type": cust_record.customer_type if cust_record else "customer",
+            "customer_type": (cust_record.customer_type.value if hasattr(cust_record.customer_type, "value") else cust_record.customer_type) if cust_record else "customer",
             "items": order_items,
             "total_monthly": float(o.total_amount or 0),
             "rental_months": o.rental_months,
@@ -104,8 +104,10 @@ def get_order(
     # Linked assets (deployed to this customer)
     linked_assets = db.query(Asset).filter(Asset.customer_email == cust_email).all()
     assets_data = [
-        {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model, "status": a.status,
-         "condition_grade": a.condition_grade, "monthly_rate": float(a.monthly_rate or 0)}
+        {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+         "status": a.status.value if hasattr(a.status, "value") else a.status,
+         "condition_grade": a.condition_grade.value if hasattr(a.condition_grade, "value") else a.condition_grade,
+         "monthly_rate": float(a.monthly_rate or 0)}
         for a in linked_assets
     ]
 
@@ -127,7 +129,7 @@ def get_order(
     linked_payments = db.query(Payment).filter(Payment.invoice_id.in_(invoice_ids)).order_by(Payment.created_at.desc()).all() if invoice_ids else []
     payments_data = [
         {"id": p.id, "invoice_number": p.invoice_number, "amount": float(p.amount or 0),
-         "method": p.method, "status": p.status, "transaction_id": p.transaction_id,
+         "method": p.method, "status": p.status.value if hasattr(p.status, "value") else p.status, "transaction_id": p.transaction_id,
          "created_at": p.created_at.isoformat() if p.created_at else None}
         for p in linked_payments
     ]
@@ -135,7 +137,7 @@ def get_order(
     # Linked returns
     linked_returns = db.query(Return).filter(Return.customer_email == cust_email).order_by(Return.created_at.desc()).all()
     returns_data = [
-        {"id": r.id, "return_number": r.return_number, "reason": r.reason, "status": r.status,
+        {"id": r.id, "return_number": r.return_number, "reason": r.reason, "status": r.status.value if hasattr(r.status, "value") else r.status,
          "asset_uids": r.asset_uids or [], "damage_charges": float(r.damage_charges or 0)}
         for r in linked_returns
     ]
@@ -144,7 +146,7 @@ def get_order(
     linked_tickets = db.query(SupportTicket).filter(SupportTicket.customer_email == cust_email).order_by(SupportTicket.created_at.desc()).all()
     tickets_data = [
         {"id": t.id, "ticket_number": t.ticket_number, "subject": t.subject,
-         "priority": t.priority, "status": t.status}
+         "priority": t.priority.value if hasattr(t.priority, "value") else t.priority, "status": t.status.value if hasattr(t.status, "value") else t.status}
         for t in linked_tickets
     ]
 
@@ -173,25 +175,44 @@ def get_order(
             "end_date": c.end_date.isoformat() if c.end_date else None,
         }
 
-    # Linked shipments
+    # Linked shipments (enriched)
     linked_shipments = db.query(Shipment).filter(Shipment.order_id == order.id).order_by(Shipment.created_at.desc()).all()
     shipments_data = [
         {"id": s.id, "shipment_number": s.shipment_number,
          "shipment_type": s.shipment_type.value if s.shipment_type else None,
          "status": s.status.value if s.status else None,
-         "logistics_partner": s.logistics_partner}
+         "logistics_partner": s.logistics_partner,
+         "tracking_number": s.tracking_number,
+         "estimated_delivery": s.estimated_delivery.isoformat() if s.estimated_delivery else None,
+         "timeline": s.timeline or [],
+         "created_at": s.created_at.isoformat() if s.created_at else None}
         for s in linked_shipments
     ]
 
-    # Linked delivery challans
+    # Linked delivery challans (enriched)
     linked_challans = db.query(DeliveryChallan).filter(DeliveryChallan.order_id == order.id).order_by(DeliveryChallan.created_at.desc()).all()
     challans_data = [
         {"id": dc.id, "dc_number": dc.dc_number,
          "challan_type": dc.challan_type.value if dc.challan_type else None,
          "status": dc.status.value if dc.status else None,
-         "total_value": float(dc.total_value or 0)}
+         "total_value": float(dc.total_value or 0),
+         "transporter_name": dc.transporter_name,
+         "eway_bill_number": dc.eway_bill_number,
+         "vehicle_number": dc.vehicle_number,
+         "items": dc.items or [],
+         "created_at": dc.created_at.isoformat() if dc.created_at else None}
         for dc in linked_challans
     ]
+
+    # Combined logistics object
+    logistics = {
+        "shipments": shipments_data,
+        "delivery_challans": challans_data,
+        "total_shipments": len(shipments_data),
+        "total_challans": len(challans_data),
+        "latest_shipment_status": shipments_data[0]["status"] if shipments_data else None,
+        "latest_challan_status": challans_data[0]["status"] if challans_data else None,
+    }
 
     # Linked standard replacements
     linked_replacements = db.query(Replacement).filter(Replacement.order_id == order.id).all()
@@ -209,7 +230,7 @@ def get_order(
         "source": "crm" if cust_record and cust_record.customer_type == "partner" else "website",
         "customer_name": customer.full_name if customer else "Unknown",
         "customer_email": cust_email,
-        "customer_type": cust_record.customer_type if cust_record else "customer",
+        "customer_type": (cust_record.customer_type.value if hasattr(cust_record.customer_type, "value") else cust_record.customer_type) if cust_record else "customer",
         "status": order.status.value if hasattr(order.status, "value") else order.status,
         "created_at": order.created_at.isoformat() if order.created_at else None,
         "shipping_address": order.shipping_address,
@@ -224,6 +245,7 @@ def get_order(
         "payments": payments_data,
         "returns": returns_data,
         "tickets": tickets_data,
+        "logistics": logistics,
         "shipments": shipments_data,
         "delivery_challans": challans_data,
         "replacements": replacements_data,

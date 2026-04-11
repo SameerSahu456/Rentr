@@ -655,78 +655,159 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {/* Delivery Challans */}
-      {order.delivery_challans && order.delivery_challans.length > 0 && (
+      {/* Logistics — Combined Shipments & Delivery Challans */}
+      {((order.shipments && order.shipments.length > 0) || (order.delivery_challans && order.delivery_challans.length > 0) || order.logistics) && (
         <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-foreground/[0.05]">
-            <FileCheck size={18} className="text-blue-500" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Delivery Challans</h2>
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-foreground/[0.05]">
+            <div className="flex items-center gap-2">
+              <Truck size={18} className="text-rentr-primary" />
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Logistics</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              {order.logistics && (
+                <>
+                  <span className="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[9px] font-bold uppercase tracking-widest border border-purple-500/15">
+                    {order.logistics.total_shipments || (order.shipments || []).length} Shipment{((order.logistics?.total_shipments ?? (order.shipments || []).length) !== 1) ? 's' : ''}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-bold uppercase tracking-widest border border-blue-500/15">
+                    {order.logistics.total_challans || (order.delivery_challans || []).length} Challan{((order.logistics?.total_challans ?? (order.delivery_challans || []).length) !== 1) ? 's' : ''}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
-          <div className="space-y-3">
-            {order.delivery_challans.map((dc) => (
-              <div key={dc.id} className="p-4 bg-blue-500/5 border border-blue-500/15 rounded-xl cursor-pointer hover:bg-blue-500/10 transition-colors"
-                   onClick={() => navigate(`/delivery-challans/${dc.id}`)}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-blue-500">{dc.dc_number}</span>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${
-                      dc.challan_type === 'replacement' ? 'bg-orange-500/10 text-orange-400' : 'bg-blue-500/10 text-blue-400'
-                    }`}>{(dc.challan_type || '').replace(/_/g, ' ')}</span>
-                  </div>
-                  <StatusBadge status={dc.status} />
-                </div>
-                <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-foreground/40">
-                  {dc.transporter_name && <span>Transporter: {dc.transporter_name}</span>}
-                  {dc.lr_number && <span>LR: {dc.lr_number}</span>}
-                  {dc.eway_bill_number && <span>E-way: {dc.eway_bill_number}</span>}
-                  {dc.asset_uids && <span>Assets: {dc.asset_uids.length}</span>}
-                  {dc.dispatched_at && <span>Dispatched: {new Date(dc.dispatched_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
-                  {dc.delivered_at && <span className="text-emerald-500">Delivered: {new Date(dc.delivered_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
-                  {dc.received_by && <span>Received by: {dc.received_by}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Shipments */}
-      {order.shipments && order.shipments.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-foreground/[0.05]">
-            <Truck size={18} className="text-purple-500" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Shipments</h2>
-          </div>
-          <div className="space-y-3">
-            {order.shipments.map((s) => (
-              <div key={s.id} className="p-4 bg-purple-500/5 border border-purple-500/15 rounded-xl cursor-pointer hover:bg-purple-500/10 transition-colors"
-                   onClick={() => navigate(`/shipments/${s.id}`)}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-purple-500">{s.shipment_number}</span>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${
-                      s.shipment_type === 'return' ? 'bg-red-500/10 text-red-400' :
-                      s.shipment_type === 'replacement' ? 'bg-orange-500/10 text-orange-400' :
-                      'bg-emerald-500/10 text-emerald-400'
-                    }`}>{s.shipment_type}</span>
-                  </div>
-                  <StatusBadge status={s.status} />
-                </div>
-                <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-foreground/40">
-                  {s.logistics_partner && <span>{s.logistics_partner}</span>}
-                  {s.tracking_number && <span>Tracking: {s.tracking_number}</span>}
-                  {s.estimated_delivery && <span>ETA: {new Date(s.estimated_delivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
-                  {s.asset_uids && <span>Assets: {s.asset_uids.length}</span>}
-                  {s.tracking_url && (
-                    <a href={s.tracking_url} target="_blank" rel="noopener noreferrer"
-                       className="text-rentr-primary hover:underline" onClick={(e) => e.stopPropagation()}>
-                      Track →
-                    </a>
-                  )}
-                </div>
+          {/* Shipments Sub-Section */}
+          {(order.shipments || order.logistics?.shipments || []).length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/40">Shipments</h3>
               </div>
-            ))}
-          </div>
+              <div className="space-y-3">
+                {(order.shipments || order.logistics?.shipments || []).map((s) => (
+                  <div key={s.id} className="p-4 bg-purple-500/5 border border-purple-500/15 rounded-xl cursor-pointer hover:bg-purple-500/10 transition-colors"
+                       onClick={() => navigate(`/shipments/${s.id}`)}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono font-bold text-purple-500">{s.shipment_number}</span>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${
+                          s.shipment_type === 'return' ? 'bg-red-500/10 text-red-400' :
+                          s.shipment_type === 'replacement' ? 'bg-orange-500/10 text-orange-400' :
+                          'bg-emerald-500/10 text-emerald-400'
+                        }`}>{s.shipment_type}</span>
+                      </div>
+                      <StatusBadge status={s.status} />
+                    </div>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-foreground/40">
+                      {s.logistics_partner && <span>Partner: {s.logistics_partner}</span>}
+                      {s.tracking_number && <span>AWB: {s.tracking_number}</span>}
+                      {s.estimated_delivery && <span>ETA: {new Date(s.estimated_delivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                      {s.created_at && <span>Created: {new Date(s.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
+                      {s.asset_uids && <span>Assets: {s.asset_uids.length}</span>}
+                      {s.tracking_url && (
+                        <a href={s.tracking_url} target="_blank" rel="noopener noreferrer"
+                           className="text-rentr-primary hover:underline" onClick={(e) => e.stopPropagation()}>
+                          Track Shipment
+                        </a>
+                      )}
+                    </div>
+                    {/* Shipment Timeline */}
+                    {s.timeline && s.timeline.length > 0 && (
+                      <div className="flex items-center gap-1 mt-3 overflow-x-auto">
+                        {s.timeline.map((step, i) => (
+                          <div key={i} className="flex items-center">
+                            <div className="flex flex-col items-center min-w-[60px]">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                i < s.timeline.length - 1 ? 'bg-emerald-500' : 'bg-rentr-primary'
+                              }`}>
+                                {i < s.timeline.length - 1
+                                  ? <CheckCircle2 size={12} className="text-white" />
+                                  : <Clock size={12} className="text-white" />}
+                              </div>
+                              <span className="text-[7px] font-bold uppercase tracking-widest mt-1 text-center text-foreground/40">
+                                {(step.status || step.description || '').replace(/_/g, ' ').substring(0, 12)}
+                              </span>
+                            </div>
+                            {i < s.timeline.length - 1 && (
+                              <div className="h-0.5 w-4 sm:w-6 bg-emerald-500" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Delivery Challans Sub-Section */}
+          {(order.delivery_challans || order.logistics?.delivery_challans || []).length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/40">Delivery Challans</h3>
+              </div>
+              <div className="space-y-3">
+                {(order.delivery_challans || order.logistics?.delivery_challans || []).map((dc) => (
+                  <div key={dc.id} className="p-4 bg-blue-500/5 border border-blue-500/15 rounded-xl cursor-pointer hover:bg-blue-500/10 transition-colors"
+                       onClick={() => navigate(`/delivery-challans/${dc.id}`)}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono font-bold text-blue-500">{dc.dc_number}</span>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${
+                          dc.challan_type === 'inward' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/15' : 'bg-blue-500/10 text-blue-400 border border-blue-500/15'
+                        }`}>{(dc.challan_type || '').replace(/_/g, ' ')}</span>
+                      </div>
+                      <StatusBadge status={dc.status} />
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-2 text-xs mt-2">
+                      {dc.transporter_name && (
+                        <div>
+                          <span className="text-foreground/20 block text-[8px] uppercase tracking-widest">Transporter</span>
+                          <span className="text-foreground/60">{dc.transporter_name}</span>
+                        </div>
+                      )}
+                      {dc.vehicle_number && (
+                        <div>
+                          <span className="text-foreground/20 block text-[8px] uppercase tracking-widest">Vehicle</span>
+                          <span className="text-foreground/60 font-mono">{dc.vehicle_number}</span>
+                        </div>
+                      )}
+                      {dc.eway_bill_number && (
+                        <div>
+                          <span className="text-foreground/20 block text-[8px] uppercase tracking-widest">E-Way Bill</span>
+                          <span className="text-foreground/60 font-mono">{dc.eway_bill_number}</span>
+                        </div>
+                      )}
+                      {dc.total_value > 0 && (
+                        <div>
+                          <span className="text-foreground/20 block text-[8px] uppercase tracking-widest">Value</span>
+                          <span className="text-foreground/60 font-semibold">{`\u20B9${fmt(dc.total_value)}`}</span>
+                        </div>
+                      )}
+                    </div>
+                    {dc.items && dc.items.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-blue-500/10">
+                        <span className="text-[8px] uppercase tracking-widest text-foreground/20 mb-1 block">Items ({dc.items.length})</span>
+                        <div className="flex flex-wrap gap-2">
+                          {dc.items.slice(0, 5).map((item, idx) => (
+                            <span key={idx} className="px-2 py-0.5 bg-blue-500/5 border border-blue-500/10 rounded text-[9px] font-mono text-foreground/40">
+                              {item.uid || item.description || `Item ${idx + 1}`}
+                            </span>
+                          ))}
+                          {dc.items.length > 5 && (
+                            <span className="px-2 py-0.5 text-[9px] text-foreground/30">+{dc.items.length - 5} more</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
