@@ -1,3 +1,4 @@
+// API base URL — includes /v1 prefix for versioned endpoints
 const BASE_URL = import.meta.env.VITE_ADMIN_API_URL || '/api';
 
 function getToken() {

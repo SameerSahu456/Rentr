@@ -18,6 +18,11 @@ from app.core.database import Base
 class UserRole(str, enum.Enum):
     customer = "customer"
     partner = "partner"
+    admin = "admin"
+    agent = "agent"
+    ops_manager = "ops_manager"
+    service_manager = "service_manager"
+    finance = "finance"
 
 
 class User(Base):

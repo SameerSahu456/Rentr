@@ -11,6 +11,7 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    get_current_user,
 )
 from app.models.user import User
 from app.schemas.user import (
@@ -79,6 +80,46 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is deactivated",
         )
+
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+    )
+
+
+@router.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    """Get the currently authenticated user's profile."""
+    return current_user
+
+
+@router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+def signup(payload: UserRegister, db: Session = Depends(get_db)):
+    """Register a new admin/agent user and return tokens."""
+    existing = db.query(User).filter(User.email == payload.email).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already registered",
+        )
+
+    user = User(
+        email=payload.email,
+        phone=payload.phone,
+        full_name=payload.full_name,
+        password_hash=hash_password(payload.password),
+        role=payload.role,
+        company_name=payload.company_name,
+        industry=payload.industry,
+        gst_no=payload.gst_no,
+        company_pan=payload.company_pan,
+        city=payload.city,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
     access_token = create_access_token(data={"sub": str(user.id)})
     refresh_token = create_refresh_token(data={"sub": str(user.id)})
