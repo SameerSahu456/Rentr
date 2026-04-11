@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #6d5ed6;
+  --color-primary-light: #8b7fe8;
+  --color-primary-dark: #5a4bb8;
+  --color-secondary: #3d2f9e;
+  --color-tertiary: #9d8fe8;
+  --color-dark: #17113e;
+  --color-dark-bg: #1a1145;
+  --color-dark-surface: #231754;
+  --color-accent-orange: #f97316;
+  --color-navy: #2d1b69;
+  --color-gray-1: #333333;
+  --color-gray-2: #4f4f4f;
+  --color-gray-3: #828282;
+  --color-gray-secondary: #3b3b3b;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Poppins', sans-serif;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: #1e293b;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-8 py-3 rounded-full font-medium transition-all duration-200 hover:bg-primary-dark active:scale-[0.98] cursor-pointer;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 px-8 py-3 rounded-full font-medium transition-all duration-200 hover:bg-gray-50 cursor-pointer;
+  }
+
+  .input-field {
+    @apply w-full border border-gray-300 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400;
+  }
+
+  .input-field-rect {
+    @apply w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors placeholder-gray-400;
+  }
+
+  .section-container {
+    @apply max-w-[1400px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16;
+  }
+
+  .promo-banner {
+    @apply text-center py-2.5 text-sm font-medium;
+  }
+}
