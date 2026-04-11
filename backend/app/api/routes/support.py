@@ -11,7 +11,9 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.rental import (
     SupportTicket, TicketStatus, TicketPriority, TicketMessage, SenderType,
+    Asset, Contract, Replacement,
 )
+from app.models.order import Order
 
 router = APIRouter(prefix="/support", tags=["Support"])
 
@@ -102,6 +104,36 @@ def get_ticket(
         .all()
     )
 
+    # Linked asset
+    asset_data = None
+    if ticket.asset_uid:
+        a = db.query(Asset).filter(Asset.uid == ticket.asset_uid).first()
+        if a:
+            asset_data = {
+                "id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+                "status": a.status.value if a.status else None,
+            }
+
+    # Linked contract
+    contract_data = None
+    if ticket.contract_id:
+        c = db.query(Contract).filter(Contract.id == ticket.contract_id).first()
+        if c:
+            contract_data = {
+                "id": c.id, "contract_number": c.contract_number,
+                "status": c.status.value if c.status else None,
+            }
+
+    # Linked advance replacements
+    linked_replacements = db.query(Replacement).filter(Replacement.ticket_id == ticket.id).all()
+    adv_replacements_data = [
+        {"id": r.id, "replacement_number": r.replacement_number,
+         "faulty_asset_uid": r.faulty_asset_uid, "replacement_asset_uid": r.replacement_asset_uid,
+         "reason": r.faulty_reason, "notes": r.faulty_reason,
+         "status": r.status.value if r.status else None}
+        for r in linked_replacements
+    ]
+
     return {
         "id": ticket.id,
         "ticket_number": ticket.ticket_number,
@@ -114,7 +146,9 @@ def get_ticket(
         "status": ticket.status.value if ticket.status else None,
         "assigned_to": ticket.assigned_to,
         "asset_uid": ticket.asset_uid,
+        "asset": asset_data,
         "contract_id": ticket.contract_id,
+        "contract": contract_data,
         "sla_deadline": ticket.sla_deadline.isoformat() if ticket.sla_deadline else None,
         "sla_response_deadline": ticket.sla_response_deadline.isoformat() if ticket.sla_response_deadline else None,
         "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
@@ -122,12 +156,16 @@ def get_ticket(
             {
                 "id": m.id,
                 "message": m.message,
+                "content": m.message,
                 "sender": m.sender,
+                "sender_name": m.sender,
                 "sender_type": m.sender_type.value if m.sender_type else None,
                 "timestamp": m.timestamp.isoformat() if m.timestamp else None,
+                "created_at": m.timestamp.isoformat() if m.timestamp else None,
             }
             for m in messages
         ],
+        "advance_replacements": adv_replacements_data,
     }
 
 

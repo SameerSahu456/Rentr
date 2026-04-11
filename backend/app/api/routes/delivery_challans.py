@@ -6,7 +6,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import DeliveryChallan
+from app.models.rental import DeliveryChallan, Asset
 
 router = APIRouter(prefix="/delivery-challans", tags=["Delivery Challans"])
 
@@ -58,6 +58,22 @@ def get_challan(
     challan = db.query(DeliveryChallan).filter(DeliveryChallan.id == challan_id).first()
     if not challan:
         raise HTTPException(status_code=404, detail="Delivery challan not found")
+
+    # Build linked_assets from items JSONB (each item may have asset_uid)
+    items = challan.items or []
+    asset_uids = [item.get("asset_uid") or item.get("uid") for item in items if isinstance(item, dict)]
+    asset_uids = [u for u in asset_uids if u]
+    linked_assets = []
+    if asset_uids:
+        assets = db.query(Asset).filter(Asset.uid.in_(asset_uids)).all()
+        linked_assets = [
+            {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+             "serial_number": a.serial_number,
+             "status": a.status.value if a.status else None,
+             "condition_grade": a.condition_grade.value if a.condition_grade else None}
+            for a in assets
+        ]
+
     return {
         "id": challan.id,
         "dc_number": challan.dc_number,
@@ -69,7 +85,8 @@ def get_challan(
         "eway_bill_number": challan.eway_bill_number,
         "vehicle_number": challan.vehicle_number,
         "status": challan.status.value if challan.status else None,
-        "items": challan.items or [],
+        "items": items,
+        "linked_assets": linked_assets,
         "created_at": challan.created_at.isoformat() if challan.created_at else None,
     }
 

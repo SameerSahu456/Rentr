@@ -9,7 +9,7 @@ from typing import Optional, List
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import Return, ReturnStatus
+from app.models.rental import Return, ReturnStatus, Asset, Invoice, SupportTicket
 
 router = APIRouter(prefix="/returns", tags=["Returns"])
 
@@ -84,19 +84,52 @@ def get_return(
     ret = db.query(Return).filter(Return.id == return_id).first()
     if not ret:
         raise HTTPException(status_code=404, detail="Return not found")
+
+    # Linked assets by UID
+    asset_uids = ret.asset_uids or []
+    linked_assets = []
+    if asset_uids:
+        linked_assets = db.query(Asset).filter(Asset.uid.in_(asset_uids)).all()
+    assets_data = [
+        {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+         "serial_number": a.serial_number,
+         "status": a.status.value if a.status else None,
+         "condition_grade": a.condition_grade.value if a.condition_grade else None}
+        for a in linked_assets
+    ]
+
+    # Linked invoices
+    linked_invoices = db.query(Invoice).filter(Invoice.customer_email == ret.customer_email).order_by(Invoice.created_at.desc()).limit(10).all()
+    invoices_data = [
+        {"id": inv.id, "invoice_number": inv.invoice_number, "total": float(inv.total or 0),
+         "status": inv.status.value if inv.status else None}
+        for inv in linked_invoices
+    ]
+
+    # Linked tickets
+    linked_tickets = db.query(SupportTicket).filter(SupportTicket.customer_email == ret.customer_email).order_by(SupportTicket.created_at.desc()).limit(10).all()
+    tickets_data = [
+        {"id": t.id, "ticket_number": t.ticket_number, "subject": t.subject,
+         "status": t.status.value if t.status else None}
+        for t in linked_tickets
+    ]
+
     return {
         "id": ret.id,
         "return_number": ret.return_number,
         "customer_name": ret.customer_name,
         "customer_email": ret.customer_email,
         "contract_id": ret.contract_id,
-        "asset_uids": ret.asset_uids or [],
+        "asset_uids": asset_uids,
+        "linked_assets": assets_data,
         "reason": ret.reason,
         "status": ret.status.value if ret.status else None,
         "pickup_date": ret.pickup_date.isoformat() if ret.pickup_date else None,
         "grn_number": ret.grn_number,
         "damage_charges": ret.damage_charges,
         "damage_report": ret.damage_report or {},
+        "invoices": invoices_data,
+        "tickets": tickets_data,
         "created_at": ret.created_at.isoformat() if ret.created_at else None,
     }
 

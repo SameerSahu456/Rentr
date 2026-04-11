@@ -10,7 +10,7 @@ from app.models.cart import Cart, CartItem
 from app.models.order import Order, OrderItem
 from app.models.rental import (
     Customer, Contract, Asset, Invoice, Payment, Return,
-    SupportTicket, Replacement, Shipment,
+    SupportTicket, Replacement, Shipment, DeliveryChallan,
 )
 from app.schemas.order import OrderCreate
 
@@ -149,16 +149,57 @@ def get_order(
     ]
 
     # Linked advance replacements
-    linked_replacements = db.query(Replacement).filter(
+    linked_adv_replacements = db.query(Replacement).filter(
         Replacement.replacement_type == "advance", Replacement.order_id == order.id
     ).all()
-    if not linked_replacements:
-        linked_replacements = db.query(Replacement).filter(
+    if not linked_adv_replacements:
+        linked_adv_replacements = db.query(Replacement).filter(
             Replacement.replacement_type == "advance", Replacement.customer_name == (customer.full_name if customer else "")
         ).all()
-    replacements_data = [
+    adv_replacements_data = [
         {"id": r.id, "replacement_number": r.replacement_number, "faulty_asset_uid": r.faulty_asset_uid,
-         "replacement_asset_uid": r.replacement_asset_uid, "status": r.status}
+         "replacement_asset_uid": r.replacement_asset_uid, "status": r.status.value if hasattr(r.status, "value") else r.status}
+        for r in linked_adv_replacements
+    ]
+
+    # Linked contract
+    contract_data = None
+    if linked_contracts:
+        c = linked_contracts[0]
+        contract_data = {
+            "id": c.id, "contract_number": c.contract_number,
+            "status": c.status.value if c.status else None,
+            "start_date": c.start_date.isoformat() if c.start_date else None,
+            "end_date": c.end_date.isoformat() if c.end_date else None,
+        }
+
+    # Linked shipments
+    linked_shipments = db.query(Shipment).filter(Shipment.order_id == order.id).order_by(Shipment.created_at.desc()).all()
+    shipments_data = [
+        {"id": s.id, "shipment_number": s.shipment_number,
+         "shipment_type": s.shipment_type.value if s.shipment_type else None,
+         "status": s.status.value if s.status else None,
+         "logistics_partner": s.logistics_partner}
+        for s in linked_shipments
+    ]
+
+    # Linked delivery challans
+    linked_challans = db.query(DeliveryChallan).filter(DeliveryChallan.order_id == order.id).order_by(DeliveryChallan.created_at.desc()).all()
+    challans_data = [
+        {"id": dc.id, "dc_number": dc.dc_number,
+         "challan_type": dc.challan_type.value if dc.challan_type else None,
+         "status": dc.status.value if dc.status else None,
+         "total_value": float(dc.total_value or 0)}
+        for dc in linked_challans
+    ]
+
+    # Linked standard replacements
+    linked_replacements = db.query(Replacement).filter(Replacement.order_id == order.id).all()
+    replacements_data = [
+        {"id": r.id, "replacement_number": r.replacement_number,
+         "replacement_type": r.replacement_type.value if r.replacement_type else None,
+         "faulty_asset_uid": r.faulty_asset_uid, "replacement_asset_uid": r.replacement_asset_uid,
+         "status": r.status.value if hasattr(r.status, "value") else r.status}
         for r in linked_replacements
     ]
 
@@ -177,12 +218,16 @@ def get_order(
         "total_monthly": float(order.total_amount or 0),
         "rental_months": order.rental_months,
         "sales_order_pdf": None,
+        "contract": contract_data,
         "assets": assets_data,
         "invoices": invoices_data,
         "payments": payments_data,
         "returns": returns_data,
         "tickets": tickets_data,
-        "advance_replacements": replacements_data,
+        "shipments": shipments_data,
+        "delivery_challans": challans_data,
+        "replacements": replacements_data,
+        "advance_replacements": adv_replacements_data,
     }
 
 

@@ -6,7 +6,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import Replacement
+from app.models.rental import Replacement, Asset
 
 router = APIRouter(prefix="/replacements", tags=["Replacements"])
 
@@ -61,6 +61,29 @@ def get_replacement(
     replacement = db.query(Replacement).filter(Replacement.id == replacement_id).first()
     if not replacement:
         raise HTTPException(status_code=404, detail="Replacement not found")
+
+    # Linked faulty asset
+    faulty_asset = None
+    if replacement.faulty_asset_uid:
+        a = db.query(Asset).filter(Asset.uid == replacement.faulty_asset_uid).first()
+        if a:
+            faulty_asset = {
+                "id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+                "serial_number": a.serial_number,
+                "status": a.status.value if a.status else None,
+            }
+
+    # Linked replacement asset
+    replacement_asset = None
+    if replacement.replacement_asset_uid:
+        a = db.query(Asset).filter(Asset.uid == replacement.replacement_asset_uid).first()
+        if a:
+            replacement_asset = {
+                "id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+                "serial_number": a.serial_number,
+                "status": a.status.value if a.status else None,
+            }
+
     return {
         "id": replacement.id,
         "replacement_number": replacement.replacement_number,
@@ -70,6 +93,8 @@ def get_replacement(
         "ticket_id": replacement.ticket_id,
         "faulty_asset_uid": replacement.faulty_asset_uid,
         "replacement_asset_uid": replacement.replacement_asset_uid,
+        "faulty_asset": faulty_asset,
+        "replacement_asset": replacement_asset,
         "faulty_reason": replacement.faulty_reason,
         "status": replacement.status.value if replacement.status else None,
         "damage_charges": replacement.damage_charges,

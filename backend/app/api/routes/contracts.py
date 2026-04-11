@@ -12,8 +12,9 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.rental import (
     Contract, ContractStatus, ContractTimeline, ContractReminder,
-    ContractAnnexure, AnnexureStatus, Customer,
+    ContractAnnexure, AnnexureStatus, Customer, Asset, Invoice, Return, SupportTicket,
 )
+from app.models.order import Order
 
 router = APIRouter(prefix="/contracts", tags=["Contracts"])
 
@@ -124,6 +125,52 @@ def get_contract(
     reminders = db.query(ContractReminder).filter(ContractReminder.contract_id == contract.id).all()
     annexures = db.query(ContractAnnexure).filter(ContractAnnexure.contract_id == contract.id).all()
 
+    # Linked order
+    order_data = None
+    if contract.order_id:
+        o = db.query(Order).filter(Order.id == contract.order_id).first()
+        if o:
+            order_data = {
+                "id": o.id, "order_number": f"ORD-{o.id:05d}",
+                "status": o.status.value if hasattr(o.status, "value") else o.status,
+            }
+
+    # Linked assets
+    linked_assets = db.query(Asset).filter(Asset.contract_id == contract.id).all()
+    assets_data = [
+        {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
+         "status": a.status.value if a.status else None,
+         "condition_grade": a.condition_grade.value if a.condition_grade else None,
+         "monthly_rate": float(a.monthly_rate or 0)}
+        for a in linked_assets
+    ]
+
+    # Linked invoices
+    linked_invoices = db.query(Invoice).filter(Invoice.contract_id == contract.id).order_by(Invoice.created_at.desc()).all()
+    invoices_data = [
+        {"id": inv.id, "invoice_number": inv.invoice_number, "total": float(inv.total or 0),
+         "status": inv.status.value if inv.status else None,
+         "due_date": inv.due_date.isoformat() if inv.due_date else None}
+        for inv in linked_invoices
+    ]
+
+    # Linked returns
+    linked_returns = db.query(Return).filter(Return.contract_id == contract.id).order_by(Return.created_at.desc()).all()
+    returns_data = [
+        {"id": r.id, "return_number": r.return_number, "status": r.status.value if r.status else None,
+         "asset_uids": r.asset_uids or []}
+        for r in linked_returns
+    ]
+
+    # Linked tickets
+    linked_tickets = db.query(SupportTicket).filter(SupportTicket.contract_id == contract.id).order_by(SupportTicket.created_at.desc()).all()
+    tickets_data = [
+        {"id": t.id, "ticket_number": t.ticket_number, "subject": t.subject,
+         "priority": t.priority.value if t.priority else None,
+         "status": t.status.value if t.status else None}
+        for t in linked_tickets
+    ]
+
     return {
         "id": contract.id,
         "contract_number": contract.contract_number,
@@ -131,13 +178,14 @@ def get_contract(
         "customer_name": contract.customer_name,
         "customer_email": contract.customer_email,
         "order_id": contract.order_id,
+        "order": order_data,
         "type": contract.type.value if contract.type else None,
         "status": contract.status.value if contract.status else None,
         "document_url": contract.document_url,
         "signed_at": contract.signed_at.isoformat() if contract.signed_at else None,
         "start_date": contract.start_date.isoformat() if contract.start_date else None,
         "end_date": contract.end_date.isoformat() if contract.end_date else None,
-        "assets": contract.assets or [],
+        "assets": assets_data if assets_data else (contract.assets or []),
         "created_at": contract.created_at.isoformat() if contract.created_at else None,
         "timeline": [
             {
@@ -169,6 +217,9 @@ def get_contract(
             }
             for a in annexures
         ],
+        "invoices": invoices_data,
+        "returns": returns_data,
+        "tickets": tickets_data,
     }
 
 

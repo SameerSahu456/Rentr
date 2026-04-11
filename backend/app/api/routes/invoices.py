@@ -9,7 +9,7 @@ from typing import Optional, List
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import Invoice, InvoiceStatus, Payment, PaymentStatus
+from app.models.rental import Invoice, InvoiceStatus, Payment, PaymentStatus, Contract
 
 router = APIRouter(prefix="/invoices", tags=["Invoices"])
 
@@ -89,14 +89,29 @@ def get_invoice(
 
     payments = db.query(Payment).filter(Payment.invoice_id == invoice.id).all()
 
+    # Linked contract
+    contract_data = None
+    if invoice.contract_id:
+        c = db.query(Contract).filter(Contract.id == invoice.contract_id).first()
+        if c:
+            contract_data = {
+                "id": c.id, "contract_number": c.contract_number,
+                "status": c.status.value if c.status else None,
+            }
+
+    subtotal = float(invoice.total or 0) - float(invoice.gst_amount or 0)
+
     return {
         "id": invoice.id,
         "invoice_number": invoice.invoice_number,
         "customer_name": invoice.customer_name,
         "customer_email": invoice.customer_email,
         "contract_id": invoice.contract_id,
+        "contract": contract_data,
         "items": invoice.items or [],
         "total": invoice.total,
+        "subtotal": subtotal,
+        "tax": invoice.gst_amount,
         "gst_amount": invoice.gst_amount,
         "status": invoice.status.value if invoice.status else None,
         "due_date": invoice.due_date.isoformat() if invoice.due_date else None,

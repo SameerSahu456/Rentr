@@ -12,6 +12,7 @@ from app.models.user import User
 from app.models.rental import (
     Asset, AssetStatus, AssetLifecycleEvent, Contract, Return, SupportTicket,
 )
+from app.models.order import Order
 
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
@@ -135,11 +136,31 @@ def get_asset(
                 "status": c.status.value if c.status else None,
             }
 
-    returns = db.query(Return).filter(
-        Return.asset_uids.op("@>")(f'["{asset.uid}"]')
-    ).all() if asset.uid else []
+    # Find linked order via contract or customer
+    order_data = None
+    if asset.contract_id:
+        c = db.query(Contract).filter(Contract.id == asset.contract_id).first()
+        if c and c.order_id:
+            o = db.query(Order).filter(Order.id == c.order_id).first()
+            if o:
+                order_data = {
+                    "id": o.id, "order_number": f"ORD-{o.id:05d}",
+                    "status": o.status.value if hasattr(o.status, "value") else o.status,
+                }
 
-    tickets = db.query(SupportTicket).filter(SupportTicket.asset_uid == asset.uid).all()
+    # Use text cast to avoid JSONB type issues
+    from sqlalchemy import cast, text
+    from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
+    returns = []
+    if asset.uid:
+        try:
+            returns = db.query(Return).filter(
+                Return.asset_uids.op("@>")(cast(f'["{asset.uid}"]', PG_JSONB))
+            ).all()
+        except Exception:
+            returns = []
+
+    tickets = db.query(SupportTicket).filter(SupportTicket.asset_uid == asset.uid).all() if asset.uid else []
 
     return {
         "id": asset.id,
@@ -153,6 +174,7 @@ def get_asset(
         "condition_grade": asset.condition_grade.value if asset.condition_grade else None,
         "warehouse_id": asset.warehouse_id,
         "customer_email": asset.customer_email,
+        "customer_name": asset.customer_email,
         "contract_id": asset.contract_id,
         "monthly_rate": asset.monthly_rate,
         "acquisition_cost": asset.acquisition_cost,
@@ -168,17 +190,22 @@ def get_asset(
                 "to_state": e.to_state,
                 "notes": e.notes,
                 "user_email": e.user_email,
+                "triggered_by": e.user_email,
                 "timestamp": e.timestamp.isoformat() if e.timestamp else None,
             }
             for e in lifecycle_events
         ],
+        "order": order_data,
         "contract": contract,
         "returns": [
-            {"id": r.id, "return_number": r.return_number, "status": r.status.value if r.status else None}
+            {"id": r.id, "return_number": r.return_number, "reason": r.reason,
+             "status": r.status.value if r.status else None}
             for r in returns
         ],
         "tickets": [
-            {"id": t.id, "ticket_number": t.ticket_number, "subject": t.subject, "status": t.status.value if t.status else None}
+            {"id": t.id, "ticket_number": t.ticket_number, "subject": t.subject,
+             "priority": t.priority.value if t.priority else None,
+             "status": t.status.value if t.status else None}
             for t in tickets
         ],
     }
