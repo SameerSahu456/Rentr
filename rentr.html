@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RENTR - A COMPRINT Enterprise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rentr-primary: #6d5ed6;
+            --rentr-primary-light: #5a4bb8;
+            --rentr-secondary: #3d2f9e;
+            --rentr-tertiary: #9d8fe8;
+            --font-brand: 'Chakra Petch', sans-serif;
+        }
+
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 4px var(--rentr-primary); }
+            50% { box-shadow: 0 0 12px var(--rentr-primary), 0 0 20px rgba(109, 94, 214, 0.3); }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #FFFFFF;
+            font-family: var(--font-brand);
+        }
+
+        .demo-section {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 60px 40px; border-bottom: 1px solid #e2e8f0; width: 100%;
+        }
+        .demo-section:last-child { border-bottom: none; }
+        .demo-label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: #94a3b8; margin-bottom: 24px; font-weight: 500; }
+        .demo-row { display: flex; align-items: center; gap: 60px; flex-wrap: wrap; justify-content: center; }
+
+        /* RENTR LOGO */
+        .rentr-logo {
+            display: flex; flex-direction: column;
+            font-family: var(--font-brand); font-weight: 900; text-transform: uppercase;
+            letter-spacing: -0.02em; line-height: 1; user-select: none; cursor: default;
+            transition: transform 0.3s ease; animation: fade-in 0.6s ease-out;
+        }
+        .rentr-logo:hover { transform: scale(1.03); }
+
+        .rentr-logo.size-sm { font-size: 32px; }
+        .rentr-logo.size-md { font-size: 56px; }
+        .rentr-logo.size-lg { font-size: 80px; }
+        .rentr-logo.size-xl { font-size: 120px; }
+
+        .rentr-logo .text-row {
+            display: flex; align-items: baseline;
+        }
+
+        .rentr-logo .text-main { color: #0f172a; }
+        .rentr-logo .text-accent { color: var(--rentr-primary); }
+
+        .rentr-logo .line-row {
+            display: flex; gap: 4px; margin-top: 0.08em; width: 100%;
+        }
+
+        .rentr-logo .line-main {
+            height: 3px; flex: 1; border-radius: 9999px;
+            background-color: var(--rentr-primary);
+        }
+
+        .rentr-logo .line-dot {
+            height: 3px; width: 3px; border-radius: 9999px;
+            background-color: #cbd5e1;
+        }
+
+        /* Icon */
+        .rentr-icon {
+            display: flex; flex-direction: column; align-items: flex-end;
+            user-select: none; cursor: default; transition: transform 0.3s ease;
+        }
+        .rentr-icon:hover { transform: scale(1.1); }
+        .rentr-icon.size-sm { font-size: 32px; }
+        .rentr-icon.size-md { font-size: 56px; }
+        .rentr-icon.size-lg { font-size: 72px; }
+        .rentr-icon .icon-r { font-family: var(--font-brand); font-weight: 900; color: var(--rentr-primary); }
+        .rentr-icon .icon-line { height: 3px; width: 100%; border-radius: 9999px; margin-top: 2px; background-color: var(--rentr-primary); }
+
+        /* Dark background */
+        .dark-bg {
+            background: linear-gradient(135deg, #000000 0%, #2E1B69 50%, #0F172A 100%);
+            border-radius: 12px; padding: 48px 64px;
+        }
+        .dark-bg .rentr-logo .text-main { color: #FFFFFF; }
+        .dark-bg .rentr-logo .line-dot { background-color: #334155; }
+        .dark-bg .rentr-icon .icon-r { color: var(--rentr-primary); }
+
+        .tagline { margin-top: 8px; font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase; color: #94a3b8; font-weight: 500; }
+        .dark-bg .tagline { color: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body>
+
+    <section class="demo-section">
+        <div class="demo-label">Primary Logo - XL</div>
+        <div>
+            <div class="rentr-logo size-xl">
+                <div class="text-row">
+                    <span class="text-main">RENT</span>
+                    <span class="text-accent">R</span>
+                </div>
+                <div class="line-row">
+                    <div class="line-main"></div>
+                    <div class="line-dot"></div>
+                    <div class="line-dot"></div>
+                    <div class="line-dot"></div>
+                </div>
+            </div>
+            <div class="tagline">Tech Rentals Simplified</div>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <div class="demo-label">Size Variants</div>
+        <div class="demo-row">
+            <div class="rentr-logo size-sm">
+                <div class="text-row"><span class="text-main">RENT</span><span class="text-accent">R</span></div>
+                <div class="line-row"><div class="line-main"></div><div class="line-dot"></div><div class="line-dot"></div><div class="line-dot"></div></div>
+            </div>
+            <div class="rentr-logo size-md">
+                <div class="text-row"><span class="text-main">RENT</span><span class="text-accent">R</span></div>
+                <div class="line-row"><div class="line-main"></div><div class="line-dot"></div><div class="line-dot"></div><div class="line-dot"></div></div>
+            </div>
+            <div class="rentr-logo size-lg">
+                <div class="text-row"><span class="text-main">RENT</span><span class="text-accent">R</span></div>
+                <div class="line-row"><div class="line-main"></div><div class="line-dot"></div><div class="line-dot"></div><div class="line-dot"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <div class="demo-label">Icon Variant</div>
+        <div class="demo-row">
+            <div class="rentr-icon size-sm"><span class="icon-r">R</span><div class="icon-line"></div></div>
+            <div class="rentr-icon size-md"><span class="icon-r">R</span><div class="icon-line"></div></div>
+            <div class="rentr-icon size-lg"><span class="icon-r">R</span><div class="icon-line"></div></div>
+        </div>
+    </section>
+
+    <section class="demo-section">
+        <div class="demo-label">On Dark Background</div>
+        <div class="dark-bg">
+            <div class="rentr-logo size-lg">
+                <div class="text-row"><span class="text-main">RENT</span><span class="text-accent">R</span></div>
+                <div class="line-row"><div class="line-main"></div><div class="line-dot"></div><div class="line-dot"></div><div class="line-dot"></div></div>
+            </div>
+            <div class="tagline">Tech Rentals Simplified</div>
+        </div>
+    </section>
+
+</body>
+</html>
