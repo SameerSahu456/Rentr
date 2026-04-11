@@ -14,7 +14,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:4000",
+        "https://rentr-admin-phi.vercel.app",
+    ]
 
     # OTP settings (mock for now)
     OTP_EXPIRY_SECONDS: int = 300
