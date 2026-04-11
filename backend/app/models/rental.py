@@ -492,6 +492,7 @@ class Shipment(Base):
     id = Column(Integer, primary_key=True, index=True)
     shipment_number = Column(String(50), unique=True, index=True, nullable=False)
     order_id = Column(Integer, ForeignKey("orders.id", ondelete="SET NULL"), nullable=True, index=True)
+    dc_id = Column(Integer, ForeignKey("delivery_challans.id", ondelete="SET NULL"), nullable=True, index=True)
     shipment_type = Column(SAEnum(ShipmentType), nullable=False)
     logistics_partner = Column(String(255), nullable=True)
     tracking_number = Column(String(100), nullable=True, index=True)
@@ -503,6 +504,7 @@ class Shipment(Base):
 
     # Relationships
     order = relationship("Order", back_populates="shipments")
+    delivery_challan = relationship("DeliveryChallan", back_populates="shipments")
     shipment_items = relationship("ShipmentItem", back_populates="shipment", cascade="all, delete-orphan")
 
 
@@ -539,6 +541,9 @@ class DeliveryChallan(Base):
     status = Column(SAEnum(ChallanStatus), default=ChallanStatus.draft, nullable=False, index=True)
     items = Column(JSONB, default=list, nullable=False)
     created_at = Column(DateTime(timezone=True), default=_utcnow, nullable=False)
+
+    # Relationships
+    shipments = relationship("Shipment", back_populates="delivery_challan")
 
 
 class Replacement(Base):

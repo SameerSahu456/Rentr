@@ -29,9 +29,8 @@ import KYCDetail from './pages/KYCDetail';
 import PartnerDetail from './pages/PartnerDetail';
 import AnalyticsPage from './pages/AnalyticsPage';
 import AdvanceReplacementsPage from './pages/AdvanceReplacementsPage';
-import ShipmentsPage from './pages/ShipmentsPage';
+import LogisticsPage from './pages/LogisticsPage';
 import ShipmentDetail from './pages/ShipmentDetail';
-import DeliveryChallansPage from './pages/DeliveryChallansPage';
 import DeliveryChallanDetail from './pages/DeliveryChallanDetail';
 import ReplacementsPage from './pages/ReplacementsPage';
 import ReplacementDetail from './pages/ReplacementDetail';
@@ -98,9 +97,10 @@ export default function App() {
         <Route path="/kyc/:id" element={<KYCDetail />} />
         <Route path="/partners" element={<Navigate to="/customers?tab=partners" replace />} />
         <Route path="/partners/:email" element={<PartnerDetail />} />
-        <Route path="/shipments" element={<ShipmentsPage />} />
+        <Route path="/logistics" element={<LogisticsPage />} />
+        <Route path="/shipments" element={<Navigate to="/logistics" replace />} />
         <Route path="/shipments/:id" element={<ShipmentDetail />} />
-        <Route path="/delivery-challans" element={<DeliveryChallansPage />} />
+        <Route path="/delivery-challans" element={<Navigate to="/logistics" replace />} />
         <Route path="/delivery-challans/:id" element={<DeliveryChallanDetail />} />
         <Route path="/replacements" element={<ReplacementsPage />} />
         <Route path="/replacements/:id" element={<ReplacementDetail />} />

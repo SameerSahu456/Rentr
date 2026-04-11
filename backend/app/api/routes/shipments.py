@@ -6,7 +6,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import Shipment, ShipmentItem
+from app.models.rental import Shipment, ShipmentItem, DeliveryChallan
 
 router = APIRouter(prefix="/shipments", tags=["Shipments"])
 
@@ -82,11 +82,23 @@ def get_shipment(
         for si in shipment.shipment_items
     ]
 
+    dc_data = None
+    if shipment.delivery_challan:
+        dc = shipment.delivery_challan
+        dc_data = {
+            "id": dc.id, "dc_number": dc.dc_number,
+            "challan_type": dc.challan_type.value if dc.challan_type else None,
+            "status": dc.status.value if dc.status else None,
+            "total_value": dc.total_value,
+        }
+
     return {
         "id": shipment.id,
         "shipment_number": shipment.shipment_number,
         "order_id": shipment.order_id,
         "order": order_data,
+        "dc_id": shipment.dc_id,
+        "delivery_challan": dc_data,
         "shipment_type": shipment.shipment_type.value if shipment.shipment_type else None,
         "logistics_partner": shipment.logistics_partner,
         "tracking_number": shipment.tracking_number,
@@ -155,11 +167,23 @@ def update_shipment(
         for si in shipment.shipment_items
     ]
 
+    dc_data = None
+    if shipment.delivery_challan:
+        dc = shipment.delivery_challan
+        dc_data = {
+            "id": dc.id, "dc_number": dc.dc_number,
+            "challan_type": dc.challan_type.value if dc.challan_type else None,
+            "status": dc.status.value if dc.status else None,
+            "total_value": dc.total_value,
+        }
+
     return {
         "id": shipment.id,
         "shipment_number": shipment.shipment_number,
         "order_id": shipment.order_id,
         "order": order_data,
+        "dc_id": shipment.dc_id,
+        "delivery_challan": dc_data,
         "shipment_type": shipment.shipment_type.value if shipment.shipment_type else None,
         "logistics_partner": shipment.logistics_partner,
         "tracking_number": shipment.tracking_number,

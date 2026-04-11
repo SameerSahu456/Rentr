@@ -6,7 +6,7 @@ from typing import Optional
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.rental import DeliveryChallan, Asset
+from app.models.rental import DeliveryChallan, Asset, Shipment
 
 router = APIRouter(prefix="/delivery-challans", tags=["Delivery Challans"])
 
@@ -74,6 +74,16 @@ def get_challan(
             for a in assets
         ]
 
+    # Linked shipments
+    linked_shipments = db.query(Shipment).filter(Shipment.dc_id == challan.id).all()
+    shipments_data = [
+        {"id": s.id, "shipment_number": s.shipment_number,
+         "status": s.status.value if s.status else None,
+         "tracking_number": s.tracking_number,
+         "logistics_partner": s.logistics_partner}
+        for s in linked_shipments
+    ]
+
     return {
         "id": challan.id,
         "dc_number": challan.dc_number,
@@ -87,6 +97,7 @@ def get_challan(
         "status": challan.status.value if challan.status else None,
         "items": items,
         "linked_assets": linked_assets,
+        "shipments": shipments_data,
         "created_at": challan.created_at.isoformat() if challan.created_at else None,
     }
 
