@@ -30,15 +30,15 @@ export default function OrderDetail() {
   }, [id, navigate]);
 
   useEffect(() => {
-    if (order?.order_number) {
-      api.get(`/contracts/?order_id=${order.order_number}`)
+    if (order?.id) {
+      api.get(`/contracts/?order_id=${order.id}`)
         .then((data) => {
           const items = Array.isArray(data) ? data : data.items || [];
           if (items.length > 0) setContract(items[0]);
         })
         .catch(() => {});
     }
-  }, [order]);
+  }, [order?.id]);
 
   const handleUploadSalesOrder = async (files) => {
     if (!files?.length) return;
