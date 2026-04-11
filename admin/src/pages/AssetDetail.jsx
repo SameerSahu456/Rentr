@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import TagsManager from '../components/TagsManager';
+import DetailTabs from '../components/DetailTabs';
 
 const gradeColors = {
   A: 'bg-emerald-500/10 text-emerald-400', B: 'bg-blue-500/10 text-blue-400',
@@ -126,30 +127,6 @@ export default function AssetDetail() {
         )}
       </div>
 
-      {/* Details Grid */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">Asset Details</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <Field label="OEM / Model" value={[asset.oem, asset.model].filter(Boolean).join(' / ')} />
-          <Field label="Serial Number" value={asset.serial_number} mono />
-          <Field label="Specs" value={specsStr} />
-          <Field label="Acquisition Cost" value={`₹${fmt(asset.acquisition_cost)}`} />
-          <Field label="Warranty Expiry" value={asset.warranty_expiry ? new Date(asset.warranty_expiry).toLocaleDateString('en-IN') : '-'} />
-          <div>
-            <span className="text-xs text-foreground/40 block mb-0.5">Warranty Status</span>
-            <span className={`text-sm font-medium ${warrantyInfo.color}`}>
-              {warrantyInfo.label}{warrantyInfo.days !== null ? ` (${warrantyInfo.days}d)` : ''}
-            </span>
-          </div>
-          {asset.customer_email && (
-            <div>
-              <span className="text-xs text-foreground/40 block mb-0.5">Customer</span>
-              <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/customers/${encodeURIComponent(asset.customer_email)}`)}>{asset.customer_name || asset.customer_email}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       {/* Quick Links */}
       {(asset.order || asset.contract) && (
         <div className="flex flex-wrap gap-2">
@@ -168,108 +145,162 @@ export default function AssetDetail() {
         </div>
       )}
 
-      {/* State Transition */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">State Transition</h2>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <select value={nextState} onChange={(e) => setNextState(e.target.value)}
-            className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm text-foreground/60">
-            <option value="">Select next state...</option>
-            {validStates.filter(s => s !== asset.status).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
-          </select>
-          <input type="text" placeholder="Notes (optional)" value={transitionNotes} onChange={(e) => setTransitionNotes(e.target.value)}
-            className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm" />
-          <button onClick={handleTransition} disabled={!nextState || transitioning}
-            className="px-4 py-2.5 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-rentr-primary hover:text-white transition-colors disabled:opacity-50">
-            {transitioning ? 'Transitioning...' : 'Transition'}
-          </button>
-        </div>
-      </div>
-
-      {/* Tags */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-foreground">Tags</h2>
-          <span className="text-xs text-foreground/40">{tags.length} tags</span>
-        </div>
-        <TagsManager tags={tags} onTagsChange={handleTagsChange} />
-      </div>
-
-      {/* Data Wipe */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><ShieldCheck size={16} className="text-foreground/40" /> Data Wipe Certificate</h2>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <StatusBadge status={dataWipeStatus} />
-            <select value={dataWipeStatus} onChange={(e) => handleDataWipeStatusChange(e.target.value)}
-              className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">
-              <option value="Not Requested">Not Requested</option>
-              <option value="Requested">Requested</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Issued">Issued</option>
-              <option value="Delivered">Delivered</option>
-            </select>
-          </div>
-          {(dataWipeStatus === 'Issued' || dataWipeStatus === 'Delivered') && asset.data_wipe_cert_url && (
-            <a href={asset.data_wipe_cert_url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
-              <Download size={14} /> Download
-            </a>
-          )}
-        </div>
-      </div>
-
-      {/* Lifecycle History */}
-      {events.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><History size={16} className="text-foreground/40" /> History</h2>
-          <div className="space-y-2">
-            {events.slice(0, 10).map((event, i) => (
-              <div key={i} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
-                <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
-                <span className="text-sm text-foreground/70">{(event.from_state || '').replace(/_/g, ' ')} → {(event.to_state || '').replace(/_/g, ' ')}</span>
-                {event.triggered_by && <span className="text-xs text-foreground/30">by {event.triggered_by}</span>}
-                <span className="text-xs text-foreground/30 ml-auto">{event.timestamp ? new Date(event.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'overview',
+          label: 'Overview',
+          content: (
+            <>
+              {/* Details Grid */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4">Asset Details</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Field label="OEM / Model" value={[asset.oem, asset.model].filter(Boolean).join(' / ')} />
+                  <Field label="Serial Number" value={asset.serial_number} mono />
+                  <Field label="Specs" value={specsStr} />
+                  <Field label="Acquisition Cost" value={`₹${fmt(asset.acquisition_cost)}`} />
+                  <Field label="Warranty Expiry" value={asset.warranty_expiry ? new Date(asset.warranty_expiry).toLocaleDateString('en-IN') : '-'} />
+                  <div>
+                    <span className="text-xs text-foreground/40 block mb-0.5">Warranty Status</span>
+                    <span className={`text-sm font-medium ${warrantyInfo.color}`}>
+                      {warrantyInfo.label}{warrantyInfo.days !== null ? ` (${warrantyInfo.days}d)` : ''}
+                    </span>
+                  </div>
+                  {asset.customer_email && (
+                    <div>
+                      <span className="text-xs text-foreground/40 block mb-0.5">Customer</span>
+                      <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/customers/${encodeURIComponent(asset.customer_email)}`)}>{asset.customer_name || asset.customer_email}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Linked Returns */}
-      {asset.returns && asset.returns.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><RotateCcw size={16} className="text-foreground/40" /> Linked Returns</h2>
-          {asset.returns.map((ret) => (
-            <button key={ret.id} onClick={() => navigate(`/returns/${ret.id}`)}
-              className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
-              <div className="flex items-center gap-3 text-sm">
-                <span className="font-medium">#{ret.return_number || ret.id}</span>
-                <StatusBadge status={ret.status} />
+            </>
+          ),
+        },
+        {
+          key: 'management',
+          label: 'Management',
+          content: (
+            <>
+              {/* State Transition */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4">State Transition</h2>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <select value={nextState} onChange={(e) => setNextState(e.target.value)}
+                    className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm text-foreground/60">
+                    <option value="">Select next state...</option>
+                    {validStates.filter(s => s !== asset.status).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+                  </select>
+                  <input type="text" placeholder="Notes (optional)" value={transitionNotes} onChange={(e) => setTransitionNotes(e.target.value)}
+                    className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm" />
+                  <button onClick={handleTransition} disabled={!nextState || transitioning}
+                    className="px-4 py-2.5 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-rentr-primary hover:text-white transition-colors disabled:opacity-50">
+                    {transitioning ? 'Transitioning...' : 'Transition'}
+                  </button>
+                </div>
               </div>
-              <ArrowRight size={14} className="text-foreground/20" />
-            </button>
-          ))}
-        </div>
-      )}
 
-      {/* Linked Tickets */}
-      {asset.tickets && asset.tickets.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><LifeBuoy size={16} className="text-foreground/40" /> Linked Tickets</h2>
-          {asset.tickets.map((t) => (
-            <button key={t.id} onClick={() => navigate(`/support/${t.id}`)}
-              className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
-              <div className="flex items-center gap-3 text-sm">
-                <span className="font-medium">#{t.ticket_number || t.id}</span>
-                <span className="text-foreground/60">{t.subject}</span>
-                <StatusBadge status={t.status} />
+              {/* Tags */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-base font-semibold text-foreground">Tags</h2>
+                  <span className="text-xs text-foreground/40">{tags.length} tags</span>
+                </div>
+                <TagsManager tags={tags} onTagsChange={handleTagsChange} />
               </div>
-              <ArrowRight size={14} className="text-foreground/20" />
-            </button>
-          ))}
-        </div>
-      )}
+
+              {/* Data Wipe */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><ShieldCheck size={16} className="text-foreground/40" /> Data Wipe Certificate</h2>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <StatusBadge status={dataWipeStatus} />
+                    <select value={dataWipeStatus} onChange={(e) => handleDataWipeStatusChange(e.target.value)}
+                      className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">
+                      <option value="Not Requested">Not Requested</option>
+                      <option value="Requested">Requested</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Issued">Issued</option>
+                      <option value="Delivered">Delivered</option>
+                    </select>
+                  </div>
+                  {(dataWipeStatus === 'Issued' || dataWipeStatus === 'Delivered') && asset.data_wipe_cert_url && (
+                    <a href={asset.data_wipe_cert_url} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
+                      <Download size={14} /> Download
+                    </a>
+                  )}
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          key: 'history',
+          label: 'History & Related',
+          count: events.length + (asset.returns?.length || 0) + (asset.tickets?.length || 0),
+          content: (
+            <>
+              {/* Lifecycle History */}
+              {events.length > 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><History size={16} className="text-foreground/40" /> History</h2>
+                  <div className="space-y-2">
+                    {events.slice(0, 10).map((event, i) => (
+                      <div key={i} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
+                        <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
+                        <span className="text-sm text-foreground/70">{(event.from_state || '').replace(/_/g, ' ')} → {(event.to_state || '').replace(/_/g, ' ')}</span>
+                        {event.triggered_by && <span className="text-xs text-foreground/30">by {event.triggered_by}</span>}
+                        <span className="text-xs text-foreground/30 ml-auto">{event.timestamp ? new Date(event.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Linked Returns */}
+              {asset.returns && asset.returns.length > 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><RotateCcw size={16} className="text-foreground/40" /> Linked Returns</h2>
+                  {asset.returns.map((ret) => (
+                    <button key={ret.id} onClick={() => navigate(`/returns/${ret.id}`)}
+                      className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="font-medium">#{ret.return_number || ret.id}</span>
+                        <StatusBadge status={ret.status} />
+                      </div>
+                      <ArrowRight size={14} className="text-foreground/20" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Linked Tickets */}
+              {asset.tickets && asset.tickets.length > 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><LifeBuoy size={16} className="text-foreground/40" /> Linked Tickets</h2>
+                  {asset.tickets.map((t) => (
+                    <button key={t.id} onClick={() => navigate(`/support/${t.id}`)}
+                      className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="font-medium">#{t.ticket_number || t.id}</span>
+                        <span className="text-foreground/60">{t.subject}</span>
+                        <StatusBadge status={t.status} />
+                      </div>
+                      <ArrowRight size={14} className="text-foreground/20" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {events.length === 0 && (!asset.returns || asset.returns.length === 0) && (!asset.tickets || asset.tickets.length === 0) && (
+                <div className="text-center py-12 text-foreground/30 text-sm">No history or related items yet.</div>
+              )}
+            </>
+          ),
+        },
+      ]} />
     </motion.div>
   );
 }

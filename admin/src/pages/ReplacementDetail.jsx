@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRightLeft, HardDrive, AlertTriangle } from 'lucide-reac
 import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
+import DetailTabs from '../components/DetailTabs';
 
 export default function ReplacementDetail() {
   const { id } = useParams();
@@ -65,66 +66,89 @@ export default function ReplacementDetail() {
         <h1 className="text-2xl font-bold text-foreground">{rpl.customer_name}</h1>
       </div>
 
-      {/* Info */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">Details</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div>
-            <span className="text-xs text-foreground/40 block mb-0.5">Order</span>
-            {rpl.order_id ? <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/orders/${rpl.order_id}`)}>#{rpl.order_id}</span> : <span className="text-sm text-foreground/40">-</span>}
-          </div>
-          <Field label="Reason" value={(rpl.faulty_reason || '').replace(/_/g, ' ')} />
-          {rpl.ticket_id && <div><span className="text-xs text-foreground/40 block mb-0.5">Ticket</span><span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/support/${rpl.ticket_id}`)}>#{rpl.ticket_id}</span></div>}
-          {rpl.damage_charges > 0 && <Field label="Damage Charges" value={`₹${Number(rpl.damage_charges).toLocaleString('en-IN')}`} />}
-        </div>
-        {rpl.fault_description && <div className="mt-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg text-sm text-foreground/60"><AlertTriangle size={14} className="text-red-500 inline mr-2" />{rpl.fault_description}</div>}
-      </div>
-
-      {/* Assets Side by Side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><HardDrive size={14} className="text-red-500" /> Faulty Asset</h3>
-          {rpl.faulty_asset ? (
-            <div className="space-y-1 text-sm cursor-pointer hover:opacity-80" onClick={() => navigate(`/assets/${rpl.faulty_asset.id}`)}>
-              <div className="font-mono font-medium text-red-500">{rpl.faulty_asset.uid}</div>
-              <div className="text-foreground/70">{rpl.faulty_asset.oem} {rpl.faulty_asset.model}</div>
-              {rpl.faulty_asset.serial_number && <div className="text-foreground/40">S/N: {rpl.faulty_asset.serial_number}</div>}
-              <StatusBadge status={rpl.faulty_asset.status} />
-            </div>
-          ) : (
-            <span className="font-mono text-sm text-red-500">{rpl.faulty_asset_uid || '-'}</span>
-          )}
-        </div>
-        <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><HardDrive size={14} className="text-emerald-500" /> Replacement Asset</h3>
-          {rpl.replacement_asset ? (
-            <div className="space-y-1 text-sm cursor-pointer hover:opacity-80" onClick={() => navigate(`/assets/${rpl.replacement_asset.id}`)}>
-              <div className="font-mono font-medium text-emerald-500">{rpl.replacement_asset.uid}</div>
-              <div className="text-foreground/70">{rpl.replacement_asset.oem} {rpl.replacement_asset.model}</div>
-              {rpl.replacement_asset.serial_number && <div className="text-foreground/40">S/N: {rpl.replacement_asset.serial_number}</div>}
-              <StatusBadge status={rpl.replacement_asset.status} />
-            </div>
-          ) : (
-            <span className="text-sm text-foreground/30 italic">Not yet assigned</span>
-          )}
-        </div>
-      </div>
-
-      {/* Timeline */}
-      {rpl.timeline && rpl.timeline.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Timeline</h2>
-          <div className="space-y-2">
-            {[...rpl.timeline].reverse().map((event, idx) => (
-              <div key={idx} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
-                <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
-                <StatusBadge status={event.status} />
-                <span className="text-xs text-foreground/40">{new Date(event.timestamp).toLocaleString('en-IN')}</span>
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'details',
+          label: 'Details',
+          content: (
+            <>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4">Details</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div>
+                    <span className="text-xs text-foreground/40 block mb-0.5">Order</span>
+                    {rpl.order_id ? <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/orders/${rpl.order_id}`)}>#{rpl.order_id}</span> : <span className="text-sm text-foreground/40">-</span>}
+                  </div>
+                  <Field label="Reason" value={(rpl.faulty_reason || '').replace(/_/g, ' ')} />
+                  {rpl.ticket_id && <div><span className="text-xs text-foreground/40 block mb-0.5">Ticket</span><span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/support/${rpl.ticket_id}`)}>#{rpl.ticket_id}</span></div>}
+                  {rpl.damage_charges > 0 && <Field label="Damage Charges" value={`₹${Number(rpl.damage_charges).toLocaleString('en-IN')}`} />}
+                </div>
+                {rpl.fault_description && <div className="mt-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg text-sm text-foreground/60"><AlertTriangle size={14} className="text-red-500 inline mr-2" />{rpl.fault_description}</div>}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </>
+          ),
+        },
+        {
+          key: 'assets',
+          label: 'Assets',
+          content: (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><HardDrive size={14} className="text-red-500" /> Faulty Asset</h3>
+                {rpl.faulty_asset ? (
+                  <div className="space-y-1 text-sm cursor-pointer hover:opacity-80" onClick={() => navigate(`/assets/${rpl.faulty_asset.id}`)}>
+                    <div className="font-mono font-medium text-red-500">{rpl.faulty_asset.uid}</div>
+                    <div className="text-foreground/70">{rpl.faulty_asset.oem} {rpl.faulty_asset.model}</div>
+                    {rpl.faulty_asset.serial_number && <div className="text-foreground/40">S/N: {rpl.faulty_asset.serial_number}</div>}
+                    <StatusBadge status={rpl.faulty_asset.status} />
+                  </div>
+                ) : (
+                  <span className="font-mono text-sm text-red-500">{rpl.faulty_asset_uid || '-'}</span>
+                )}
+              </div>
+              <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><HardDrive size={14} className="text-emerald-500" /> Replacement Asset</h3>
+                {rpl.replacement_asset ? (
+                  <div className="space-y-1 text-sm cursor-pointer hover:opacity-80" onClick={() => navigate(`/assets/${rpl.replacement_asset.id}`)}>
+                    <div className="font-mono font-medium text-emerald-500">{rpl.replacement_asset.uid}</div>
+                    <div className="text-foreground/70">{rpl.replacement_asset.oem} {rpl.replacement_asset.model}</div>
+                    {rpl.replacement_asset.serial_number && <div className="text-foreground/40">S/N: {rpl.replacement_asset.serial_number}</div>}
+                    <StatusBadge status={rpl.replacement_asset.status} />
+                  </div>
+                ) : (
+                  <span className="text-sm text-foreground/30 italic">Not yet assigned</span>
+                )}
+              </div>
+            </div>
+          ),
+        },
+        {
+          key: 'timeline',
+          label: 'Timeline',
+          count: rpl.timeline?.length || 0,
+          content: (
+            <>
+              {rpl.timeline && rpl.timeline.length > 0 ? (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4">Timeline</h2>
+                  <div className="space-y-2">
+                    {[...rpl.timeline].reverse().map((event, idx) => (
+                      <div key={idx} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
+                        <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
+                        <StatusBadge status={event.status} />
+                        <span className="text-xs text-foreground/40">{new Date(event.timestamp).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No timeline events yet.</div>
+              )}
+            </>
+          ),
+        },
+      ]} />
     </motion.div>
   );
 }

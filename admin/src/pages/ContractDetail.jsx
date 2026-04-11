@@ -6,6 +6,7 @@ import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import DetailTabs from '../components/DetailTabs';
 
 const statusFlow = ['draft', 'pending_signature', 'active', 'expired', 'cancelled'];
 const BASE_URL = import.meta.env.VITE_ADMIN_API_URL || '/api';
@@ -314,378 +315,394 @@ export default function ContractDetail() {
         </div>
       </div>
 
-      {/* Contract Details */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Details</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6 text-sm">
-          <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Customer</span><span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(contract.customer_email)}`)}>{contract.customer_name}</span></div>
-          <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Email</span><span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(contract.customer_email)}`)}>{contract.customer_email}</span></div>
-          <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Type</span><span className="font-medium text-foreground capitalize">{contract.type}</span></div>
-          <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Start Date</span><span className="font-medium text-foreground">{contract.start_date}</span></div>
-          <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">End Date</span><span className="font-medium text-foreground">{contract.end_date}{contract.extended_months > 0 && <span className="ml-1 text-blue-400 text-xs">(+{contract.extended_months}mo)</span>}</span></div>
-          {contract.original_end_date && (
-            <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Original End Date</span><span className="font-medium text-foreground/50">{contract.original_end_date}</span></div>
-          )}
-          {contract.order_id && (
-            <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Order</span>
-              {contract.order ? (
-                <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/orders/${contract.order.id}`)}>{contract.order.order_number} ({contract.order.status})</span>
-              ) : (
-                <span className="font-medium text-foreground">{contract.order_id}</span>
+      <DetailTabs tabs={[
+        { key: 'overview', label: 'Overview', content: (
+          <>
+            {/* Contract Details */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Details</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6 text-sm">
+                <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Customer</span><span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(contract.customer_email)}`)}>{contract.customer_name}</span></div>
+                <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Email</span><span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(contract.customer_email)}`)}>{contract.customer_email}</span></div>
+                <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Type</span><span className="font-medium text-foreground capitalize">{contract.type}</span></div>
+                <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Start Date</span><span className="font-medium text-foreground">{contract.start_date}</span></div>
+                <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">End Date</span><span className="font-medium text-foreground">{contract.end_date}{contract.extended_months > 0 && <span className="ml-1 text-blue-400 text-xs">(+{contract.extended_months}mo)</span>}</span></div>
+                {contract.original_end_date && (
+                  <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Original End Date</span><span className="font-medium text-foreground/50">{contract.original_end_date}</span></div>
+                )}
+                {contract.order_id && (
+                  <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Order</span>
+                    {contract.order ? (
+                      <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/orders/${contract.order.id}`)}>{contract.order.order_number} ({contract.order.status})</span>
+                    ) : (
+                      <span className="font-medium text-foreground">{contract.order_id}</span>
+                    )}
+                  </div>
+                )}
+                {contract.signed_at && (
+                  <div>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Signed At</span>
+                    <span className="font-medium text-foreground">
+                      {new Date(contract.signed_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                )}
+                {contract.document_url && (
+                  <div>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Agreement PDF</span>
+                    <span className="font-medium text-green-600">Generated</span>
+                  </div>
+                )}
+              </div>
+
+              {contract.terms && (
+                <div className="mt-6 border-t border-foreground/[0.05] pt-4">
+                  <h3 className="text-lg font-brand font-black uppercase tracking-tight text-foreground/70 mb-2">Terms & Conditions</h3>
+                  <p className="text-sm text-foreground/60 whitespace-pre-wrap">{contract.terms}</p>
+                </div>
               )}
             </div>
-          )}
-          {contract.signed_at && (
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Signed At</span>
-              <span className="font-medium text-foreground">
-                {new Date(contract.signed_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          )}
-          {contract.document_url && (
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Agreement PDF</span>
-              <span className="font-medium text-green-600">Generated</span>
-            </div>
-          )}
-        </div>
 
-        {contract.terms && (
-          <div className="mt-6 border-t border-foreground/[0.05] pt-4">
-            <h3 className="text-lg font-brand font-black uppercase tracking-tight text-foreground/70 mb-2">Terms & Conditions</h3>
-            <p className="text-sm text-foreground/60 whitespace-pre-wrap">{contract.terms}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Annexure Management */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-4 mb-6">
-          <div className="flex items-center gap-2">
-            <FilePlus2 size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Annexures</h2>
-            {annexures.length > 0 && (
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-foreground/[0.05] text-[9px] font-bold text-foreground/40">{annexures.length}</span>
+            {/* Linked Assets */}
+            {contract.assets && contract.assets.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Package size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Assets</h2>
+                </div>
+                <div className="border-t border-foreground/[0.05]">
+                  <DataTable
+                    columns={[
+                      { key: 'uid', label: 'UID', render: (v) => <span className="font-mono font-bold">{v}</span> },
+                      { key: 'oem', label: 'OEM / Model', render: (_, row) => [row.oem, row.model].filter(Boolean).join(' / ') || '-' },
+                      { key: 'category', label: 'Category' },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'monthly_rate', label: 'Monthly Rate', render: (v) => v ? `₹${Number(v).toLocaleString('en-IN')}` : '-' },
+                    ]}
+                    data={contract.assets}
+                    loading={false}
+                    onRowClick={(row) => navigate(`/assets/${row.id}`)}
+                    emptyMessage="No assets."
+                  />
+                </div>
+              </div>
             )}
-          </div>
-          <button
-            onClick={() => setAnnexureModal(true)}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
-          >
-            <Plus size={14} />
-            Create Annexure
-          </button>
-        </div>
 
-        {annexures.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-foreground/[0.03] flex items-center justify-center mb-4">
-              <FilePlus2 size={20} className="text-foreground/20" />
-            </div>
-            <p className="text-sm font-medium text-foreground/30 mb-1">No annexures yet</p>
-            <p className="text-xs text-foreground/20">Create an annexure to add, return, or replace assets on this contract.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <AnimatePresence>
-              {annexures.map((annexure, idx) => {
-                const typeStyle = annexureTypeBadge[annexure.type] || annexureTypeBadge.addition;
-                const assetCount = Array.isArray(annexure.assets) ? annexure.assets.length : 0;
-                return (
-                  <motion.div
-                    key={annexure.id || idx}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-4 hover:border-foreground/[0.1] transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <span className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest border ${typeStyle.bg} ${typeStyle.text} ${typeStyle.border}`}>
-                        {annexure.type}
-                      </span>
-                      <StatusBadge status={annexure.status || 'draft'} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Assets</span>
-                        <span className="font-medium text-foreground">{assetCount} asset{assetCount !== 1 ? 's' : ''}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Signing</span>
-                        <span className="font-medium text-foreground capitalize">{annexure.signing_status || '-'}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Created</span>
-                        <span className="font-medium text-foreground/60 text-xs">
-                          {annexure.created_at
-                            ? new Date(annexure.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                            : '-'}
-                        </span>
-                      </div>
-                    </div>
-                    {Array.isArray(annexure.assets) && annexure.assets.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-foreground/[0.05]">
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block mb-1">Asset UIDs</span>
-                        <div className="flex flex-wrap gap-1">
-                          {annexure.assets.map((uid, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded-md bg-foreground/[0.04] text-[10px] font-mono text-foreground/50">{uid}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
+            {/* Linked Invoices */}
+            {contract.invoices && contract.invoices.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Invoices</h2>
+                </div>
+                <div className="border-t border-foreground/[0.05]">
+                  <DataTable
+                    columns={[
+                      { key: 'invoice_number', label: 'Invoice #' },
+                      { key: 'total', label: 'Total', render: (v) => `₹${Number(v || 0).toLocaleString('en-IN')}` },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'due_date', label: 'Due Date', render: (v) => v || '-' },
+                    ]}
+                    data={contract.invoices}
+                    loading={false}
+                    onRowClick={(row) => navigate(`/invoices/${row.id}`)}
+                    emptyMessage="No invoices."
+                  />
+                </div>
+              </div>
+            )}
 
-      {/* Linked Assets */}
-      {contract.assets && contract.assets.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <Package size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Assets</h2>
-          </div>
-          <div className="border-t border-foreground/[0.05]">
-            <DataTable
-              columns={[
-                { key: 'uid', label: 'UID', render: (v) => <span className="font-mono font-bold">{v}</span> },
-                { key: 'oem', label: 'OEM / Model', render: (_, row) => [row.oem, row.model].filter(Boolean).join(' / ') || '-' },
-                { key: 'category', label: 'Category' },
-                { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                { key: 'monthly_rate', label: 'Monthly Rate', render: (v) => v ? `₹${Number(v).toLocaleString('en-IN')}` : '-' },
-              ]}
-              data={contract.assets}
-              loading={false}
-              onRowClick={(row) => navigate(`/assets/${row.id}`)}
-              emptyMessage="No assets."
-            />
-          </div>
-        </div>
-      )}
+            {/* Linked Payments */}
+            {contract.payments && contract.payments.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <CreditCard size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Payments</h2>
+                </div>
+                <div className="border-t border-foreground/[0.05]">
+                  <DataTable
+                    columns={[
+                      { key: 'amount', label: 'Amount', render: (v) => `₹${Number(v || 0).toLocaleString('en-IN')}` },
+                      { key: 'method', label: 'Method', render: (v) => (v || '').replace(/_/g, ' ') },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'transaction_id', label: 'Transaction ID', render: (v) => v || '-' },
+                    ]}
+                    data={contract.payments}
+                    loading={false}
+                    emptyMessage="No payments."
+                  />
+                </div>
+              </div>
+            )}
 
-      {/* Linked Invoices */}
-      {contract.invoices && contract.invoices.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <FileText size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Invoices</h2>
-          </div>
-          <div className="border-t border-foreground/[0.05]">
-            <DataTable
-              columns={[
-                { key: 'invoice_number', label: 'Invoice #' },
-                { key: 'total', label: 'Total', render: (v) => `₹${Number(v || 0).toLocaleString('en-IN')}` },
-                { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                { key: 'due_date', label: 'Due Date', render: (v) => v || '-' },
-              ]}
-              data={contract.invoices}
-              loading={false}
-              onRowClick={(row) => navigate(`/invoices/${row.id}`)}
-              emptyMessage="No invoices."
-            />
-          </div>
-        </div>
-      )}
+            {/* Linked Returns */}
+            {contract.returns && contract.returns.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <RotateCcw size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Returns</h2>
+                </div>
+                <div className="border-t border-foreground/[0.05]">
+                  <DataTable
+                    columns={[
+                      { key: 'return_number', label: 'Return #' },
+                      { key: 'reason', label: 'Reason' },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'asset_uids', label: 'Assets', render: (v) => Array.isArray(v) ? v.length : 0 },
+                    ]}
+                    data={contract.returns}
+                    loading={false}
+                    onRowClick={(row) => navigate(`/returns/${row.id}`)}
+                    emptyMessage="No returns."
+                  />
+                </div>
+              </div>
+            )}
 
-      {/* Linked Payments */}
-      {contract.payments && contract.payments.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <CreditCard size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Payments</h2>
-          </div>
-          <div className="border-t border-foreground/[0.05]">
-            <DataTable
-              columns={[
-                { key: 'amount', label: 'Amount', render: (v) => `₹${Number(v || 0).toLocaleString('en-IN')}` },
-                { key: 'method', label: 'Method', render: (v) => (v || '').replace(/_/g, ' ') },
-                { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                { key: 'transaction_id', label: 'Transaction ID', render: (v) => v || '-' },
-              ]}
-              data={contract.payments}
-              loading={false}
-              emptyMessage="No payments."
-            />
-          </div>
-        </div>
-      )}
+            {/* Linked Support Tickets */}
+            {contract.tickets && contract.tickets.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <LifeBuoy size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Support Tickets</h2>
+                </div>
+                <div className="border-t border-foreground/[0.05]">
+                  <DataTable
+                    columns={[
+                      { key: 'ticket_number', label: 'Ticket #' },
+                      { key: 'subject', label: 'Subject' },
+                      { key: 'priority', label: 'Priority', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                    ]}
+                    data={contract.tickets}
+                    loading={false}
+                    onRowClick={(row) => navigate(`/support/${row.id}`)}
+                    emptyMessage="No tickets."
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        ) },
+        { key: 'annexures', label: 'Annexures', count: annexures.length, content: (
+          <>
+            {/* Annexure Management */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+              <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <FilePlus2 size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Annexures</h2>
+                  {annexures.length > 0 && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full bg-foreground/[0.05] text-[9px] font-bold text-foreground/40">{annexures.length}</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setAnnexureModal(true)}
+                  className="flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
+                >
+                  <Plus size={14} />
+                  Create Annexure
+                </button>
+              </div>
 
-      {/* Linked Returns */}
-      {contract.returns && contract.returns.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <RotateCcw size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Returns</h2>
-          </div>
-          <div className="border-t border-foreground/[0.05]">
-            <DataTable
-              columns={[
-                { key: 'return_number', label: 'Return #' },
-                { key: 'reason', label: 'Reason' },
-                { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                { key: 'asset_uids', label: 'Assets', render: (v) => Array.isArray(v) ? v.length : 0 },
-              ]}
-              data={contract.returns}
-              loading={false}
-              onRowClick={(row) => navigate(`/returns/${row.id}`)}
-              emptyMessage="No returns."
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Linked Support Tickets */}
-      {contract.tickets && contract.tickets.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <LifeBuoy size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Linked Support Tickets</h2>
-          </div>
-          <div className="border-t border-foreground/[0.05]">
-            <DataTable
-              columns={[
-                { key: 'ticket_number', label: 'Ticket #' },
-                { key: 'subject', label: 'Subject' },
-                { key: 'priority', label: 'Priority', render: (v) => <StatusBadge status={v} /> },
-                { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-              ]}
-              data={contract.tickets}
-              loading={false}
-              onRowClick={(row) => navigate(`/support/${row.id}`)}
-              emptyMessage="No tickets."
-            />
-          </div>
-        </div>
-      )}
-      {/* Activity Log / Action Items */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center gap-2 border-b border-foreground/[0.05] pb-4 mb-6">
-          <Clock size={18} className="text-foreground/40" />
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Activity Log</h2>
-          {actionItems.length > 0 && (
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-foreground/[0.05] text-[9px] font-bold text-foreground/40">{actionItems.length}</span>
-          )}
-        </div>
-
-        {actionItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-foreground/[0.03] flex items-center justify-center mb-4">
-              <Clock size={20} className="text-foreground/20" />
-            </div>
-            <p className="text-sm font-medium text-foreground/30 mb-1">No activity recorded</p>
-            <p className="text-xs text-foreground/20">Action items and events will appear here as the contract progresses.</p>
-          </div>
-        ) : (
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-foreground/[0.06]" />
-
-            <div className="space-y-0">
-              {[...actionItems]
-                .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-                .map((item, idx) => (
-                  <motion.div
-                    key={item.id || idx}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.04 }}
-                    className="relative pl-10 py-4 group"
-                  >
-                    {/* Timeline dot */}
-                    <div className="absolute left-[9px] top-5 w-[14px] h-[14px] rounded-full bg-foreground/[0.04] border-2 border-foreground/[0.1] group-hover:border-rentr-primary/40 transition-colors flex items-center justify-center">
-                      <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'completed' ? 'bg-green-500' : item.status === 'pending' ? 'bg-amber-500' : 'bg-foreground/20'}`} />
-                    </div>
-
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm">{actionTypeIcons[item.type] || '\u2022'}</span>
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/30">{(item.type || 'event').replace(/_/g, ' ')}</span>
-                          {item.status && <StatusBadge status={item.status} />}
-                        </div>
-                        <p className="text-sm text-foreground/70 leading-relaxed">{item.description}</p>
-                        {item.references && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {(Array.isArray(item.references) ? item.references : [item.references]).map((ref, i) => (
-                              <span key={i} className="px-2 py-0.5 rounded-md bg-foreground/[0.04] text-[10px] font-mono text-foreground/40">{typeof ref === 'string' ? ref : ref.id || JSON.stringify(ref)}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-[10px] font-medium text-foreground/20 whitespace-nowrap shrink-0">
-                        {item.date
-                          ? new Date(item.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                          : '-'}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Expiry Reminders Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Bell size={18} className="text-foreground/40" />
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Expiry Reminders</h2>
-          </div>
-          <button
-            onClick={() => setReminderModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all"
-          >
-            <Bell size={14} />
-            Add Reminder
-          </button>
-        </div>
-        <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-          {reminders.length === 0 ? (
-            <p className="text-sm text-foreground/30 text-center py-6">No reminders configured. Add a reminder to get notified before contract expiry.</p>
-          ) : (
-            <div className="space-y-3">
-              {reminders.map((r) => (
-                <div key={r.id} className="flex items-center justify-between bg-foreground/[0.03] rounded-xl p-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${r.is_active ? 'bg-amber-500/20 text-amber-500' : 'bg-foreground/5 text-foreground/20'}`}>
-                      {r.is_active ? <Bell size={16} /> : <BellOff size={16} />}
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-foreground block">
-                        {r.days_before} days before {r.reminder_type}
-                      </span>
-                      <span className="text-[10px] text-foreground/30 uppercase tracking-wider">
-                        via {r.channel} {r.last_sent_at ? `· Last sent: ${new Date(r.last_sent_at).toLocaleDateString('en-IN')}` : '· Never sent'}
-                        {r.next_trigger_date && ` · Next: ${new Date(r.next_trigger_date).toLocaleDateString('en-IN')}`}
-                      </span>
-                    </div>
+              {annexures.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-12 h-12 rounded-full bg-foreground/[0.03] flex items-center justify-center mb-4">
+                    <FilePlus2 size={20} className="text-foreground/20" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleToggleReminder(r)}
-                      className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${r.is_active ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
-                    >
-                      {r.is_active ? 'Active' : 'Paused'}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteReminder(r.id)}
-                      className="p-1.5 rounded-full text-foreground/20 hover:text-red-500 hover:bg-red-500/10 transition-all"
-                    >
-                      <X size={14} />
-                    </button>
+                  <p className="text-sm font-medium text-foreground/30 mb-1">No annexures yet</p>
+                  <p className="text-xs text-foreground/20">Create an annexure to add, return, or replace assets on this contract.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <AnimatePresence>
+                    {annexures.map((annexure, idx) => {
+                      const typeStyle = annexureTypeBadge[annexure.type] || annexureTypeBadge.addition;
+                      const assetCount = Array.isArray(annexure.assets) ? annexure.assets.length : 0;
+                      return (
+                        <motion.div
+                          key={annexure.id || idx}
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -12 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-4 hover:border-foreground/[0.1] transition-all"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <span className={`px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest border ${typeStyle.bg} ${typeStyle.text} ${typeStyle.border}`}>
+                              {annexure.type}
+                            </span>
+                            <StatusBadge status={annexure.status || 'draft'} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Assets</span>
+                              <span className="font-medium text-foreground">{assetCount} asset{assetCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div>
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Signing</span>
+                              <span className="font-medium text-foreground capitalize">{annexure.signing_status || '-'}</span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Created</span>
+                              <span className="font-medium text-foreground/60 text-xs">
+                                {annexure.created_at
+                                  ? new Date(annexure.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                  : '-'}
+                              </span>
+                            </div>
+                          </div>
+                          {Array.isArray(annexure.assets) && annexure.assets.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-foreground/[0.05]">
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block mb-1">Asset UIDs</span>
+                              <div className="flex flex-wrap gap-1">
+                                {annexure.assets.map((uid, i) => (
+                                  <span key={i} className="px-2 py-0.5 rounded-md bg-foreground/[0.04] text-[10px] font-mono text-foreground/50">{uid}</span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
+          </>
+        ) },
+        { key: 'reminders', label: 'Reminders', count: reminders.length, content: (
+          <>
+            {/* Expiry Reminders Section */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Bell size={18} className="text-foreground/40" />
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Expiry Reminders</h2>
+                </div>
+                <button
+                  onClick={() => setReminderModal(true)}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all"
+                >
+                  <Bell size={14} />
+                  Add Reminder
+                </button>
+              </div>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                {reminders.length === 0 ? (
+                  <p className="text-sm text-foreground/30 text-center py-6">No reminders configured. Add a reminder to get notified before contract expiry.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {reminders.map((r) => (
+                      <div key={r.id} className="flex items-center justify-between bg-foreground/[0.03] rounded-xl p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${r.is_active ? 'bg-amber-500/20 text-amber-500' : 'bg-foreground/5 text-foreground/20'}`}>
+                            {r.is_active ? <Bell size={16} /> : <BellOff size={16} />}
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-foreground block">
+                              {r.days_before} days before {r.reminder_type}
+                            </span>
+                            <span className="text-[10px] text-foreground/30 uppercase tracking-wider">
+                              via {r.channel} {r.last_sent_at ? `· Last sent: ${new Date(r.last_sent_at).toLocaleDateString('en-IN')}` : '· Never sent'}
+                              {r.next_trigger_date && ` · Next: ${new Date(r.next_trigger_date).toLocaleDateString('en-IN')}`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleToggleReminder(r)}
+                            className={`px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${r.is_active ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
+                          >
+                            {r.is_active ? 'Active' : 'Paused'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteReminder(r.id)}
+                            className="p-1.5 rounded-full text-foreground/20 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) },
+        { key: 'activity', label: 'Activity Log', count: actionItems.length, content: (
+          <>
+            {/* Activity Log / Action Items */}
+            <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+              <div className="flex items-center gap-2 border-b border-foreground/[0.05] pb-4 mb-6">
+                <Clock size={18} className="text-foreground/40" />
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Activity Log</h2>
+                {actionItems.length > 0 && (
+                  <span className="ml-2 px-2 py-0.5 rounded-full bg-foreground/[0.05] text-[9px] font-bold text-foreground/40">{actionItems.length}</span>
+                )}
+              </div>
+
+              {actionItems.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-12 h-12 rounded-full bg-foreground/[0.03] flex items-center justify-center mb-4">
+                    <Clock size={20} className="text-foreground/20" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground/30 mb-1">No activity recorded</p>
+                  <p className="text-xs text-foreground/20">Action items and events will appear here as the contract progresses.</p>
+                </div>
+              ) : (
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-4 top-0 bottom-0 w-px bg-foreground/[0.06]" />
+
+                  <div className="space-y-0">
+                    {[...actionItems]
+                      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+                      .map((item, idx) => (
+                        <motion.div
+                          key={item.id || idx}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.04 }}
+                          className="relative pl-10 py-4 group"
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-[9px] top-5 w-[14px] h-[14px] rounded-full bg-foreground/[0.04] border-2 border-foreground/[0.1] group-hover:border-rentr-primary/40 transition-colors flex items-center justify-center">
+                            <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'completed' ? 'bg-green-500' : item.status === 'pending' ? 'bg-amber-500' : 'bg-foreground/20'}`} />
+                          </div>
+
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-sm">{actionTypeIcons[item.type] || '\u2022'}</span>
+                                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/30">{(item.type || 'event').replace(/_/g, ' ')}</span>
+                                {item.status && <StatusBadge status={item.status} />}
+                              </div>
+                              <p className="text-sm text-foreground/70 leading-relaxed">{item.description}</p>
+                              {item.references && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {(Array.isArray(item.references) ? item.references : [item.references]).map((ref, i) => (
+                                    <span key={i} className="px-2 py-0.5 rounded-md bg-foreground/[0.04] text-[10px] font-mono text-foreground/40">{typeof ref === 'string' ? ref : ref.id || JSON.stringify(ref)}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-medium text-foreground/20 whitespace-nowrap shrink-0">
+                              {item.date
+                                ? new Date(item.date).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                : '-'}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </>
+        ) },
+      ]} />
 
       {/* PDF Viewer Modal */}
       {pdfViewerOpen && pdfBlobUrl && (

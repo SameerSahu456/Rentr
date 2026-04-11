@@ -4,6 +4,7 @@ import { ArrowLeft, Truck, Package, CheckCircle2, Clock, Circle, FileCheck, Exte
 import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
+import DetailTabs from '../components/DetailTabs';
 
 export default function ShipmentDetail() {
   const { id } = useParams();
@@ -97,87 +98,113 @@ export default function ShipmentDetail() {
         </div>
       </div>
 
-      {/* Details Grid */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">Shipment Details</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Field label="Logistics Partner" value={shipment.logistics_partner} />
-          <Field label="Tracking #" value={shipment.tracking_number} mono />
-          <Field label="ETA" value={shipment.estimated_delivery ? new Date(shipment.estimated_delivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
-          <Field label="Customer" value={shipment.customer_name} />
-        </div>
-      </div>
-
-      {/* Linked Order */}
-      {shipment.order && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground">Order Details</h2>
-            <button onClick={() => navigate(`/orders/${shipment.order.id}`)} className="text-sm text-rentr-primary hover:underline flex items-center gap-1">View Order <ExternalLink size={12} /></button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Field label="Order ID" value={`#${shipment.order.id}`} />
-            <div><span className="text-xs text-foreground/40 block mb-0.5">Status</span><StatusBadge status={shipment.order.status} /></div>
-            <Field label="Amount" value={shipment.order.total_amount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} />
-            <Field label="Rental Period" value={shipment.order.rental_months ? `${shipment.order.rental_months} month${shipment.order.rental_months !== 1 ? 's' : ''}` : null} />
-          </div>
-        </div>
-      )}
-
-      {/* Linked Delivery Challan */}
-      {shipment.delivery_challan && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2"><FileCheck size={16} className="text-blue-500" /> Delivery Challan</h2>
-            <button onClick={() => navigate(`/delivery-challans/${shipment.delivery_challan.id}`)} className="text-sm text-rentr-primary hover:underline flex items-center gap-1">View DC <ExternalLink size={12} /></button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Field label="DC Number" value={shipment.delivery_challan.dc_number} mono />
-            <Field label="Type" value={shipment.delivery_challan.challan_type} />
-            <div><span className="text-xs text-foreground/40 block mb-0.5">Status</span><StatusBadge status={shipment.delivery_challan.status} /></div>
-            <Field label="Value" value={shipment.delivery_challan.total_value ? `₹${Number(shipment.delivery_challan.total_value).toLocaleString('en-IN')}` : null} />
-          </div>
-        </div>
-      )}
-
-      {/* Tracking History */}
-      {shipment.timeline && shipment.timeline.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Tracking History</h2>
-          <div className="space-y-2">
-            {[...shipment.timeline].reverse().map((event, idx) => (
-              <div key={idx} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
-                <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
-                <StatusBadge status={event.status} />
-                <span className="text-xs text-foreground/40">{new Date(event.timestamp).toLocaleString('en-IN')}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Assets */}
-      {shipment.assets && shipment.assets.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Assets in Shipment ({shipment.assets.length})</h2>
-          <div className="space-y-2">
-            {shipment.assets.map((asset) => (
-              <div key={asset.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] cursor-pointer transition-colors"
-                onClick={() => navigate(`/assets?search=${asset.asset_uid}`)}>
-                <div className="flex items-center gap-3">
-                  <Package size={14} className="text-foreground/30" />
-                  <span className="font-mono text-sm font-medium">{asset.asset_uid}</span>
-                  {asset.asset_model && <span className="text-foreground/40 text-sm">{asset.asset_model}</span>}
-                </div>
-                <div className="flex items-center gap-2">
-                  {asset.asset_category && <span className="text-xs px-2 py-0.5 bg-foreground/[0.05] rounded">{asset.asset_category}</span>}
-                  {asset.asset_status && <StatusBadge status={asset.asset_status} />}
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'overview',
+          label: 'Overview',
+          content: (
+            <>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4">Shipment Details</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <Field label="Logistics Partner" value={shipment.logistics_partner} />
+                  <Field label="Tracking #" value={shipment.tracking_number} mono />
+                  <Field label="ETA" value={shipment.estimated_delivery ? new Date(shipment.estimated_delivery).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
+                  <Field label="Customer" value={shipment.customer_name} />
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+
+              {shipment.order && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-semibold text-foreground">Order Details</h2>
+                    <button onClick={() => navigate(`/orders/${shipment.order.id}`)} className="text-sm text-rentr-primary hover:underline flex items-center gap-1">View Order <ExternalLink size={12} /></button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <Field label="Order ID" value={`#${shipment.order.id}`} />
+                    <div><span className="text-xs text-foreground/40 block mb-0.5">Status</span><StatusBadge status={shipment.order.status} /></div>
+                    <Field label="Amount" value={shipment.order.total_amount?.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} />
+                    <Field label="Rental Period" value={shipment.order.rental_months ? `${shipment.order.rental_months} month${shipment.order.rental_months !== 1 ? 's' : ''}` : null} />
+                  </div>
+                </div>
+              )}
+
+              {shipment.delivery_challan && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-semibold text-foreground flex items-center gap-2"><FileCheck size={16} className="text-blue-500" /> Delivery Challan</h2>
+                    <button onClick={() => navigate(`/delivery-challans/${shipment.delivery_challan.id}`)} className="text-sm text-rentr-primary hover:underline flex items-center gap-1">View DC <ExternalLink size={12} /></button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <Field label="DC Number" value={shipment.delivery_challan.dc_number} mono />
+                    <Field label="Type" value={shipment.delivery_challan.challan_type} />
+                    <div><span className="text-xs text-foreground/40 block mb-0.5">Status</span><StatusBadge status={shipment.delivery_challan.status} /></div>
+                    <Field label="Value" value={shipment.delivery_challan.total_value ? `₹${Number(shipment.delivery_challan.total_value).toLocaleString('en-IN')}` : null} />
+                  </div>
+                </div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'tracking',
+          label: 'Tracking',
+          count: shipment.timeline?.length || 0,
+          content: (
+            <>
+              {shipment.timeline && shipment.timeline.length > 0 ? (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4">Tracking History</h2>
+                  <div className="space-y-2">
+                    {[...shipment.timeline].reverse().map((event, idx) => (
+                      <div key={idx} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
+                        <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
+                        <StatusBadge status={event.status} />
+                        <span className="text-xs text-foreground/40">{new Date(event.timestamp).toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No tracking events yet.</div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'assets',
+          label: 'Assets',
+          count: shipment.assets?.length || 0,
+          content: (
+            <>
+              {shipment.assets && shipment.assets.length > 0 ? (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4">Assets in Shipment ({shipment.assets.length})</h2>
+                  <div className="space-y-2">
+                    {shipment.assets.map((asset) => (
+                      <div key={asset.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] cursor-pointer transition-colors"
+                        onClick={() => navigate(`/assets?search=${asset.asset_uid}`)}>
+                        <div className="flex items-center gap-3">
+                          <Package size={14} className="text-foreground/30" />
+                          <span className="font-mono text-sm font-medium">{asset.asset_uid}</span>
+                          {asset.asset_model && <span className="text-foreground/40 text-sm">{asset.asset_model}</span>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {asset.asset_category && <span className="text-xs px-2 py-0.5 bg-foreground/[0.05] rounded">{asset.asset_category}</span>}
+                          {asset.asset_status && <StatusBadge status={asset.asset_status} />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No assets in this shipment.</div>
+              )}
+            </>
+          ),
+        },
+      ]} />
     </motion.div>
   );
 }

@@ -6,6 +6,7 @@ import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
+import DetailTabs from '../components/DetailTabs';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 
@@ -117,64 +118,76 @@ export default function InvoiceDetail() {
         </div>
       )}
 
-      {/* Details */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-          <Field label="Customer" value={invoice.customer_name} />
-          <Field label="Email" value={invoice.customer_email} />
-          <Field label="Due Date" value={invoice.due_date} />
-          <Field label="Status" value={invoice.status?.replace(/_/g, ' ')} />
-        </div>
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'details',
+          label: 'Details & Line Items',
+          content: (
+            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                <Field label="Customer" value={invoice.customer_name} />
+                <Field label="Email" value={invoice.customer_email} />
+                <Field label="Due Date" value={invoice.due_date} />
+                <Field label="Status" value={invoice.status?.replace(/_/g, ' ')} />
+              </div>
 
-        {/* Line Items */}
-        {invoice.items && invoice.items.length > 0 && (
-          <div className="border-t border-foreground/[0.06] pt-4">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Line Items</h3>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left border-b border-foreground/[0.06]">
-                  <th className="text-xs text-foreground/40 pb-2">Description</th>
-                  <th className="text-xs text-foreground/40 pb-2">Qty</th>
-                  <th className="text-xs text-foreground/40 pb-2">Unit Price</th>
-                  <th className="text-xs text-foreground/40 pb-2 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.items.map((item, i) => (
-                  <tr key={i} className="border-b border-foreground/[0.04] last:border-0">
-                    <td className="py-2">{item.description}</td>
-                    <td className="py-2">{item.quantity}</td>
-                    <td className="py-2">₹{fmt(item.unit_price)}</td>
-                    <td className="py-2 text-right">₹{fmt((item.quantity || 0) * (item.unit_price || 0))}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="mt-3 text-sm space-y-1 text-right border-t border-foreground/[0.06] pt-3">
-              {invoice.subtotal != null && <div className="text-foreground/50">Subtotal: ₹{fmt(invoice.subtotal)}</div>}
-              {invoice.tax != null && <div className="text-foreground/50">Tax: ₹{fmt(invoice.tax)}</div>}
-              <div className="font-bold text-foreground text-base">Total: ₹{fmt(invoice.total)}</div>
+              {invoice.items && invoice.items.length > 0 && (
+                <div className="border-t border-foreground/[0.06] pt-4">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">Line Items</h3>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left border-b border-foreground/[0.06]">
+                        <th className="text-xs text-foreground/40 pb-2">Description</th>
+                        <th className="text-xs text-foreground/40 pb-2">Qty</th>
+                        <th className="text-xs text-foreground/40 pb-2">Unit Price</th>
+                        <th className="text-xs text-foreground/40 pb-2 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {invoice.items.map((item, i) => (
+                        <tr key={i} className="border-b border-foreground/[0.04] last:border-0">
+                          <td className="py-2">{item.description}</td>
+                          <td className="py-2">{item.quantity}</td>
+                          <td className="py-2">₹{fmt(item.unit_price)}</td>
+                          <td className="py-2 text-right">₹{fmt((item.quantity || 0) * (item.unit_price || 0))}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="mt-3 text-sm space-y-1 text-right border-t border-foreground/[0.06] pt-3">
+                    {invoice.subtotal != null && <div className="text-foreground/50">Subtotal: ₹{fmt(invoice.subtotal)}</div>}
+                    {invoice.tax != null && <div className="text-foreground/50">Tax: ₹{fmt(invoice.tax)}</div>}
+                    <div className="font-bold text-foreground text-base">Total: ₹{fmt(invoice.total)}</div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Payment History */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">Payment History</h2>
-        <DataTable
-          columns={[
-            { key: 'amount', label: 'Amount', render: (v) => `₹${fmt(v)}` },
-            { key: 'method', label: 'Method', render: (v) => (v || '').replace(/_/g, ' ') },
-            { key: 'transaction_id', label: 'Transaction ID' },
-            { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-            { key: 'created_at', label: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
-          ]}
-          data={invoice.payments || []}
-          loading={false}
-          emptyMessage="No payments recorded."
-        />
-      </div>
+          ),
+        },
+        {
+          key: 'payments',
+          label: 'Payments',
+          count: invoice.payments?.length || 0,
+          content: (
+            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+              <h2 className="text-base font-semibold text-foreground mb-4">Payment History</h2>
+              <DataTable
+                columns={[
+                  { key: 'amount', label: 'Amount', render: (v) => `₹${fmt(v)}` },
+                  { key: 'method', label: 'Method', render: (v) => (v || '').replace(/_/g, ' ') },
+                  { key: 'transaction_id', label: 'Transaction ID' },
+                  { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                  { key: 'created_at', label: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
+                ]}
+                data={invoice.payments || []}
+                loading={false}
+                emptyMessage="No payments recorded."
+              />
+            </div>
+          ),
+        },
+      ]} />
 
       {/* Payment Modal */}
       <Modal isOpen={paymentModal} onClose={() => setPaymentModal(false)} title="Record Payment"

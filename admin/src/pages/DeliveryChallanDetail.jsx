@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
+import DetailTabs from '../components/DetailTabs';
 
 export default function DeliveryChallanDetail() {
   const { id } = useParams();
@@ -72,90 +73,116 @@ export default function DeliveryChallanDetail() {
         </div>
       </div>
 
-      {/* Transport Details */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-        <h2 className="text-base font-semibold text-foreground mb-4">Transport & Document Info</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div>
-            <span className="text-xs text-foreground/40 block mb-0.5">Order</span>
-            {dc.order_id ? <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/orders/${dc.order_id}`)}>#{dc.order_id}</span> : <span className="text-sm text-foreground/40">-</span>}
-          </div>
-          <Field label="Transporter" value={dc.transporter_name} />
-          <Field label="Vehicle" value={dc.vehicle_number} />
-          <Field label="E-way Bill" value={dc.eway_bill_number} mono />
-        </div>
-      </div>
-
-      {/* Linked Shipments */}
-      {dc.shipments && dc.shipments.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><Truck size={16} className="text-purple-500" /> Linked Shipments</h2>
-          <div className="space-y-2">
-            {dc.shipments.map((s) => (
-              <div key={s.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] cursor-pointer transition-colors"
-                onClick={() => navigate(`/shipments/${s.id}`)}>
-                <div className="flex items-center gap-3">
-                  <Truck size={14} className="text-foreground/30" />
-                  <span className="font-mono text-sm font-medium">{s.shipment_number}</span>
-                  {s.logistics_partner && <span className="text-sm text-foreground/40">{s.logistics_partner}</span>}
-                </div>
-                <div className="flex items-center gap-2">
-                  {s.tracking_number && <span className="text-xs font-mono text-foreground/40">{s.tracking_number}</span>}
-                  <StatusBadge status={s.status} />
-                  <ExternalLink size={12} className="text-foreground/20" />
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'overview',
+          label: 'Overview',
+          content: (
+            <>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                <h2 className="text-base font-semibold text-foreground mb-4">Transport & Document Info</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div>
+                    <span className="text-xs text-foreground/40 block mb-0.5">Order</span>
+                    {dc.order_id ? <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/orders/${dc.order_id}`)}>#{dc.order_id}</span> : <span className="text-sm text-foreground/40">-</span>}
+                  </div>
+                  <Field label="Transporter" value={dc.transporter_name} />
+                  <Field label="Vehicle" value={dc.vehicle_number} />
+                  <Field label="E-way Bill" value={dc.eway_bill_number} mono />
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Linked Assets */}
-      {dc.linked_assets && dc.linked_assets.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Assets on Challan ({dc.linked_assets.length})</h2>
-          <DataTable
-            columns={[
-              { key: 'uid', label: 'UID', render: (v) => <span className="font-mono font-medium">{v}</span> },
-              { key: 'oem', label: 'OEM' },
-              { key: 'model', label: 'Model' },
-              { key: 'serial_number', label: 'Serial #' },
-              { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-              { key: 'condition_grade', label: 'Grade' },
-            ]}
-            data={dc.linked_assets}
-            loading={false}
-            onRowClick={(row) => navigate(`/assets/${row.id}`)}
-            emptyMessage="No assets."
-          />
-        </div>
-      )}
-
-      {/* Addresses */}
-      {(dc.dispatch_from || dc.ship_to) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {dc.dispatch_from && (
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><MapPin size={14} className="text-foreground/40" /> Dispatch From</h3>
-              <div className="text-sm text-foreground/60 space-y-0.5">
-                {dc.dispatch_from.name && <p className="font-medium text-foreground">{dc.dispatch_from.name}</p>}
-                <p>{dc.dispatch_from.address1 || dc.dispatch_from.streetAddress1}</p>
-                <p>{[dc.dispatch_from.city, dc.dispatch_from.state, dc.dispatch_from.pinCode || dc.dispatch_from.postalCode].filter(Boolean).join(', ')}</p>
-              </div>
-            </div>
-          )}
-          {dc.ship_to && (
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><MapPin size={14} className="text-foreground/40" /> Ship To</h3>
-              <div className="text-sm text-foreground/60 space-y-0.5">
-                {dc.ship_to.name && <p className="font-medium text-foreground">{dc.ship_to.name}</p>}
-                <p>{dc.ship_to.address1 || dc.ship_to.streetAddress1}</p>
-                <p>{[dc.ship_to.city, dc.ship_to.state, dc.ship_to.pinCode || dc.ship_to.postalCode].filter(Boolean).join(', ')}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+              {dc.shipments && dc.shipments.length > 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><Truck size={16} className="text-purple-500" /> Linked Shipments</h2>
+                  <div className="space-y-2">
+                    {dc.shipments.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] cursor-pointer transition-colors"
+                        onClick={() => navigate(`/shipments/${s.id}`)}>
+                        <div className="flex items-center gap-3">
+                          <Truck size={14} className="text-foreground/30" />
+                          <span className="font-mono text-sm font-medium">{s.shipment_number}</span>
+                          {s.logistics_partner && <span className="text-sm text-foreground/40">{s.logistics_partner}</span>}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {s.tracking_number && <span className="text-xs font-mono text-foreground/40">{s.tracking_number}</span>}
+                          <StatusBadge status={s.status} />
+                          <ExternalLink size={12} className="text-foreground/20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'assets',
+          label: 'Assets',
+          count: dc.linked_assets?.length || 0,
+          content: (
+            <>
+              {dc.linked_assets && dc.linked_assets.length > 0 ? (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                  <h2 className="text-base font-semibold text-foreground mb-4">Assets on Challan ({dc.linked_assets.length})</h2>
+                  <DataTable
+                    columns={[
+                      { key: 'uid', label: 'UID', render: (v) => <span className="font-mono font-medium">{v}</span> },
+                      { key: 'oem', label: 'OEM' },
+                      { key: 'model', label: 'Model' },
+                      { key: 'serial_number', label: 'Serial #' },
+                      { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
+                      { key: 'condition_grade', label: 'Grade' },
+                    ]}
+                    data={dc.linked_assets}
+                    loading={false}
+                    onRowClick={(row) => navigate(`/assets/${row.id}`)}
+                    emptyMessage="No assets."
+                  />
+                </div>
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No assets on this challan.</div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'addresses',
+          label: 'Addresses',
+          content: (
+            <>
+              {(dc.dispatch_from || dc.ship_to) ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {dc.dispatch_from && (
+                    <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><MapPin size={14} className="text-foreground/40" /> Dispatch From</h3>
+                      <div className="text-sm text-foreground/60 space-y-0.5">
+                        {dc.dispatch_from.name && <p className="font-medium text-foreground">{dc.dispatch_from.name}</p>}
+                        <p>{dc.dispatch_from.address1 || dc.dispatch_from.streetAddress1}</p>
+                        <p>{[dc.dispatch_from.city, dc.dispatch_from.state, dc.dispatch_from.pinCode || dc.dispatch_from.postalCode].filter(Boolean).join(', ')}</p>
+                      </div>
+                    </div>
+                  )}
+                  {dc.ship_to && (
+                    <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
+                      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2"><MapPin size={14} className="text-foreground/40" /> Ship To</h3>
+                      <div className="text-sm text-foreground/60 space-y-0.5">
+                        {dc.ship_to.name && <p className="font-medium text-foreground">{dc.ship_to.name}</p>}
+                        <p>{dc.ship_to.address1 || dc.ship_to.streetAddress1}</p>
+                        <p>{[dc.ship_to.city, dc.ship_to.state, dc.ship_to.pinCode || dc.ship_to.postalCode].filter(Boolean).join(', ')}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No address information available.</div>
+              )}
+            </>
+          ),
+        },
+      ]} />
     </motion.div>
   );
 }

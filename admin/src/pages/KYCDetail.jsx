@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
+import DetailTabs from '../components/DetailTabs';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 
@@ -105,111 +106,137 @@ export default function KYCDetail() {
         </div>
       </div>
 
-      {/* Info Grid */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
-          <div className="flex items-start gap-2">
-            <User size={16} className="text-foreground/30 mt-0.5 shrink-0" />
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Customer Name</span>
-              <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(kyc.customer_email)}`)}>{kyc.customer_name || '-'}</span>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <User size={16} className="text-foreground/30 mt-0.5 shrink-0" />
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Email</span>
-              <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(kyc.customer_email)}`)}>{kyc.customer_email || '-'}</span>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <Shield size={16} className="text-foreground/30 mt-0.5 shrink-0" />
-            <div>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Account Type</span>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${accountTypeBadge(kyc.account_type)}`}>
-                {kyc.account_type === 'channel_partner' ? 'Channel Partner' : kyc.account_type === 'direct_enterprise' ? 'Direct Enterprise' : kyc.account_type || '-'}
-              </span>
-            </div>
-          </div>
-          <InfoItem icon={FileText} label="GSTIN" value={kyc.gstin || '-'} />
-          <InfoItem icon={FileText} label="PAN" value={kyc.pan || '-'} />
-          <InfoItem icon={CreditCard} label="Credit Limit" value={`\u20B9${fmt(kyc.credit_limit)}`} />
-          <InfoItem icon={CreditCard} label="Credit Used" value={`\u20B9${fmt(kyc.credit_used)}`} />
-          <InfoItem icon={CreditCard} label="Credit Available" value={`\u20B9${fmt(creditAvailable)}`} />
-        </div>
-      </div>
-
-      {/* Documents */}
-      {documents.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Documents</h2>
-          <div className="space-y-3">
-            {documents.map((doc, i) => (
-              <div key={i} className="flex items-center justify-between py-6 px-4 bg-foreground/[0.02] rounded-2xl border border-foreground/[0.04] hover:bg-foreground/[0.01] transition-colors">
-                <div className="flex items-center gap-3">
-                  <FileText size={18} className="text-foreground/30" />
-                  <div>
-                    <span className="text-sm font-medium text-foreground">{doc.type || doc.document_type || 'Document'}</span>
-                    <span className="block text-xs text-foreground/40">{doc.filename || doc.file_name || '-'}</span>
+      {/* Tabs */}
+      <DetailTabs tabs={[
+        {
+          key: 'details',
+          label: 'Details',
+          content: (
+            <>
+              {/* Info Grid */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
+                  <div className="flex items-start gap-2">
+                    <User size={16} className="text-foreground/30 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Customer Name</span>
+                      <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(kyc.customer_email)}`)}>{kyc.customer_name || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <User size={16} className="text-foreground/30 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Email</span>
+                      <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(kyc.customer_email)}`)}>{kyc.customer_email || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Shield size={16} className="text-foreground/30 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Account Type</span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${accountTypeBadge(kyc.account_type)}`}>
+                        {kyc.account_type === 'channel_partner' ? 'Channel Partner' : kyc.account_type === 'direct_enterprise' ? 'Direct Enterprise' : kyc.account_type || '-'}
+                      </span>
+                    </div>
+                  </div>
+                  <InfoItem icon={FileText} label="GSTIN" value={kyc.gstin || '-'} />
+                  <InfoItem icon={FileText} label="PAN" value={kyc.pan || '-'} />
+                  <InfoItem icon={CreditCard} label="Credit Limit" value={`\u20B9${fmt(kyc.credit_limit)}`} />
+                  <InfoItem icon={CreditCard} label="Credit Used" value={`\u20B9${fmt(kyc.credit_used)}`} />
+                  <InfoItem icon={CreditCard} label="Credit Available" value={`\u20B9${fmt(creditAvailable)}`} />
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          key: 'documents',
+          label: 'Documents',
+          count: documents.length,
+          content: (
+            <>
+              {documents.length > 0 ? (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Documents</h2>
+                  <div className="space-y-3">
+                    {documents.map((doc, i) => (
+                      <div key={i} className="flex items-center justify-between py-6 px-4 bg-foreground/[0.02] rounded-2xl border border-foreground/[0.04] hover:bg-foreground/[0.01] transition-colors">
+                        <div className="flex items-center gap-3">
+                          <FileText size={18} className="text-foreground/30" />
+                          <div>
+                            <span className="text-sm font-medium text-foreground">{doc.type || doc.document_type || 'Document'}</span>
+                            <span className="block text-xs text-foreground/40">{doc.filename || doc.file_name || '-'}</span>
+                          </div>
+                        </div>
+                        {doc.status && <StatusBadge status={doc.status} />}
+                      </div>
+                    ))}
                   </div>
                 </div>
-                {doc.status && <StatusBadge status={doc.status} />}
+              ) : (
+                <div className="text-center py-12 text-foreground/30 text-sm">No documents uploaded.</div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'review',
+          label: 'Review',
+          content: (
+            <>
+              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Review</h2>
+                {isPendingReview ? (
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setApproveModal(true)}
+                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
+                    >
+                      <CheckCircle size={16} />
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => setRejectModal(true)}
+                      className="p-3 rounded-full border border-foreground/[0.05] text-foreground/40 hover:text-foreground hover:border-foreground/20 transition-all"
+                    >
+                      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-3"><XCircle size={16} /> Reject</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                    {kyc.reviewer && (
+                      <div>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Reviewed By</span>
+                        <span className="font-medium text-foreground">{kyc.reviewer}</span>
+                      </div>
+                    )}
+                    {kyc.review_notes && (
+                      <div className="col-span-2">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Review Notes</span>
+                        <span className="font-medium text-foreground">{kyc.review_notes}</span>
+                      </div>
+                    )}
+                    {kyc.rejection_reason && (
+                      <div className="col-span-2">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Rejection Reason</span>
+                        <span className="font-medium text-red-600">{kyc.rejection_reason}</span>
+                      </div>
+                    )}
+                    {kyc.reviewed_at && (
+                      <div>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Reviewed At</span>
+                        <span className="font-medium text-foreground">
+                          {new Date(kyc.reviewed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Review Section */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6">Review</h2>
-        {isPendingReview ? (
-          <div className="flex gap-3">
-            <button
-              onClick={() => setApproveModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
-            >
-              <CheckCircle size={16} />
-              Approve
-            </button>
-            <button
-              onClick={() => setRejectModal(true)}
-              className="p-3 rounded-full border border-foreground/[0.05] text-foreground/40 hover:text-foreground hover:border-foreground/20 transition-all"
-            >
-              <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest px-3"><XCircle size={16} /> Reject</span>
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-            {kyc.reviewer && (
-              <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Reviewed By</span>
-                <span className="font-medium text-foreground">{kyc.reviewer}</span>
-              </div>
-            )}
-            {kyc.review_notes && (
-              <div className="col-span-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Review Notes</span>
-                <span className="font-medium text-foreground">{kyc.review_notes}</span>
-              </div>
-            )}
-            {kyc.rejection_reason && (
-              <div className="col-span-2">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Rejection Reason</span>
-                <span className="font-medium text-red-600">{kyc.rejection_reason}</span>
-              </div>
-            )}
-            {kyc.reviewed_at && (
-              <div>
-                <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">Reviewed At</span>
-                <span className="font-medium text-foreground">
-                  {new Date(kyc.reviewed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+            </>
+          ),
+        },
+      ]} />
 
       {/* Approve Modal */}
       <Modal

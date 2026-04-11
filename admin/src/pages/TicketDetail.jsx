@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
+import DetailTabs from '../components/DetailTabs';
 
 const statusOptions = ['open', 'in_progress', 'resolved', 'closed'];
 const priorityColors = {
@@ -236,236 +237,270 @@ export default function TicketDetail() {
         </div>
       )}
 
-      {/* Ticket info */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-wrap gap-6 items-start justify-between">
-          <div className="space-y-3 flex-1 min-w-0">
-            <div className="flex flex-wrap gap-4 text-sm">
-              <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Customer:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_name}</span></div>
-              <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Email:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_email}</span></div>
-              <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Category:</span> <span className="font-medium capitalize">{ticket.category}</span></div>
-            </div>
-            {ticket.description && (
-              <p className="text-sm text-foreground/60 mt-2">{ticket.description}</p>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2 shrink-0">
-            <select
-              value={ticket.status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-full px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all text-foreground/40"
-            >
-              {statusOptions.map((s) => (
-                <option key={s} value={s} className="capitalize">{s.replace(/_/g, ' ')}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Assign to..."
-              value={ticket.assigned_to || ''}
-              onChange={(e) => handleAssign(e.target.value)}
-              className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10"
-            />
-            <button
-              onClick={openArModal}
-              className="flex items-center gap-2 px-5 py-3 rounded-full bg-foreground/[0.02] border border-foreground/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 hover:border-rentr-primary/50 hover:text-rentr-primary transition-all"
-            >
-              <RefreshCw size={14} />
-              Initiate Advance Replacement
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Related Links */}
-      {(ticket.order || ticket.order_id || ticket.asset || ticket.contract || ticket.invoice || ticket.return_request || ticket.customer_email) && (
-        <div className="flex flex-wrap gap-2">
-          {ticket.order && (
-            <button
-              onClick={() => navigate(`/orders/${ticket.order.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15 hover:bg-blue-500/20 transition-colors"
-            >
-              Order: {ticket.order.order_number} ({ticket.order.status})
-              <ExternalLink size={12} />
-            </button>
-          )}
-          {!ticket.order && ticket.order_id && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15">
-              Order: {ticket.order_id}
-            </span>
-          )}
-          {ticket.asset && (
-            <button
-              onClick={() => navigate(`/assets/${ticket.asset.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15 hover:bg-cyan-500/20 transition-colors"
-            >
-              Asset: {ticket.asset.uid} ({ticket.asset.oem} {ticket.asset.model})
-              <ExternalLink size={12} />
-            </button>
-          )}
-          {!ticket.asset && ticket.asset_uid && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15">
-              Asset: {ticket.asset_uid}
-            </span>
-          )}
-          {ticket.contract && (
-            <button
-              onClick={() => navigate(`/contracts/${ticket.contract.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15 hover:bg-emerald-500/20 transition-colors"
-            >
-              Contract: {ticket.contract.contract_number} ({ticket.contract.status})
-              <ExternalLink size={12} />
-            </button>
-          )}
-          {!ticket.contract && ticket.contract_id && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">
-              Contract: {ticket.contract_id}
-            </span>
-          )}
-          {ticket.invoice && (
-            <button
-              onClick={() => navigate(`/invoices/${ticket.invoice.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15 hover:bg-amber-500/20 transition-colors"
-            >
-              Invoice: {ticket.invoice.invoice_number} ({ticket.invoice.status})
-              <ExternalLink size={12} />
-            </button>
-          )}
-          {!ticket.invoice && ticket.invoice_id && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15">
-              Invoice: {ticket.invoice_id}
-            </span>
-          )}
-          {ticket.return_request && (
-            <button
-              onClick={() => navigate(`/returns/${ticket.return_request.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15 hover:bg-orange-500/20 transition-colors"
-            >
-              Return: {ticket.return_request.return_number} ({ticket.return_request.status})
-              <ExternalLink size={12} />
-            </button>
-          )}
-          {!ticket.return_request && ticket.return_id && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15">
-              Return: {ticket.return_id}
-            </span>
-          )}
-          {ticket.customer_email && (
-            <button
-              onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-purple-500/10 text-purple-400 border border-purple-500/15 hover:bg-purple-500/20 transition-colors"
-            >
-              Customer: {ticket.customer_name || ticket.customer_email}
-              <ExternalLink size={12} />
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Linked Advance Replacements */}
-      {advanceReplacements.length > 0 && (
-        <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-          <div className="flex items-center gap-3 mb-4">
-            <RefreshCw className="w-5 h-5 text-foreground/40" />
-            <h3 className="text-lg sm:text-xl font-brand font-black uppercase tracking-tight text-foreground">Advance Replacements ({advanceReplacements.length})</h3>
-          </div>
-          <div className="space-y-3">
-            {advanceReplacements.map((ar, i) => (
-              <div key={ar.id || i} className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-4 flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Faulty Asset</span>
-                    <p className="font-mono text-foreground/70">{ar.faulty_asset_uid}</p>
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Replacement Asset</span>
-                    <p className="font-mono text-foreground/70">{ar.replacement_asset_uid}</p>
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Reason</span>
-                    <p className="text-foreground/70">{ar.reason}</p>
-                  </div>
-                  {ar.notes && (
-                    <div>
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Notes</span>
-                      <p className="text-foreground/50">{ar.notes}</p>
+      {/* Tabbed Content */}
+      <DetailTabs tabs={[
+        {
+          key: 'details',
+          label: 'Details',
+          content: (
+            <>
+              {/* Ticket info */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-wrap gap-6 items-start justify-between">
+                  <div className="space-y-3 flex-1 min-w-0">
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Customer:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_name}</span></div>
+                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Email:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_email}</span></div>
+                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Category:</span> <span className="font-medium capitalize">{ticket.category}</span></div>
                     </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${arStatusColors[ar.status] || 'bg-foreground/[0.05] text-foreground/60 border-foreground/10'}`}>
-                    {ar.status}
-                  </span>
-                  {ar.created_at && (
-                    <span className="text-[10px] text-foreground/30">{new Date(ar.created_at).toLocaleDateString()}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Messages */}
-      <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] flex flex-col" style={{ minHeight: '300px' }}>
-        <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-foreground/[0.05]">
-          <h3 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Messages ({messages.length})</h3>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
-          {messages.length === 0 && (
-            <p className="text-center text-foreground/30 text-sm py-8">No messages yet.</p>
-          )}
-          {messages.map((msg, i) => {
-            const isAgent = msg.sender_type === 'agent';
-            return (
-              <div key={i} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                  isAgent ? 'bg-rentr-primary text-white' : 'bg-foreground/[0.05] text-foreground'
-                }`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-xs font-semibold ${isAgent ? 'text-white/80' : 'text-foreground/40'}`}>
-                      {msg.sender_name || (isAgent ? 'Agent' : 'Customer')}
-                    </span>
-                    <span className={`text-xs ${isAgent ? 'text-white/60' : 'text-foreground/30'}`}>
-                      {msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}
-                    </span>
+                    {ticket.description && (
+                      <p className="text-sm text-foreground/60 mt-2">{ticket.description}</p>
+                    )}
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{msg.message || msg.content}</p>
+
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <select
+                      value={ticket.status}
+                      onChange={(e) => handleStatusChange(e.target.value)}
+                      className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-full px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all text-foreground/40"
+                    >
+                      {statusOptions.map((s) => (
+                        <option key={s} value={s} className="capitalize">{s.replace(/_/g, ' ')}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Assign to..."
+                      value={ticket.assigned_to || ''}
+                      onChange={(e) => handleAssign(e.target.value)}
+                      className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10"
+                    />
+                  </div>
                 </div>
               </div>
-            );
-          })}
-          <div ref={messagesEnd} />
-        </div>
 
-        {/* Reply box */}
-        <div className="border-t border-foreground/[0.05] p-6">
-          <div className="flex gap-3">
-            <textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder="Type your reply..."
-              rows={2}
-              className="flex-1 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10 resize-none"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                  handleSendReply();
-                }
-              }}
-            />
-            <button
-              onClick={handleSendReply}
-              disabled={sending || !reply.trim()}
-              className="self-end flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500 disabled:opacity-50"
-            >
-              <Send size={18} />
-            </button>
-          </div>
-          <p className="text-xs text-foreground/30 mt-1">Ctrl+Enter to send</p>
-        </div>
-      </div>
+              {/* Related Links */}
+              {(ticket.order || ticket.order_id || ticket.asset || ticket.contract || ticket.invoice || ticket.return_request || ticket.customer_email) && (
+                <div className="flex flex-wrap gap-2">
+                  {ticket.order && (
+                    <button
+                      onClick={() => navigate(`/orders/${ticket.order.id}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15 hover:bg-blue-500/20 transition-colors"
+                    >
+                      Order: {ticket.order.order_number} ({ticket.order.status})
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                  {!ticket.order && ticket.order_id && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15">
+                      Order: {ticket.order_id}
+                    </span>
+                  )}
+                  {ticket.asset && (
+                    <button
+                      onClick={() => navigate(`/assets/${ticket.asset.id}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15 hover:bg-cyan-500/20 transition-colors"
+                    >
+                      Asset: {ticket.asset.uid} ({ticket.asset.oem} {ticket.asset.model})
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                  {!ticket.asset && ticket.asset_uid && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15">
+                      Asset: {ticket.asset_uid}
+                    </span>
+                  )}
+                  {ticket.contract && (
+                    <button
+                      onClick={() => navigate(`/contracts/${ticket.contract.id}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15 hover:bg-emerald-500/20 transition-colors"
+                    >
+                      Contract: {ticket.contract.contract_number} ({ticket.contract.status})
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                  {!ticket.contract && ticket.contract_id && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">
+                      Contract: {ticket.contract_id}
+                    </span>
+                  )}
+                  {ticket.invoice && (
+                    <button
+                      onClick={() => navigate(`/invoices/${ticket.invoice.id}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15 hover:bg-amber-500/20 transition-colors"
+                    >
+                      Invoice: {ticket.invoice.invoice_number} ({ticket.invoice.status})
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                  {!ticket.invoice && ticket.invoice_id && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15">
+                      Invoice: {ticket.invoice_id}
+                    </span>
+                  )}
+                  {ticket.return_request && (
+                    <button
+                      onClick={() => navigate(`/returns/${ticket.return_request.id}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15 hover:bg-orange-500/20 transition-colors"
+                    >
+                      Return: {ticket.return_request.return_number} ({ticket.return_request.status})
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                  {!ticket.return_request && ticket.return_id && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15">
+                      Return: {ticket.return_id}
+                    </span>
+                  )}
+                  {ticket.customer_email && (
+                    <button
+                      onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-purple-500/10 text-purple-400 border border-purple-500/15 hover:bg-purple-500/20 transition-colors"
+                    >
+                      Customer: {ticket.customer_name || ticket.customer_email}
+                      <ExternalLink size={12} />
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          ),
+        },
+        {
+          key: 'messages',
+          label: 'Messages',
+          count: messages.length,
+          content: (
+            <>
+              {/* Messages */}
+              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] flex flex-col" style={{ minHeight: '300px' }}>
+                <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-foreground/[0.05]">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Messages ({messages.length})</h3>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
+                  {messages.length === 0 && (
+                    <p className="text-center text-foreground/30 text-sm py-8">No messages yet.</p>
+                  )}
+                  {messages.map((msg, i) => {
+                    const isAgent = msg.sender_type === 'agent';
+                    return (
+                      <div key={i} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                          isAgent ? 'bg-rentr-primary text-white' : 'bg-foreground/[0.05] text-foreground'
+                        }`}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-xs font-semibold ${isAgent ? 'text-white/80' : 'text-foreground/40'}`}>
+                              {msg.sender_name || (isAgent ? 'Agent' : 'Customer')}
+                            </span>
+                            <span className={`text-xs ${isAgent ? 'text-white/60' : 'text-foreground/30'}`}>
+                              {msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}
+                            </span>
+                          </div>
+                          <p className="text-sm whitespace-pre-wrap">{msg.message || msg.content}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEnd} />
+                </div>
+
+                {/* Reply box */}
+                <div className="border-t border-foreground/[0.05] p-6">
+                  <div className="flex gap-3">
+                    <textarea
+                      value={reply}
+                      onChange={(e) => setReply(e.target.value)}
+                      placeholder="Type your reply..."
+                      rows={2}
+                      className="flex-1 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10 resize-none"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                          handleSendReply();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={handleSendReply}
+                      disabled={sending || !reply.trim()}
+                      className="self-end flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500 disabled:opacity-50"
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
+                  <p className="text-xs text-foreground/30 mt-1">Ctrl+Enter to send</p>
+                </div>
+              </div>
+            </>
+          ),
+        },
+        {
+          key: 'replacements',
+          label: 'Replacements',
+          count: advanceReplacements.length,
+          content: (
+            <>
+              {/* Linked Advance Replacements */}
+              {advanceReplacements.length > 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <RefreshCw className="w-5 h-5 text-foreground/40" />
+                    <h3 className="text-lg sm:text-xl font-brand font-black uppercase tracking-tight text-foreground">Advance Replacements ({advanceReplacements.length})</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {advanceReplacements.map((ar, i) => (
+                      <div key={ar.id || i} className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-4 flex flex-wrap gap-4 items-center justify-between">
+                        <div className="flex flex-wrap gap-4 text-sm">
+                          <div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Faulty Asset</span>
+                            <p className="font-mono text-foreground/70">{ar.faulty_asset_uid}</p>
+                          </div>
+                          <div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Replacement Asset</span>
+                            <p className="font-mono text-foreground/70">{ar.replacement_asset_uid}</p>
+                          </div>
+                          <div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Reason</span>
+                            <p className="text-foreground/70">{ar.reason}</p>
+                          </div>
+                          {ar.notes && (
+                            <div>
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Notes</span>
+                              <p className="text-foreground/50">{ar.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${arStatusColors[ar.status] || 'bg-foreground/[0.05] text-foreground/60 border-foreground/10'}`}>
+                            {ar.status}
+                          </span>
+                          {ar.created_at && (
+                            <span className="text-[10px] text-foreground/30">{new Date(ar.created_at).toLocaleDateString()}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {advanceReplacements.length === 0 && (
+                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                  <p className="text-center text-foreground/30 text-sm py-8">No advance replacements yet.</p>
+                </div>
+              )}
+
+              <button
+                onClick={openArModal}
+                className="flex items-center gap-2 px-5 py-3 rounded-full bg-foreground/[0.02] border border-foreground/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 hover:border-rentr-primary/50 hover:text-rentr-primary transition-all"
+              >
+                <RefreshCw size={14} />
+                Initiate Advance Replacement
+              </button>
+            </>
+          ),
+        },
+      ]} />
 
       {/* Advance Replacement Modal */}
       <Modal
