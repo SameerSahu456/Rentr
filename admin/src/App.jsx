@@ -104,7 +104,7 @@ export default function App() {
         <Route path="/delivery-challans/:id" element={<DeliveryChallanDetail />} />
         <Route path="/replacements" element={<ReplacementsPage />} />
         <Route path="/replacements/:id" element={<ReplacementDetail />} />
-        <Route path="/advance-replacements" element={<AdvanceReplacementsPage />} />
+        <Route path="/advance-replacements" element={<Navigate to="/replacements" replace />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/billing" element={<BillingPage />} />
         <Route path="/reports" element={<ReportsPage />} />
