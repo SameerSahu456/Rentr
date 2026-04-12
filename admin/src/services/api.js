@@ -14,14 +14,6 @@ function clearToken() {
   localStorage.removeItem('rentr_admin_token');
 }
 
-// Ensure URL has trailing slash so FastAPI never sends 307 redirects.
-// This avoids opaque redirect issues through ngrok.
-function normalizeUrl(url) {
-  const [path, query] = url.split('?');
-  const normalized = path.endsWith('/') ? path : path + '/';
-  return query ? `${normalized}?${query}` : normalized;
-}
-
 async function request(method, url, data = null, { skipAuthRedirect = false } = {}) {
   const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
   const token = getToken();
@@ -34,7 +26,7 @@ async function request(method, url, data = null, { skipAuthRedirect = false } = 
     config.body = JSON.stringify(data);
   }
 
-  const response = await fetch(`${BASE_URL}${normalizeUrl(url)}`, config);
+  const response = await fetch(`${BASE_URL}${url}`, config);
 
   if (response.status === 401 && !skipAuthRedirect) {
     if (token) {
@@ -60,7 +52,7 @@ async function uploadFiles(url, formData) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${BASE_URL}${normalizeUrl(url)}`, {
+  const response = await fetch(`${BASE_URL}${url}`, {
     method: 'POST',
     headers,
     body: formData,

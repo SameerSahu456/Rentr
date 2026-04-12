@@ -81,7 +81,7 @@ async def lifespan(app: FastAPI):
     task.cancel()
 
 
-app = FastAPI(title="Rentr Admin API", lifespan=lifespan)
+app = FastAPI(title="Rentr Admin API", lifespan=lifespan, redirect_slashes=False)
 
 # CORS: allow all origins dynamically. We use allow_origin_regex to match
 # localhost, Vercel previews, ngrok tunnels, and any future deployment domains.
