@@ -24,9 +24,9 @@ export default function KYCDetail() {
   useEffect(() => {
     api.get(`/kyc/${id}`)
       .then(setKyc)
-      .catch(() => navigate('/kyc'))
+      .catch(() => setKyc(null))
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id]);
 
   const handleApprove = async () => {
     setSubmitting(true);
@@ -66,7 +66,12 @@ export default function KYCDetail() {
     );
   }
 
-  if (!kyc) return null;
+  if (!kyc) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">KYC record not found</p>
+      <button onClick={() => navigate('/customers?tab=kyc')} className="text-rentr-primary text-sm hover:underline">Back to KYC</button>
+    </div>
+  );
 
   const accountTypeBadge = (type) => {
     if (type === 'channel_partner') return 'bg-purple-500/10 text-purple-400 border border-purple-500/15';

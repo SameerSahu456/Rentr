@@ -8,6 +8,8 @@ from app.api.routes import (
     advance_replacements, proforma_invoices, delivery_challans, shipments,
     replacements, security_deposits, credit_notes, insurance,
 )
+from app.api.routes.distributor import router as distributor_router
+from app.api.routes import distributor_admin
 
 router.include_router(auth.router)
 router.include_router(orders.router)
@@ -31,3 +33,5 @@ router.include_router(replacements.router)
 router.include_router(security_deposits.router)
 router.include_router(credit_notes.router)
 router.include_router(insurance.router)
+router.include_router(distributor_router)
+router.include_router(distributor_admin.router)

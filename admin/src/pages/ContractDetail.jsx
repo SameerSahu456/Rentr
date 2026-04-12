@@ -54,9 +54,9 @@ export default function ContractDetail() {
   useEffect(() => {
     api.get(`/contracts/${id}`)
       .then(setContract)
-      .catch(() => navigate('/contracts'))
+      .catch(() => setContract(null))
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id]);
 
   const handleGetSigningLink = async () => {
     try {
@@ -195,7 +195,12 @@ export default function ContractDetail() {
     return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
   }
 
-  if (!contract) return null;
+  if (!contract) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">Contract not found</p>
+      <button onClick={() => navigate('/contracts')} className="text-rentr-primary text-sm hover:underline">Back to Contracts</button>
+    </div>
+  );
 
   const currentIndex = statusFlow.indexOf(contract.status);
   const annexures = contract.annexures || [];

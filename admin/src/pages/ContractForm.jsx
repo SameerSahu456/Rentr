@@ -58,9 +58,9 @@ export default function ContractForm() {
           } catch { /* use defaults */ }
         }
       })
-      .catch(() => navigate('/contracts'))
+      .catch(() => {})
       .finally(() => setLoadingContract(false));
-  }, [id, isEdit, navigate]);
+  }, [id, isEdit]);
 
   const updateField = (field, value) => setForm((f) => ({ ...f, [field]: value }));
 

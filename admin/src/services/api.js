@@ -27,14 +27,16 @@ async function request(method, url, data = null, { skipAuthRedirect = false } = 
 
   let response = await fetch(`${BASE_URL}${url}`, config);
 
-  // Handle redirects manually to preserve Authorization header
-  if (response.status === 307 || response.status === 308) {
-    const redirectUrl = response.headers.get('location');
-    if (redirectUrl) {
-      // Re-request with same headers to the redirect URL
-      // Convert absolute URL back to relative for the proxy
-      const relativeUrl = redirectUrl.replace(/^https?:\/\/[^/]+/, '');
-      response = await fetch(relativeUrl, { method, headers, body: config.body });
+  // Handle 307/308 redirects manually to preserve Authorization header across ngrok
+  if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 308) {
+    const location = response.headers.get('location');
+    if (location) {
+      // Use the full redirect URL but keep our auth headers
+      response = await fetch(location, { method, headers, body: config.body });
+    } else {
+      // Opaque redirect — retry with trailing slash appended
+      const retryUrl = `${BASE_URL}${url}${url.includes('?') ? '' : url.endsWith('/') ? '' : '/'}`;
+      response = await fetch(retryUrl, { method, headers, body: config.body });
     }
   }
 
@@ -69,11 +71,13 @@ async function uploadFiles(url, formData) {
     redirect: 'manual',
   });
 
-  if (response.status === 307 || response.status === 308) {
-    const redirectUrl = response.headers.get('location');
-    if (redirectUrl) {
-      const relativeUrl = redirectUrl.replace(/^https?:\/\/[^/]+/, '');
-      response = await fetch(relativeUrl, { method: 'POST', headers, body: formData });
+  if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 308) {
+    const location = response.headers.get('location');
+    if (location) {
+      response = await fetch(location, { method: 'POST', headers, body: formData });
+    } else {
+      const retryUrl = `${BASE_URL}${url}${url.endsWith('/') ? '' : '/'}`;
+      response = await fetch(retryUrl, { method: 'POST', headers, body: formData });
     }
   }
 

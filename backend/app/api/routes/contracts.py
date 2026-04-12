@@ -68,7 +68,7 @@ def _next_contract_number(db: Session) -> str:
 def list_contracts(
     status: str = Query(None),
     search: str = Query(None),
-    order_id: int = Query(None),
+    order_id: str = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -76,7 +76,12 @@ def list_contracts(
     if status:
         query = query.filter(Contract.status == status)
     if order_id:
-        query = query.filter(Contract.order_id == order_id)
+        # Accept both integer ID and string order number
+        if order_id.isdigit():
+            query = query.filter(Contract.order_id == int(order_id))
+        else:
+            # Non-numeric order_id (e.g. "ORD-00001") — no match in this DB
+            query = query.filter(Contract.order_id == -1)
     if search:
         query = query.filter(
             or_(

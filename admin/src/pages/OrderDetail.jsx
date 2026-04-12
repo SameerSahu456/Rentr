@@ -26,13 +26,13 @@ export default function OrderDetail() {
   useEffect(() => {
     api.get(`/orders/${id}`)
       .then(setOrder)
-      .catch(() => navigate('/orders'))
+      .catch(() => setOrder(null))
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id]);
 
   useEffect(() => {
-    if (order?.order_number) {
-      api.get(`/contracts/?order_id=${order.order_number}`)
+    if (order?.id) {
+      api.get(`/contracts/?order_id=${order.id}`)
         .then((data) => {
           const items = Array.isArray(data) ? data : data.items || [];
           if (items.length > 0) setContract(items[0]);
@@ -70,7 +70,12 @@ export default function OrderDetail() {
     );
   }
 
-  if (!order) return null;
+  if (!order) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">Order not found</p>
+      <button onClick={() => navigate('/orders')} className="text-rentr-primary text-sm hover:underline">Back to Orders</button>
+    </div>
+  );
 
   const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
   const shipping = order.shipping_address;

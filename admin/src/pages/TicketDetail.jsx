@@ -93,9 +93,9 @@ export default function TicketDetail() {
   useEffect(() => {
     api.get(`/support/tickets/${id}`)
       .then(setTicket)
-      .catch(() => navigate('/support'))
+      .catch(() => setTicket(null))
       .finally(() => setLoading(false));
-  }, [id, navigate]);
+  }, [id]);
 
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -179,7 +179,12 @@ export default function TicketDetail() {
     return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
   }
 
-  if (!ticket) return null;
+  if (!ticket) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">Ticket not found</p>
+      <button onClick={() => navigate('/support')} className="text-rentr-primary text-sm hover:underline">Back to Support</button>
+    </div>
+  );
 
   const messages = ticket.messages || [];
   const pClasses = priorityColors[(ticket.priority || '').toLowerCase()] || 'bg-foreground/[0.05] text-foreground/60';

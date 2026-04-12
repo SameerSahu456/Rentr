@@ -50,6 +50,13 @@ def _migrate_new_columns():
         conn.execute(text("UPDATE orders SET customer_type = 'partner' WHERE customer_type = 'distributor'"))
         conn.execute(text("UPDATE customers SET role = 'partner' WHERE role = 'distributor'"))
 
+        # DistributorUser: extra columns
+        if "distributor_users" in inspector.get_table_names():
+            _add_col_if_missing("distributor_users", "partner_email")
+            _add_col_if_missing("distributor_users", "commission_rate", "FLOAT DEFAULT 0")
+            _add_col_if_missing("distributor_users", "credit_limit", "FLOAT DEFAULT 0")
+            _add_col_if_missing("distributor_users", "credit_used", "FLOAT DEFAULT 0")
+
         # Order: delivery tracking & billing fields
         _add_col_if_missing("orders", "delivery_status", "VARCHAR(50) DEFAULT 'pending'")
         _add_col_if_missing("orders", "delivered_at", "TIMESTAMP WITH TIME ZONE")

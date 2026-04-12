@@ -39,6 +39,8 @@ import NotificationsPage from './pages/NotificationsPage';
 import AuditTrailPage from './pages/AuditTrailPage';
 import BillingPage from './pages/BillingPage';
 import ReportsPage from './pages/ReportsPage';
+import DistributorsPage from './pages/DistributorsPage';
+import DistributorDetail from './pages/DistributorDetail';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -105,6 +107,8 @@ export default function App() {
         <Route path="/replacements" element={<ReplacementsPage />} />
         <Route path="/replacements/:id" element={<ReplacementDetail />} />
         <Route path="/advance-replacements" element={<Navigate to="/replacements" replace />} />
+        <Route path="/distributors" element={<DistributorsPage />} />
+        <Route path="/distributors/:id" element={<DistributorDetail />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/billing" element={<BillingPage />} />
         <Route path="/reports" element={<ReportsPage />} />

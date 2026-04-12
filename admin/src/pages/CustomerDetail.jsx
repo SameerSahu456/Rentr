@@ -46,9 +46,9 @@ export default function CustomerDetail() {
           if (match) setKyc(match);
         }).catch(() => {});
       }
-    }).catch(() => navigate('/customers'))
+    }).catch(() => setCustomer(null))
       .finally(() => setLoading(false));
-  }, [email, navigate]);
+  }, [email]);
 
   const handleApprove = async () => {
     if (!kyc) return;

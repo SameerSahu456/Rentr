@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-brand: "Chakra Petch", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+
+  --color-rentr-primary: #2d9d78;
+  --color-rentr-primary-light: #3dbf92;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: #2d9d78;
+  --color-primary-light: #3dbf92;
+  --color-primary-dark: #238a66;
+
+  --radius-xl: 2rem;
+  --radius-2xl: 3rem;
+}
+
+@layer base {
+  :root {
+    --background: #fdfdfd;
+    --foreground: #050505;
+    --card: #ffffff;
+    --card-foreground: #050505;
+    --border: rgba(0, 0, 0, 0.06);
+    --input: rgba(0, 0, 0, 0.03);
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+  }
+
+  .dark {
+    --background: #050505;
+    --foreground: #ffffff;
+    --card: #0a0a0a;
+    --card-foreground: #ffffff;
+    --border: rgba(255, 255, 255, 0.08);
+    --input: rgba(255, 255, 255, 0.05);
+    --muted: #1a1a1e;
+    --muted-foreground: #a1a1aa;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased selection:bg-rentr-primary/30 transition-colors duration-500;
+    margin: 0;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-medium font-brand;
+  }
+}
+
+.glass {
+  @apply bg-foreground/[0.02] backdrop-blur-2xl border border-foreground/[0.05];
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/40;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 3px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--input) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}

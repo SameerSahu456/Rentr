@@ -35,6 +35,7 @@ import {
   ArrowRightLeft,
   Wallet,
   Wrench,
+  Building2,
 } from 'lucide-react';
 
 const navItems = [
@@ -61,6 +62,7 @@ const navItems = [
       { to: '/replacements', label: 'Replacements', icon: ArrowRightLeft },
     ],
   },
+  { to: '/distributors', label: 'Distributors', icon: Building2 },
   { to: '/support', label: 'Support', icon: LifeBuoy },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/reports', label: 'Reports', icon: FileBarChart },

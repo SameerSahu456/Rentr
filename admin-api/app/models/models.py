@@ -640,6 +640,181 @@ class CreditNote(Base):
 # ── Insurance Policy ────────────────────────────────────────────────────────
 
 
+# ── Distributor Portal ──────────────────────────────────────────────────────
+
+
+class DistributorUser(Base):
+    """Login accounts for distributor portal users."""
+    __tablename__ = "distributor_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    phone = Column(String(50))
+    company_name = Column(String(255), nullable=False)
+    gstin = Column(String(20))
+    pan = Column(String(15))
+    password_hash = Column(String(255), nullable=False)
+    is_active = Column(Boolean, default=True)
+    # Link to existing partner/customer record in orders system
+    partner_email = Column(String(255), index=True)  # links to Order.customer_email where customer_type='partner'
+    commission_rate = Column(Float, default=0.0)  # default commission % Rentr keeps (0 = pure spread model)
+    credit_limit = Column(Float, default=0.0)
+    credit_used = Column(Float, default=0.0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    customers = relationship("DistributorCustomer", back_populates="distributor", lazy="selectin")
+
+
+class DistributorCustomer(Base):
+    """End-customers of a distributor."""
+    __tablename__ = "distributor_customers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    email = Column(String(255), nullable=False, index=True)
+    name = Column(String(255), nullable=False)
+    phone = Column(String(50))
+    company_name = Column(String(255))
+    gstin = Column(String(20))
+    pan = Column(String(15))
+    shipping_address = Column(JSON)
+    billing_address = Column(JSON)
+    kyc_status = Column(String(50), default="pending", index=True)  # pending/under_review/approved/rejected
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    distributor = relationship("DistributorUser", back_populates="customers")
+    orders = relationship("DistributorOrder", back_populates="customer", lazy="selectin")
+
+    __table_args__ = (
+        Index("ix_dist_cust_dist_email", "distributor_id", "email"),
+    )
+
+
+class DistributorKYC(Base):
+    """KYC submissions for distributor's end-customers."""
+    __tablename__ = "distributor_kyc"
+
+    id = Column(Integer, primary_key=True, index=True)
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey("distributor_customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_name = Column(String(255), nullable=False)
+    company_name = Column(String(255))
+    gstin = Column(String(20))
+    pan = Column(String(15))
+    documents = Column(JSON, default=list)  # [{type, filename, url, status}]
+    status = Column(String(50), default="pending", index=True)  # pending/under_review/approved/rejected
+    credit_limit = Column(Float, default=0.0)
+    reviewer = Column(String(255))
+    review_notes = Column(Text)
+    rejection_reason = Column(Text)
+    reviewed_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class DistributorOrder(Base):
+    """Orders placed by distributor's end-customers."""
+    __tablename__ = "distributor_orders"
+
+    id = Column(Integer, primary_key=True, index=True)
+    order_number = Column(String(100), unique=True, nullable=False, index=True)  # DIST-ORD-2026-0001
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey("distributor_customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_name = Column(String(255), nullable=False)
+    customer_email = Column(String(255), nullable=False, index=True)
+    items = Column(JSON, default=list)  # [{description, qty, monthly_rate, asset_uids}]
+    total_monthly = Column(Float, default=0.0)  # what distributor charges end-customer
+    rentr_monthly = Column(Float, default=0.0)  # what Rentr charges distributor for these assets
+    spread = Column(Float, default=0.0)  # total_monthly - rentr_monthly
+    rental_months = Column(Integer, default=12)
+    status = Column(String(50), default="confirmed", index=True)  # confirmed/active/completed/cancelled
+    asset_uids = Column(JSON, default=list)  # Rentr asset UIDs assigned
+    shipping_address = Column(JSON)
+    notes = Column(Text)
+    billing_start_date = Column(Date)
+    billing_end_date = Column(Date)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    customer = relationship("DistributorCustomer", back_populates="orders")
+
+    __table_args__ = (
+        Index("ix_dist_ord_dist_status", "distributor_id", "status"),
+    )
+
+
+class DistributorContract(Base):
+    """Contracts between distributor and their end-customers."""
+    __tablename__ = "distributor_contracts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    contract_number = Column(String(100), unique=True, nullable=False, index=True)  # DIST-CON-2026-0001
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey("distributor_customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    order_id = Column(Integer, ForeignKey("distributor_orders.id", ondelete="SET NULL"), nullable=True, index=True)
+    customer_name = Column(String(255), nullable=False)
+    customer_email = Column(String(255), nullable=False)
+    type = Column(String(50), default="rental")  # rental/lease
+    start_date = Column(Date)
+    end_date = Column(Date)
+    terms = Column(Text)
+    document_url = Column(String(500))
+    status = Column(String(50), default="draft", index=True)  # draft/pending_signature/active/expired/terminated
+    signed_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    invoices = relationship("DistributorInvoice", back_populates="contract", lazy="selectin")
+
+
+class DistributorInvoice(Base):
+    """Invoices issued by distributor to their end-customers."""
+    __tablename__ = "distributor_invoices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_number = Column(String(100), unique=True, nullable=False, index=True)  # DIST-INV-2026-0001
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    customer_id = Column(Integer, ForeignKey("distributor_customers.id", ondelete="CASCADE"), nullable=False, index=True)
+    contract_id = Column(Integer, ForeignKey("distributor_contracts.id", ondelete="SET NULL"), nullable=True, index=True)
+    order_id = Column(Integer, ForeignKey("distributor_orders.id", ondelete="SET NULL"), nullable=True, index=True)
+    customer_name = Column(String(255), nullable=False)
+    customer_email = Column(String(255), nullable=False)
+    items = Column(JSON, default=list)  # [{description, qty, rate, amount}]
+    subtotal = Column(Float, default=0.0)
+    tax = Column(Float, default=0.0)
+    total = Column(Float, default=0.0)
+    status = Column(String(50), default="draft", index=True)  # draft/sent/paid/overdue/cancelled
+    due_date = Column(Date)
+    paid_date = Column(Date)
+    notes = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    contract = relationship("DistributorContract", back_populates="invoices")
+    payments = relationship("DistributorPayment", back_populates="invoice", lazy="selectin")
+
+
+class DistributorPayment(Base):
+    """Payments received by distributor from end-customers."""
+    __tablename__ = "distributor_payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    distributor_id = Column(Integer, ForeignKey("distributor_users.id", ondelete="CASCADE"), nullable=False, index=True)
+    invoice_id = Column(Integer, ForeignKey("distributor_invoices.id", ondelete="CASCADE"), nullable=False, index=True)
+    amount = Column(Float, nullable=False)
+    method = Column(String(100))  # bank_transfer/upi/cheque/cash
+    transaction_id = Column(String(255))
+    status = Column(String(50), default="pending", index=True)  # pending/completed/failed/refunded
+    paid_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    invoice = relationship("DistributorInvoice", back_populates="payments")
+
+
 class InsurancePolicy(Base):
     __tablename__ = "insurance_policies"
 

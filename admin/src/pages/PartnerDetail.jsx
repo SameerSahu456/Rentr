@@ -25,9 +25,9 @@ export default function PartnerDetail() {
   useEffect(() => {
     api.get(`/partners/${encodeURIComponent(email)}`)
       .then(setData)
-      .catch(() => navigate('/partners'))
+      .catch(() => setData(null))
       .finally(() => setLoading(false));
-  }, [email, navigate]);
+  }, [email]);
 
   if (loading) {
     return (
@@ -37,7 +37,12 @@ export default function PartnerDetail() {
     );
   }
 
-  if (!data) return null;
+  if (!data) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">Partner not found</p>
+      <button onClick={() => navigate('/partners')} className="text-rentr-primary text-sm hover:underline">Back to Partners</button>
+    </div>
+  );
 
   const { profile, kyc, tier, metrics } = data;
   const fmt = (n) => Number(n || 0).toLocaleString('en-IN');

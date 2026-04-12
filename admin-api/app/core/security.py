@@ -94,6 +94,39 @@ def get_current_customer(
     return customer
 
 
+distributor_oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/api/distributor/auth/login", auto_error=True
+)
+
+
+def get_current_distributor(
+    token: str = Depends(distributor_oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        sub: str | None = payload.get("sub")
+        user_type: str | None = payload.get("user_type")
+        if sub is None or user_type != "distributor":
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    from app.models.models import DistributorUser
+
+    distributor = db.query(DistributorUser).filter(DistributorUser.id == int(sub)).first()
+    if distributor is None or not distributor.is_active:
+        raise credentials_exception
+    return distributor
+
+
 def get_optional_customer(
     token: str | None = Depends(customer_oauth2_scheme),
     db: Session = Depends(get_db),
