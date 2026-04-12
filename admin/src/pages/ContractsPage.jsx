@@ -6,7 +6,15 @@ import api from '../services/api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 
-const tabs = ['all', 'draft', 'pending_signature', 'active', 'expired'];
+const tabs = ['all', 'draft', 'pending_signature', 'active', 'expiring_soon', 'expired'];
+const tabLabels = {
+  all: 'All',
+  draft: 'Draft',
+  pending_signature: 'Pending Signature',
+  active: 'Active',
+  expiring_soon: 'Expiring Soon',
+  expired: 'Expired',
+};
 
 const container = {
   hidden: { opacity: 0 },
@@ -114,7 +122,7 @@ export default function ContractsPage() {
                 : 'text-foreground/20 hover:text-foreground'
             }`}
           >
-            {tab}
+            {tabLabels[tab] || tab}
           </button>
         ))}
       </motion.div>

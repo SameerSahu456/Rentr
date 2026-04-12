@@ -25,6 +25,7 @@ from app.schemas.schemas import (
     ReminderUpdate,
     SignatureSubmit,
 )
+from app.services.email_service import send_contract_expiry_reminder
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -115,7 +116,16 @@ def list_contracts(
     current_user: AdminUser = Depends(get_current_user),
 ):
     query = db.query(Contract)
-    if status_filter:
+    if status_filter == "expiring_soon":
+        # Contracts expiring within 30 days
+        today = date.today()
+        query = query.filter(
+            Contract.status == "active",
+            Contract.end_date != None,
+            Contract.end_date >= today,
+            Contract.end_date <= today + timedelta(days=30),
+        )
+    elif status_filter:
         query = query.filter(Contract.status == status_filter)
     if customer_email:
         query = query.filter(Contract.customer_email.ilike(f"%{customer_email}%"))
@@ -189,11 +199,22 @@ def send_reminder_now(
         f"Best regards,\nRentr Team"
     )
 
+    # Actually send the email
+    email_sent = False
+    if reminder.channel in ("email", "both") and contract.customer_email:
+        email_sent = send_contract_expiry_reminder(
+            to_email=contract.customer_email,
+            customer_name=contract.customer_name,
+            contract_number=contract.contract_number,
+            end_date=contract.end_date,
+            days_left=days_left,
+        )
+
     log = ContractReminderLog(
         reminder_id=reminder.id,
         contract_id=contract.id,
         channel=reminder.channel,
-        status="sent",
+        status="sent" if email_sent else "failed",
         recipient_email=contract.customer_email,
         message_preview=message[:500],
     )
@@ -210,8 +231,9 @@ def send_reminder_now(
     db.commit()
     db.refresh(reminder)
 
+    send_status = "sent" if email_sent else "failed_no_smtp"
     return {
-        "status": "sent",
+        "status": send_status,
         "message_preview": message,
         "recipient": contract.customer_email,
         "channel": reminder.channel,

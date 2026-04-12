@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models.models import Contract, ContractReminder, ContractReminderLog
+from app.services.email_service import send_contract_expiry_reminder
 
 logger = logging.getLogger(__name__)
 
@@ -57,12 +58,23 @@ def check_and_process_reminders():
                 f"Best regards,\nRentr Team"
             )
 
+            # Send email if channel is email or both
+            email_sent = False
+            if reminder.channel in ("email", "both") and contract.customer_email:
+                email_sent = send_contract_expiry_reminder(
+                    to_email=contract.customer_email,
+                    customer_name=contract.customer_name,
+                    contract_number=contract.contract_number,
+                    end_date=contract.end_date,
+                    days_left=days_left,
+                )
+
             # Create log entry
             log = ContractReminderLog(
                 reminder_id=reminder.id,
                 contract_id=contract.id,
                 channel=reminder.channel,
-                status="pending",
+                status="sent" if email_sent else "failed",
                 recipient_email=contract.customer_email,
                 message_preview=message[:500],
             )
