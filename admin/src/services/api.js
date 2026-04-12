@@ -1,6 +1,5 @@
 // API base URL — admin-api serves at /api (NOT /api/v1)
 const _env = import.meta.env.VITE_ADMIN_API_URL || '';
-// Fix legacy env values that incorrectly include /v1
 const BASE_URL = _env.replace(/\/api\/v1\b/, '/api') || '/api';
 
 function getToken() {
@@ -15,6 +14,14 @@ function clearToken() {
   localStorage.removeItem('rentr_admin_token');
 }
 
+// Ensure URL has trailing slash so FastAPI never sends 307 redirects.
+// This avoids opaque redirect issues through ngrok.
+function normalizeUrl(url) {
+  const [path, query] = url.split('?');
+  const normalized = path.endsWith('/') ? path : path + '/';
+  return query ? `${normalized}?${query}` : normalized;
+}
+
 async function request(method, url, data = null, { skipAuthRedirect = false } = {}) {
   const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
   const token = getToken();
@@ -22,25 +29,12 @@ async function request(method, url, data = null, { skipAuthRedirect = false } = 
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const config = { method, headers, redirect: 'manual' };
+  const config = { method, headers };
   if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
     config.body = JSON.stringify(data);
   }
 
-  let response = await fetch(`${BASE_URL}${url}`, config);
-
-  // Handle 307/308 redirects manually to preserve Authorization header across ngrok
-  if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 308) {
-    const location = response.headers.get('location');
-    if (location) {
-      // Use the full redirect URL but keep our auth headers
-      response = await fetch(location, { method, headers, body: config.body });
-    } else {
-      // Opaque redirect — retry with trailing slash appended
-      const retryUrl = `${BASE_URL}${url}${url.includes('?') ? '' : url.endsWith('/') ? '' : '/'}`;
-      response = await fetch(retryUrl, { method, headers, body: config.body });
-    }
-  }
+  const response = await fetch(`${BASE_URL}${normalizeUrl(url)}`, config);
 
   if (response.status === 401 && !skipAuthRedirect) {
     if (token) {
@@ -66,22 +60,11 @@ async function uploadFiles(url, formData) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  let response = await fetch(`${BASE_URL}${url}`, {
+  const response = await fetch(`${BASE_URL}${normalizeUrl(url)}`, {
     method: 'POST',
     headers,
     body: formData,
-    redirect: 'manual',
   });
-
-  if (response.type === 'opaqueredirect' || response.status === 307 || response.status === 308) {
-    const location = response.headers.get('location');
-    if (location) {
-      response = await fetch(location, { method: 'POST', headers, body: formData });
-    } else {
-      const retryUrl = `${BASE_URL}${url}${url.endsWith('/') ? '' : '/'}`;
-      response = await fetch(retryUrl, { method: 'POST', headers, body: formData });
-    }
-  }
 
   if (response.status === 401) {
     clearToken();
