@@ -49,7 +49,6 @@ const navItems = [
     children: [
       { to: '/invoices', label: 'Invoices', icon: FileText },
       { to: '/payments', label: 'Payments', icon: CreditCard },
-      { to: '/billing', label: 'Billing', icon: DollarSign },
       { to: '/contracts', label: 'Contracts', icon: ScrollText },
     ],
   },

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Download, Send, Pencil, Check, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import DetailTabs from '../components/DetailTabs';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
+const BASE_URL = import.meta.env.VITE_ADMIN_API_URL || '/api';
 
 export default function InvoiceDetail() {
   const { id } = useParams();
@@ -19,6 +20,9 @@ export default function InvoiceDetail() {
   const [paymentModal, setPaymentModal] = useState(false);
   const [payment, setPayment] = useState({ amount: '', method: 'bank_transfer', transaction_id: '' });
   const [saving, setSaving] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [editingDate, setEditingDate] = useState(false);
+  const [newDueDate, setNewDueDate] = useState('');
 
   useEffect(() => {
     api.get(`/invoices/${id}`)
@@ -49,6 +53,43 @@ export default function InvoiceDetail() {
     } catch { /* ignore */ }
   };
 
+  const handleDownloadPdf = async () => {
+    try {
+      const token = api.getToken();
+      const res = await fetch(`${BASE_URL.replace(/\/api\/v1\b/, '/api')}/invoices/${id}/pdf`, {
+        headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' },
+      });
+      if (!res.ok) throw new Error('Failed to generate PDF');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${invoice.invoice_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF download failed:', err);
+    }
+  };
+
+  const handleSendInvoice = async () => {
+    setSending(true);
+    try {
+      const res = await api.post(`/invoices/${id}/send`);
+      setInvoice((prev) => ({ ...prev, status: res.status || 'sent' }));
+    } catch { /* ignore */ }
+    finally { setSending(false); }
+  };
+
+  const handleSaveDueDate = async () => {
+    if (!newDueDate) return;
+    try {
+      const updated = await api.patch(`/invoices/${id}`, { due_date: newDueDate });
+      setInvoice((prev) => ({ ...prev, due_date: updated.due_date || newDueDate }));
+      setEditingDate(false);
+    } catch { /* ignore */ }
+  };
+
   if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (error) return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -56,7 +97,12 @@ export default function InvoiceDetail() {
       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-red-400 text-sm">{error}</div>
     </div>
   );
-  if (!invoice) return null;
+  if (!invoice) return (
+    <div className="text-center py-20">
+      <p className="text-foreground/30 text-sm mb-4">Invoice not found</p>
+      <button onClick={() => navigate('/invoices')} className="text-rentr-primary text-sm hover:underline">Back to Invoices</button>
+    </div>
+  );
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6">
@@ -65,7 +111,7 @@ export default function InvoiceDetail() {
         <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <StatusBadge status={invoice.status} />
           <select value={invoice.status} onChange={(e) => handleStatusChange(e.target.value)}
             className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">
@@ -75,6 +121,16 @@ export default function InvoiceDetail() {
             <option value="overdue">Overdue</option>
             <option value="cancelled">Cancelled</option>
           </select>
+          <button onClick={handleDownloadPdf}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-foreground/[0.08] text-sm text-foreground/60 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors"
+            title="Download PDF">
+            <Download className="w-4 h-4" /> PDF
+          </button>
+          <button onClick={handleSendInvoice} disabled={sending}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rentr-primary text-white text-sm font-medium hover:bg-rentr-primary-light transition-colors disabled:opacity-50"
+            title="Send to customer">
+            <Send className="w-4 h-4" /> {sending ? 'Sending...' : 'Send'}
+          </button>
           <button onClick={() => setPaymentModal(true)}
             className="px-4 py-2 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-rentr-primary hover:text-white transition-colors">
             Record Payment
@@ -128,7 +184,23 @@ export default function InvoiceDetail() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                 <Field label="Customer" value={invoice.customer_name} />
                 <Field label="Email" value={invoice.customer_email} />
-                <Field label="Due Date" value={invoice.due_date} />
+                <div>
+                  <span className="text-xs text-foreground/40 block mb-0.5">Due Date</span>
+                  {editingDate ? (
+                    <div className="flex items-center gap-1">
+                      <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)}
+                        className="bg-foreground/[0.03] border border-foreground/[0.08] rounded px-2 py-1 text-sm" />
+                      <button onClick={handleSaveDueDate} className="p-1 text-emerald-500 hover:text-emerald-400"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => setEditingDate(false)} className="p-1 text-foreground/30 hover:text-foreground"><X className="w-4 h-4" /></button>
+                    </div>
+                  ) : (
+                    <span className="text-sm font-medium text-foreground inline-flex items-center gap-1.5 group cursor-pointer"
+                      onClick={() => { setNewDueDate(invoice.due_date || ''); setEditingDate(true); }}>
+                      {invoice.due_date || '-'}
+                      <Pencil className="w-3 h-3 text-foreground/20 group-hover:text-rentr-primary transition-colors" />
+                    </span>
+                  )}
+                </div>
                 <Field label="Status" value={invoice.status?.replace(/_/g, ' ')} />
               </div>
 
