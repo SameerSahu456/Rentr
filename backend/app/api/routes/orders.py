@@ -164,16 +164,19 @@ def get_order(
         for r in linked_adv_replacements
     ]
 
-    # Linked contract
-    contract_data = None
-    if linked_contracts:
-        c = linked_contracts[0]
-        contract_data = {
+    # Linked contracts
+    contracts_data = [
+        {
             "id": c.id, "contract_number": c.contract_number,
             "status": c.status.value if c.status else None,
             "start_date": c.start_date.isoformat() if c.start_date else None,
             "end_date": c.end_date.isoformat() if c.end_date else None,
+            "type": c.type.value if hasattr(c.type, "value") else c.type if hasattr(c, "type") else None,
+            "version": c.version if hasattr(c, "version") else 1,
+            "signed_at": c.signed_at.isoformat() if hasattr(c, "signed_at") and c.signed_at else None,
         }
+        for c in linked_contracts
+    ]
 
     # Linked shipments (enriched)
     linked_shipments = db.query(Shipment).filter(Shipment.order_id == order.id).order_by(Shipment.created_at.desc()).all()
@@ -239,7 +242,8 @@ def get_order(
         "total_monthly": float(order.total_amount or 0),
         "rental_months": order.rental_months,
         "sales_order_pdf": None,
-        "contract": contract_data,
+        "contract": contracts_data[0] if contracts_data else None,
+        "contracts": contracts_data,
         "assets": assets_data,
         "invoices": invoices_data,
         "payments": payments_data,
