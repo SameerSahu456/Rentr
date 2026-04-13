@@ -35,7 +35,6 @@ import {
   ArrowRightLeft,
   Wallet,
   Wrench,
-  Building2,
 } from 'lucide-react';
 
 const navItems = [
