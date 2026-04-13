@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, ExternalLink, Clock, AlertTriangle, ShieldAlert, RefreshCw } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, Send, ExternalLink, Clock, AlertTriangle, ShieldAlert, RefreshCw, MessageSquare, Info, Wrench } from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
-import DetailTabs from '../components/DetailTabs';
 
 const statusOptions = ['open', 'in_progress', 'resolved', 'closed'];
 const priorityColors = {
@@ -63,14 +61,12 @@ function SlaCountdown({ label, deadline }) {
   const isExpired = remaining === 'Expired';
 
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">{label}</span>
-      <span className={`text-sm font-mono font-semibold ${isExpired ? 'text-red-400' : 'text-foreground/70'}`}>
+    <div>
+      <p className="text-[10px] text-foreground/25 uppercase tracking-widest">{label}</p>
+      <p className={`text-sm font-mono font-bold ${isExpired ? 'text-red-400' : 'text-foreground'}`}>
         {remaining}
-      </span>
-      <span className="text-[10px] text-foreground/30">
-        {new Date(deadline).toLocaleString()}
-      </span>
+      </p>
+      <p className="text-[10px] text-foreground/30">{new Date(deadline).toLocaleString()}</p>
     </div>
   );
 }
@@ -80,6 +76,7 @@ export default function TicketDetail() {
   const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('details');
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEnd = useRef(null);
@@ -165,7 +162,6 @@ export default function TicketDetail() {
         notes: arForm.notes,
       });
       setArModalOpen(false);
-      // Refresh ticket to get updated advance_replacements
       const updated = await api.get(`/support/tickets/${id}`);
       setTicket(updated);
     } catch (err) {
@@ -175,14 +171,14 @@ export default function TicketDetail() {
     }
   };
 
-  if (loading) {
-    return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
-  }
+  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl">&nbsp;</div>)}</div>;
 
   if (!ticket) return (
-    <div className="text-center py-20">
-      <p className="text-foreground/30 text-sm mb-4">Ticket not found</p>
-      <button onClick={() => navigate('/support')} className="text-rentr-primary text-sm hover:underline">Back to Support</button>
+    <div className="space-y-6">
+      <button onClick={() => navigate('/support')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Support
+      </button>
+      <div className="glass rounded-2xl p-8 text-center text-foreground/20 text-xs italic">Ticket not found</div>
     </div>
   );
 
@@ -191,321 +187,346 @@ export default function TicketDetail() {
   const sla = slaColors[ticket.sla_status] || null;
   const advanceReplacements = ticket.advance_replacements || [];
 
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto space-y-10">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-6">
-        <button onClick={() => navigate('/support')} className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-foreground/30 hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Support
-        </button>
-        <div className="flex items-center gap-3">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${pClasses}`}>
-            {ticket.priority}
-          </span>
-          <StatusBadge status={(ticket.status || '').replace(/_/g, ' ')} />
-        </div>
-      </div>
+  const tabs = [
+    { key: 'details', label: 'Details' },
+    { key: 'messages', label: `Messages (${messages.length})` },
+    { key: 'replacements', label: `Replacements (${advanceReplacements.length})` },
+  ];
 
-      {/* Hero */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="px-2 py-1 rounded-md bg-rentr-primary/10 text-rentr-primary text-[9px] font-bold uppercase tracking-widest border border-rentr-primary/20">
-              Ticket
-            </span>
-            <span className="text-[10px] font-mono text-foreground/20">{ticket.ticket_number}</span>
+  return (
+    <div className="space-y-6">
+      <button onClick={() => navigate('/support')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Support
+      </button>
+
+      {/* Header Card */}
+      <div className="glass rounded-2xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-rentr-primary/10 text-rentr-primary">Ticket</span>
+              <span className="font-mono text-xs text-foreground/25">{ticket.ticket_number}</span>
+            </div>
+            <h1 className="text-2xl font-brand font-bold text-foreground">{ticket.subject}</h1>
+            <p className="text-foreground/30 text-sm">
+              <span className="cursor-pointer hover:text-rentr-primary transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>
+                {ticket.customer_name}
+              </span>
+              {' '}&middot;{' '}{ticket.customer_email}
+            </p>
+            {ticket.description && <p className="text-foreground/40 text-xs mt-1 max-w-xl">{ticket.description}</p>}
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-5xl font-brand font-black tracking-tighter text-foreground uppercase leading-none">
-            {ticket.subject}
-          </h1>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${pClasses}`}>
+              {ticket.priority}
+            </span>
+            <StatusBadge status={(ticket.status || '').replace(/_/g, ' ')} />
+          </div>
+        </div>
+
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mt-6">
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Category</p>
+            <p className="text-sm font-bold capitalize">{ticket.category || '-'}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Assigned To</p>
+            <p className="text-sm font-bold">{ticket.assigned_to || '-'}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Messages</p>
+            <p className="text-sm font-bold">{messages.length}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Replacements</p>
+            <p className="text-sm font-bold">{advanceReplacements.length}</p>
+          </div>
+          {sla && (
+            <div>
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">SLA Status</p>
+              <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${sla.text} ${sla.bg} border ${sla.border}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${sla.dot}`} />
+                {sla.label}
+              </span>
+            </div>
+          )}
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Status</p>
+            <select
+              value={ticket.status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-2 py-1 text-xs text-foreground/60 mt-0.5"
+            >
+              {statusOptions.map((s) => (
+                <option key={s} value={s} className="capitalize">{s.replace(/_/g, ' ')}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
       {/* SLA Tracking Card */}
       {ticket.sla_status && sla && (
-        <div className={`${sla.bg} border ${sla.border} rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8`}>
+        <div className={`${sla.bg} border ${sla.border} rounded-2xl p-6`}>
           <div className="flex items-center gap-3 mb-4">
             {ticket.sla_status === 'on_track' && <Clock className={`w-5 h-5 ${sla.text}`} />}
             {ticket.sla_status === 'at_risk' && <AlertTriangle className={`w-5 h-5 ${sla.text}`} />}
             {ticket.sla_status === 'breached' && <ShieldAlert className={`w-5 h-5 ${sla.text}`} />}
-            <h3 className="text-lg sm:text-xl font-brand font-black uppercase tracking-tight text-foreground">SLA Status</h3>
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${sla.text} ${sla.bg} border ${sla.border}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${sla.dot}`} />
-              {sla.label}
-            </span>
+            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">SLA Countdown</h3>
           </div>
-          <div className="flex flex-wrap gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <SlaCountdown label="Response Deadline" deadline={ticket.response_deadline} />
             <SlaCountdown label="Resolution Deadline" deadline={ticket.resolution_deadline} />
           </div>
         </div>
       )}
 
-      {/* Tabbed Content */}
-      <DetailTabs tabs={[
-        {
-          key: 'details',
-          label: 'Details',
-          content: (
-            <>
-              {/* Ticket info */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-                <div className="flex flex-wrap gap-6 items-start justify-between">
-                  <div className="space-y-3 flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-4 text-sm">
-                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Customer:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_name}</span></div>
-                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Email:</span> <span className="font-medium text-rentr-primary hover:text-rentr-primary-light cursor-pointer hover:underline transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>{ticket.customer_email}</span></div>
-                      <div><span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Category:</span> <span className="font-medium capitalize">{ticket.category}</span></div>
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-foreground/[0.05] overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 ${tab === t.key ? 'border-rentr-primary text-rentr-primary' : 'border-transparent text-foreground/25 hover:text-foreground/50'}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      {tab === 'details' && (
+        <div className="space-y-6">
+          {/* Assign */}
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-foreground/[0.03]">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Assignment</h3>
+            </div>
+            <div className="px-6 py-4">
+              <input
+                type="text"
+                placeholder="Assign to..."
+                value={ticket.assigned_to || ''}
+                onChange={(e) => handleAssign(e.target.value)}
+                className="w-full max-w-sm bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20"
+              />
+            </div>
+          </div>
+
+          {/* Related Links */}
+          {(ticket.order || ticket.order_id || ticket.asset || ticket.asset_uid || ticket.contract || ticket.contract_id || ticket.invoice || ticket.invoice_id || ticket.return_request || ticket.return_id || ticket.customer_email) && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.03]">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Related Items</h3>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {ticket.order && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/orders/${ticket.order.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Order: {ticket.order.order_number}</p>
+                      <p className="text-xs text-foreground/30">{ticket.order.status}</p>
                     </div>
-                    {ticket.description && (
-                      <p className="text-sm text-foreground/60 mt-2">{ticket.description}</p>
-                    )}
+                    <ExternalLink size={14} className="text-foreground/20" />
                   </div>
-
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <select
-                      value={ticket.status}
-                      onChange={(e) => handleStatusChange(e.target.value)}
-                      className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-full px-5 py-3 text-[10px] font-bold uppercase tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all text-foreground/40"
-                    >
-                      {statusOptions.map((s) => (
-                        <option key={s} value={s} className="capitalize">{s.replace(/_/g, ' ')}</option>
-                      ))}
-                    </select>
-                    <input
-                      type="text"
-                      placeholder="Assign to..."
-                      value={ticket.assigned_to || ''}
-                      onChange={(e) => handleAssign(e.target.value)}
-                      className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10"
-                    />
+                )}
+                {!ticket.order && ticket.order_id && (
+                  <div className="px-6 py-4">
+                    <p className="text-sm font-bold">Order: {ticket.order_id}</p>
                   </div>
-                </div>
+                )}
+                {ticket.asset && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/assets/${ticket.asset.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Asset: {ticket.asset.uid}</p>
+                      <p className="text-xs text-foreground/30">{ticket.asset.oem} {ticket.asset.model}</p>
+                    </div>
+                    <ExternalLink size={14} className="text-foreground/20" />
+                  </div>
+                )}
+                {!ticket.asset && ticket.asset_uid && (
+                  <div className="px-6 py-4">
+                    <p className="text-sm font-bold">Asset: {ticket.asset_uid}</p>
+                  </div>
+                )}
+                {ticket.contract && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/contracts/${ticket.contract.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Contract: {ticket.contract.contract_number}</p>
+                      <p className="text-xs text-foreground/30">{ticket.contract.status}</p>
+                    </div>
+                    <ExternalLink size={14} className="text-foreground/20" />
+                  </div>
+                )}
+                {!ticket.contract && ticket.contract_id && (
+                  <div className="px-6 py-4">
+                    <p className="text-sm font-bold">Contract: {ticket.contract_id}</p>
+                  </div>
+                )}
+                {ticket.invoice && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/invoices/${ticket.invoice.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Invoice: {ticket.invoice.invoice_number}</p>
+                      <p className="text-xs text-foreground/30">{ticket.invoice.status}</p>
+                    </div>
+                    <ExternalLink size={14} className="text-foreground/20" />
+                  </div>
+                )}
+                {!ticket.invoice && ticket.invoice_id && (
+                  <div className="px-6 py-4">
+                    <p className="text-sm font-bold">Invoice: {ticket.invoice_id}</p>
+                  </div>
+                )}
+                {ticket.return_request && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/returns/${ticket.return_request.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Return: {ticket.return_request.return_number}</p>
+                      <p className="text-xs text-foreground/30">{ticket.return_request.status}</p>
+                    </div>
+                    <ExternalLink size={14} className="text-foreground/20" />
+                  </div>
+                )}
+                {!ticket.return_request && ticket.return_id && (
+                  <div className="px-6 py-4">
+                    <p className="text-sm font-bold">Return: {ticket.return_id}</p>
+                  </div>
+                )}
+                {ticket.customer_email && (
+                  <div className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors"
+                    onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>
+                    <div>
+                      <p className="text-sm font-bold">Customer: {ticket.customer_name || ticket.customer_email}</p>
+                      <p className="text-xs text-foreground/30">{ticket.customer_email}</p>
+                    </div>
+                    <ExternalLink size={14} className="text-foreground/20" />
+                  </div>
+                )}
               </div>
+            </div>
+          )}
+        </div>
+      )}
 
-              {/* Related Links */}
-              {(ticket.order || ticket.order_id || ticket.asset || ticket.contract || ticket.invoice || ticket.return_request || ticket.customer_email) && (
-                <div className="flex flex-wrap gap-2">
-                  {ticket.order && (
-                    <button
-                      onClick={() => navigate(`/orders/${ticket.order.id}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15 hover:bg-blue-500/20 transition-colors"
-                    >
-                      Order: {ticket.order.order_number} ({ticket.order.status})
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                  {!ticket.order && ticket.order_id && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/15">
-                      Order: {ticket.order_id}
-                    </span>
-                  )}
-                  {ticket.asset && (
-                    <button
-                      onClick={() => navigate(`/assets/${ticket.asset.id}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15 hover:bg-cyan-500/20 transition-colors"
-                    >
-                      Asset: {ticket.asset.uid} ({ticket.asset.oem} {ticket.asset.model})
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                  {!ticket.asset && ticket.asset_uid && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/15">
-                      Asset: {ticket.asset_uid}
-                    </span>
-                  )}
-                  {ticket.contract && (
-                    <button
-                      onClick={() => navigate(`/contracts/${ticket.contract.id}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15 hover:bg-emerald-500/20 transition-colors"
-                    >
-                      Contract: {ticket.contract.contract_number} ({ticket.contract.status})
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                  {!ticket.contract && ticket.contract_id && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">
-                      Contract: {ticket.contract_id}
-                    </span>
-                  )}
-                  {ticket.invoice && (
-                    <button
-                      onClick={() => navigate(`/invoices/${ticket.invoice.id}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15 hover:bg-amber-500/20 transition-colors"
-                    >
-                      Invoice: {ticket.invoice.invoice_number} ({ticket.invoice.status})
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                  {!ticket.invoice && ticket.invoice_id && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/15">
-                      Invoice: {ticket.invoice_id}
-                    </span>
-                  )}
-                  {ticket.return_request && (
-                    <button
-                      onClick={() => navigate(`/returns/${ticket.return_request.id}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15 hover:bg-orange-500/20 transition-colors"
-                    >
-                      Return: {ticket.return_request.return_number} ({ticket.return_request.status})
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                  {!ticket.return_request && ticket.return_id && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-orange-500/10 text-orange-400 border border-orange-500/15">
-                      Return: {ticket.return_id}
-                    </span>
-                  )}
-                  {ticket.customer_email && (
-                    <button
-                      onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-purple-500/10 text-purple-400 border border-purple-500/15 hover:bg-purple-500/20 transition-colors"
-                    >
-                      Customer: {ticket.customer_name || ticket.customer_email}
-                      <ExternalLink size={12} />
-                    </button>
-                  )}
-                </div>
-              )}
-            </>
-          ),
-        },
-        {
-          key: 'messages',
-          label: 'Messages',
-          count: messages.length,
-          content: (
-            <>
-              {/* Messages */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] flex flex-col" style={{ minHeight: '300px' }}>
-                <div className="px-4 sm:px-6 lg:px-8 py-4 border-b border-foreground/[0.05]">
-                  <h3 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground">Messages ({messages.length})</h3>
-                </div>
+      {tab === 'messages' && (
+        <div className="glass rounded-2xl overflow-hidden flex flex-col" style={{ minHeight: '300px' }}>
+          <div className="px-6 py-4 border-b border-foreground/[0.03]">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50">Messages ({messages.length})</h3>
+          </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
-                  {messages.length === 0 && (
-                    <p className="text-center text-foreground/30 text-sm py-8">No messages yet.</p>
-                  )}
-                  {messages.map((msg, i) => {
-                    const isAgent = msg.sender_type === 'agent';
-                    return (
-                      <div key={i} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                          isAgent ? 'bg-rentr-primary text-white' : 'bg-foreground/[0.05] text-foreground'
-                        }`}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-xs font-semibold ${isAgent ? 'text-white/80' : 'text-foreground/40'}`}>
-                              {msg.sender_name || (isAgent ? 'Agent' : 'Customer')}
-                            </span>
-                            <span className={`text-xs ${isAgent ? 'text-white/60' : 'text-foreground/30'}`}>
-                              {msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}
-                            </span>
-                          </div>
-                          <p className="text-sm whitespace-pre-wrap">{msg.message || msg.content}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div ref={messagesEnd} />
-                </div>
-
-                {/* Reply box */}
-                <div className="border-t border-foreground/[0.05] p-6">
-                  <div className="flex gap-3">
-                    <textarea
-                      value={reply}
-                      onChange={(e) => setReply(e.target.value)}
-                      placeholder="Type your reply..."
-                      rows={2}
-                      className="flex-1 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 pl-4 pr-4 text-[10px] font-bold tracking-[0.2em] focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10 resize-none"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                          handleSendReply();
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={handleSendReply}
-                      disabled={sending || !reply.trim()}
-                      className="self-end flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500 disabled:opacity-50"
-                    >
-                      <Send size={18} />
-                    </button>
-                  </div>
-                  <p className="text-xs text-foreground/30 mt-1">Ctrl+Enter to send</p>
-                </div>
-              </div>
-            </>
-          ),
-        },
-        {
-          key: 'replacements',
-          label: 'Replacements',
-          count: advanceReplacements.length,
-          content: (
-            <>
-              {/* Linked Advance Replacements */}
-              {advanceReplacements.length > 0 && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <RefreshCw className="w-5 h-5 text-foreground/40" />
-                    <h3 className="text-lg sm:text-xl font-brand font-black uppercase tracking-tight text-foreground">Advance Replacements ({advanceReplacements.length})</h3>
-                  </div>
-                  <div className="space-y-3">
-                    {advanceReplacements.map((ar, i) => (
-                      <div key={ar.id || i} className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-4 flex flex-wrap gap-4 items-center justify-between">
-                        <div className="flex flex-wrap gap-4 text-sm">
-                          <div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Faulty Asset</span>
-                            <p className="font-mono text-foreground/70">{ar.faulty_asset_uid}</p>
-                          </div>
-                          <div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Replacement Asset</span>
-                            <p className="font-mono text-foreground/70">{ar.replacement_asset_uid}</p>
-                          </div>
-                          <div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Reason</span>
-                            <p className="text-foreground/70">{ar.reason}</p>
-                          </div>
-                          {ar.notes && (
-                            <div>
-                              <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">Notes</span>
-                              <p className="text-foreground/50">{ar.notes}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${arStatusColors[ar.status] || 'bg-foreground/[0.05] text-foreground/60 border-foreground/10'}`}>
-                            {ar.status}
-                          </span>
-                          {ar.created_at && (
-                            <span className="text-[10px] text-foreground/30">{new Date(ar.created_at).toLocaleDateString()}</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
+            {messages.length === 0 && (
+              <p className="text-center text-foreground/20 text-xs italic py-8">No messages yet.</p>
+            )}
+            {messages.map((msg, i) => {
+              const isAgent = msg.sender_type === 'agent';
+              return (
+                <div key={i} className={`flex ${isAgent ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                    isAgent ? 'bg-rentr-primary text-white' : 'bg-foreground/[0.05] text-foreground'
+                  }`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-xs font-semibold ${isAgent ? 'text-white/80' : 'text-foreground/40'}`}>
+                        {msg.sender_name || (isAgent ? 'Agent' : 'Customer')}
+                      </span>
+                      <span className={`text-xs ${isAgent ? 'text-white/60' : 'text-foreground/30'}`}>
+                        {msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}
+                      </span>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{msg.message || msg.content}</p>
                   </div>
                 </div>
-              )}
+              );
+            })}
+            <div ref={messagesEnd} />
+          </div>
 
-              {advanceReplacements.length === 0 && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-                  <p className="text-center text-foreground/30 text-sm py-8">No advance replacements yet.</p>
-                </div>
-              )}
-
+          {/* Reply box */}
+          <div className="border-t border-foreground/[0.03] p-6">
+            <div className="flex gap-3">
+              <textarea
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                placeholder="Type your reply..."
+                rows={2}
+                className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20 resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                    handleSendReply();
+                  }
+                }}
+              />
               <button
-                onClick={openArModal}
-                className="flex items-center gap-2 px-5 py-3 rounded-full bg-foreground/[0.02] border border-foreground/[0.05] text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 hover:border-rentr-primary/50 hover:text-rentr-primary transition-all"
+                onClick={handleSendReply}
+                disabled={sending || !reply.trim()}
+                className="self-end flex items-center gap-2 px-5 py-3 rounded-lg bg-rentr-primary text-white text-xs font-bold uppercase tracking-widest hover:bg-rentr-primary-light transition-all disabled:opacity-50"
               >
-                <RefreshCw size={14} />
-                Initiate Advance Replacement
+                <Send size={16} />
               </button>
-            </>
-          ),
-        },
-      ]} />
+            </div>
+            <p className="text-[10px] text-foreground/25 mt-1">Ctrl+Enter to send</p>
+          </div>
+        </div>
+      )}
+
+      {tab === 'replacements' && (
+        <div className="space-y-6">
+          {advanceReplacements.length > 0 ? (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.03]">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50 flex items-center gap-2">
+                  <RefreshCw size={14} className="text-foreground/30" /> Advance Replacements ({advanceReplacements.length})
+                </h3>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {advanceReplacements.map((ar, i) => (
+                  <div key={ar.id || i} className="px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-wrap gap-6 text-sm">
+                      <div>
+                        <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Faulty Asset</p>
+                        <p className="font-mono font-bold">{ar.faulty_asset_uid}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Replacement Asset</p>
+                        <p className="font-mono font-bold">{ar.replacement_asset_uid}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Reason</p>
+                        <p className="text-foreground/70">{ar.reason}</p>
+                      </div>
+                      {ar.notes && (
+                        <div>
+                          <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Notes</p>
+                          <p className="text-foreground/50">{ar.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize border ${arStatusColors[ar.status] || 'bg-foreground/[0.05] text-foreground/60 border-foreground/10'}`}>
+                        {ar.status}
+                      </span>
+                      {ar.created_at && (
+                        <span className="text-[10px] text-foreground/30">{new Date(ar.created_at).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="glass rounded-2xl p-8 text-center text-foreground/20 text-xs italic">No advance replacements yet.</div>
+          )}
+
+          <button
+            onClick={openArModal}
+            className="flex items-center gap-2 px-5 py-3 rounded-lg bg-foreground/[0.03] border border-foreground/[0.08] text-xs font-bold uppercase tracking-widest text-foreground/40 hover:border-rentr-primary/50 hover:text-rentr-primary transition-all"
+          >
+            <RefreshCw size={14} />
+            Initiate Advance Replacement
+          </button>
+        </div>
+      )}
 
       {/* Advance Replacement Modal */}
       <Modal
@@ -516,14 +537,14 @@ export default function TicketDetail() {
           <>
             <button
               onClick={() => setArModalOpen(false)}
-              className="px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-foreground/40 border border-foreground/[0.05] hover:text-foreground transition-colors"
+              className="px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest text-foreground/40 border border-foreground/[0.08] hover:text-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleArSubmit}
               disabled={arSubmitting}
-              className="px-5 py-2.5 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-lg bg-rentr-primary text-white text-xs font-bold uppercase tracking-widest hover:bg-rentr-primary-light transition-all disabled:opacity-50"
             >
               {arSubmitting ? 'Submitting...' : 'Submit'}
             </button>
@@ -537,47 +558,47 @@ export default function TicketDetail() {
             </div>
           )}
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-1.5">Faulty Asset UID</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/25 mb-1.5">Faulty Asset UID</label>
             <input
               type="text"
               value={arForm.faulty_asset_uid}
               onChange={(e) => setArForm((f) => ({ ...f, faulty_asset_uid: e.target.value }))}
-              className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10"
+              className="w-full bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20"
               placeholder="e.g. AST-00123"
             />
           </div>
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-1.5">Replacement Asset UID</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/25 mb-1.5">Replacement Asset UID</label>
             <input
               type="text"
               value={arForm.replacement_asset_uid}
               onChange={(e) => setArForm((f) => ({ ...f, replacement_asset_uid: e.target.value }))}
-              className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10"
+              className="w-full bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20"
               placeholder="e.g. AST-00456"
             />
           </div>
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-1.5">Reason</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/25 mb-1.5">Reason</label>
             <textarea
               value={arForm.reason}
               onChange={(e) => setArForm((f) => ({ ...f, reason: e.target.value }))}
               rows={2}
-              className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10 resize-none"
+              className="w-full bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20 resize-none"
               placeholder="Reason for advance replacement"
             />
           </div>
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-1.5">Notes</label>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/25 mb-1.5">Notes</label>
             <textarea
               value={arForm.notes}
               onChange={(e) => setArForm((f) => ({ ...f, notes: e.target.value }))}
               rows={2}
-              className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10 resize-none"
+              className="w-full bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/20 resize-none"
               placeholder="Additional notes (optional)"
             />
           </div>
         </div>
       </Modal>
-    </motion.div>
+    </div>
   );
 }
