@@ -23,6 +23,11 @@ from app.models.models import (
     ContractReminder,
     Customer,
     DeliveryChallan,
+    DistributorUser,
+    DistributorCustomer,
+    DistributorOrder,
+    DistributorContract,
+    DistributorInvoice,
     Invoice,
     KYCSubmission,
     Order,
@@ -432,6 +437,62 @@ def seed():
             db.add_all(cns)
             db.flush()
             print("  ✓ Credit notes created")
+
+        # ── Distributor Users & Data ────────────────────────────────────
+        if db.query(DistributorUser).count() == 0:
+            dist_users = [
+                DistributorUser(
+                    email="vikram@digidistribute.in", name="Vikram Singh", phone="+919812345678",
+                    company_name="DigiDistribute", gstin="07AAECV9012H1ZQ", pan="AAECV9012H",
+                    password_hash=hash_password("dist123"), is_active=True,
+                    partner_email="vikram@distributor.in",
+                    commission_rate=12.0, credit_limit=500000, credit_used=56640,
+                ),
+                DistributorUser(
+                    email="rajesh@infrabuild.in", name="Rajesh Nair", phone="+919845123456",
+                    company_name="InfraBuild Tech", gstin="32AAHCI7890L1ZS", pan="AAHCI7890L",
+                    password_hash=hash_password("dist123"), is_active=True,
+                    partner_email="rajesh@infrabuild.in",
+                    commission_rate=10.0, credit_limit=750000, credit_used=67850,
+                ),
+            ]
+            db.add_all(dist_users)
+            db.flush()
+
+            # Distributor customers
+            dist_customers = [
+                DistributorCustomer(distributor_id=1, email="acme@corp.in", name="Acme Corp", phone="+919900110011", company_name="Acme Corporation", gstin="07AABCA1234D1ZP", kyc_status="approved", is_active=True),
+                DistributorCustomer(distributor_id=1, email="beta@tech.in", name="Beta Technologies", phone="+919900220022", company_name="Beta Tech Pvt Ltd", gstin="07AABCB5678E1ZQ", kyc_status="approved", is_active=True),
+                DistributorCustomer(distributor_id=2, email="gamma@build.in", name="Gamma Builders", phone="+919900330033", company_name="Gamma Construction", gstin="32AABCG9012F1ZR", kyc_status="pending", is_active=True),
+            ]
+            db.add_all(dist_customers)
+            db.flush()
+
+            # Distributor orders
+            dist_orders = [
+                DistributorOrder(distributor_id=1, customer_id=1, order_number="DIST-ORD-2026-0001", customer_name="Acme Corp", customer_email="acme@corp.in", items=[{"product_name": "Dell Latitude 5540", "quantity": 10, "price_per_month": 4000}], total_monthly=40000, rentr_monthly=35000, spread=5000, rental_months=12, status="active", shipping_address={"city": "Delhi", "state": "Delhi"}),
+                DistributorOrder(distributor_id=1, customer_id=2, order_number="DIST-ORD-2026-0002", customer_name="Beta Technologies", customer_email="beta@tech.in", items=[{"product_name": "HP ProDesk 400 G9", "quantity": 5, "price_per_month": 3200}], total_monthly=16000, rentr_monthly=14000, spread=2000, rental_months=12, status="active", shipping_address={"city": "Noida", "state": "UP"}),
+                DistributorOrder(distributor_id=2, customer_id=3, order_number="DIST-ORD-2026-0003", customer_name="Gamma Builders", customer_email="gamma@build.in", items=[{"product_name": "Lenovo ThinkStation P360", "quantity": 3, "price_per_month": 7000}], total_monthly=21000, rentr_monthly=18000, spread=3000, rental_months=18, status="confirmed", shipping_address={"city": "Kochi", "state": "Kerala"}),
+            ]
+            db.add_all(dist_orders)
+            db.flush()
+
+            # Distributor contracts
+            dist_contracts = [
+                DistributorContract(distributor_id=1, customer_id=1, order_id=1, contract_number="DIST-CON-2026-0001", customer_name="Acme Corp", customer_email="acme@corp.in", type="rental", start_date=today - timedelta(days=30), end_date=today + timedelta(days=335), status="active", signed_at=datetime.now() - timedelta(days=28)),
+                DistributorContract(distributor_id=1, customer_id=2, order_id=2, contract_number="DIST-CON-2026-0002", customer_name="Beta Technologies", customer_email="beta@tech.in", type="rental", start_date=today - timedelta(days=15), end_date=today + timedelta(days=350), status="active", signed_at=datetime.now() - timedelta(days=14)),
+            ]
+            db.add_all(dist_contracts)
+            db.flush()
+
+            # Distributor invoices
+            dist_invoices = [
+                DistributorInvoice(distributor_id=1, customer_id=1, contract_id=1, order_id=1, invoice_number="DIST-INV-2026-0001", customer_name="Acme Corp", customer_email="acme@corp.in", items=[{"description": "Monthly rental - Apr 2026", "quantity": 1, "unit_price": 40000}], subtotal=40000, tax=7200, total=47200, status="paid", due_date=today - timedelta(days=10), paid_date=today - timedelta(days=8)),
+                DistributorInvoice(distributor_id=1, customer_id=2, contract_id=2, order_id=2, invoice_number="DIST-INV-2026-0002", customer_name="Beta Technologies", customer_email="beta@tech.in", items=[{"description": "Monthly rental - Apr 2026", "quantity": 1, "unit_price": 16000}], subtotal=16000, tax=2880, total=18880, status="sent", due_date=today + timedelta(days=5)),
+            ]
+            db.add_all(dist_invoices)
+            db.flush()
+            print("  ✓ Distributor users, customers, orders, contracts & invoices created")
 
         db.commit()
         print("\n✅ Seed data complete! All entities populated with comprehensive interlinked data.")
