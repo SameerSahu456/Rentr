@@ -1,4 +1,4 @@
-const _env = import.meta.env.VITE_ADMIN_API_URL || '';
+const _env = import.meta.env.VITE_RENTR_ADMIN_API_URL || import.meta.env.VITE_ADMIN_API_URL || '';
 const BASE_URL = _env || '/api';
 
 function getToken() {
