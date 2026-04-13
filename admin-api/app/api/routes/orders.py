@@ -183,7 +183,8 @@ def get_order(
     order_dict["contracts"] = [
         {"id": c.id, "contract_number": c.contract_number, "status": c.status,
          "start_date": c.start_date, "end_date": c.end_date,
-         "document_url": c.document_url, "type": c.type}
+         "document_url": c.document_url, "type": c.type,
+         "version": getattr(c, 'version', 1), "signed_at": c.signed_at}
         for c in contracts
     ]
     order_dict["returns"] = [

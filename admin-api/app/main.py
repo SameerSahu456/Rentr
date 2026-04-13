@@ -46,6 +46,10 @@ def _migrate_new_columns():
         # Order: sales_order_pdf for CRM orders
         _add_col_if_missing("orders", "sales_order_pdf", "VARCHAR(500)")
 
+        # Contract versioning columns
+        _add_col_if_missing("contracts", "version", "INTEGER DEFAULT 1")
+        _add_col_if_missing("contracts", "parent_contract_id", "INTEGER")
+
         # Rename 'distributor' to 'partner' in customer_type and role columns
         conn.execute(text("UPDATE orders SET customer_type = 'partner' WHERE customer_type = 'distributor'"))
         conn.execute(text("UPDATE customers SET role = 'partner' WHERE role = 'distributor'"))

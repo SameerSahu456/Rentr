@@ -61,7 +61,6 @@ const navItems = [
       { to: '/replacements', label: 'Replacements', icon: ArrowRightLeft },
     ],
   },
-  { to: '/distributors', label: 'Distributors', icon: Building2 },
   { to: '/support', label: 'Support', icon: LifeBuoy },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/reports', label: 'Reports', icon: FileBarChart },
@@ -232,7 +231,7 @@ export default function AdminLayout() {
       <aside className="hidden lg:flex w-64 h-screen border-r border-foreground/[0.08] bg-background/80 backdrop-blur-xl flex-col sticky top-0 z-50">
         {/* Logo area */}
         <div className="px-6 py-6 border-b border-foreground/[0.06]">
-          <Logo size="sm" />
+          <Logo size="sm" clickable />
         </div>
 
         <SidebarNav items={navItems} pathname={location.pathname} />
@@ -267,7 +266,7 @@ export default function AdminLayout() {
         )}
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-foreground/[0.06]">
-          <Logo size="sm" />
+          <Logo size="sm" clickable />
           <button
             className="text-foreground/40 hover:text-foreground"
             onClick={() => setMobileOpen(false)}

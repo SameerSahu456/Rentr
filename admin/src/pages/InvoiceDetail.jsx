@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Download, Send, Pencil, Check, X } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, Download, Send, Pencil, Check, X, ExternalLink, CreditCard, CalendarDays, Receipt, Banknote } from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
-import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
-import DetailTabs from '../components/DetailTabs';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 const BASE_URL = import.meta.env.VITE_ADMIN_API_URL || '/api';
@@ -17,6 +14,7 @@ export default function InvoiceDetail() {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tab, setTab] = useState('details');
   const [paymentModal, setPaymentModal] = useState(false);
   const [payment, setPayment] = useState({ amount: '', method: 'bank_transfer', transaction_id: '' });
   const [saving, setSaving] = useState(false);
@@ -90,176 +88,265 @@ export default function InvoiceDetail() {
     } catch { /* ignore */ }
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl">&nbsp;</div>)}</div>;
   if (error) return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground"><ArrowLeft className="w-4 h-4" /> Back</button>
-      <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-red-400 text-sm">{error}</div>
+    <div className="space-y-6">
+      <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Invoices
+      </button>
+      <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 text-red-400 text-sm">{error}</div>
     </div>
   );
   if (!invoice) return (
-    <div className="text-center py-20">
-      <p className="text-foreground/30 text-sm mb-4">Invoice not found</p>
-      <button onClick={() => navigate('/invoices')} className="text-rentr-primary text-sm hover:underline">Back to Invoices</button>
+    <div className="space-y-6">
+      <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Invoices
+      </button>
+      <p className="text-foreground/30 text-center py-20 text-sm">Invoice not found</p>
     </div>
   );
 
+  const amountPaid = (invoice.payments || [])
+    .filter(p => p.status !== 'failed' && p.status !== 'cancelled')
+    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+  const amountDue = Number(invoice.total || 0) - amountPaid;
+
+  const tabs = [
+    { key: 'details', label: 'Details' },
+    { key: 'items', label: `Line Items (${invoice.items?.length || 0})` },
+    { key: 'payments', label: `Payments (${invoice.payments?.length || 0})` },
+  ];
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-foreground/[0.06]">
-        <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <div className="flex items-center gap-2 flex-wrap">
-          <StatusBadge status={invoice.status} />
-          <select value={invoice.status} onChange={(e) => handleStatusChange(e.target.value)}
-            className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">
-            <option value="draft">Draft</option>
-            <option value="sent">Sent</option>
-            <option value="paid">Paid</option>
-            <option value="overdue">Overdue</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+    <div className="space-y-6">
+      {/* Back button */}
+      <button onClick={() => navigate('/invoices')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Invoices
+      </button>
+
+      {/* Glass card header */}
+      <div className="glass rounded-2xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-brand font-bold text-foreground">{invoice.invoice_number}</h1>
+            <p className="text-foreground/30 text-sm">
+              {invoice.customer_name || 'Unknown Customer'}
+              {invoice.customer_email ? ` \u00b7 ${invoice.customer_email}` : ''}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusBadge status={invoice.status} />
+            <select value={invoice.status} onChange={(e) => handleStatusChange(e.target.value)}
+              className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-2 py-1.5 text-xs text-foreground/60">
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 mt-4">
+          {(invoice.order || invoice.contract) && (
+            <>
+              {invoice.order && (
+                <button onClick={() => navigate(`/orders/${invoice.order.id}`)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+                  Order: {invoice.order.order_number} <ExternalLink size={12} />
+                </button>
+              )}
+              {invoice.contract && (
+                <button onClick={() => navigate(`/contracts/${invoice.contract.id}`)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
+                  Contract: {invoice.contract.contract_number} <ExternalLink size={12} />
+                </button>
+              )}
+              <div className="flex-1" />
+            </>
+          )}
+          {!(invoice.order || invoice.contract) && <div className="flex-1" />}
           <button onClick={handleDownloadPdf}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-foreground/[0.08] text-sm text-foreground/60 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors"
-            title="Download PDF">
-            <Download className="w-4 h-4" /> PDF
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-foreground/[0.08] text-xs text-foreground/50 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors">
+            <Download className="w-3.5 h-3.5" /> PDF
           </button>
           <button onClick={handleSendInvoice} disabled={sending}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rentr-primary text-white text-sm font-medium hover:bg-rentr-primary-light transition-colors disabled:opacity-50"
-            title="Send to customer">
-            <Send className="w-4 h-4" /> {sending ? 'Sending...' : 'Send'}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rentr-primary text-white text-xs font-medium hover:bg-rentr-primary-light transition-colors disabled:opacity-50">
+            <Send className="w-3.5 h-3.5" /> {sending ? 'Sending...' : 'Send'}
           </button>
           <button onClick={() => setPaymentModal(true)}
-            className="px-4 py-2 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-rentr-primary hover:text-white transition-colors">
-            Record Payment
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground text-background text-xs font-medium hover:bg-rentr-primary hover:text-white transition-colors">
+            <CreditCard className="w-3.5 h-3.5" /> Record Payment
           </button>
         </div>
-      </div>
 
-      {/* Title */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-xs font-medium bg-rentr-primary/10 text-rentr-primary">Invoice</span>
-            <span className="font-mono text-sm text-foreground/40">{invoice.invoice_number}</span>
+        {/* Metrics grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Total</p>
+            <p className="text-lg font-bold">{'\u20B9'}{fmt(invoice.total)}</p>
           </div>
-          <h1 className="text-2xl font-bold text-foreground cursor-pointer hover:text-rentr-primary transition-colors"
-            onClick={() => invoice.customer_email && navigate(`/customers/${encodeURIComponent(invoice.customer_email)}`)}>
-            {invoice.customer_name || 'Invoice'}
-          </h1>
-        </div>
-        <div className="text-right">
-          <span className="text-xs text-foreground/40">Total</span>
-          <div className="text-2xl font-bold text-foreground">₹{fmt(invoice.total)}</div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Paid</p>
+            <p className="text-lg font-bold text-emerald-500">{'\u20B9'}{fmt(amountPaid)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Outstanding</p>
+            <p className={`text-lg font-bold ${amountDue > 0 ? 'text-amber-500' : 'text-foreground/40'}`}>{'\u20B9'}{fmt(amountDue)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Due Date</p>
+            {editingDate ? (
+              <div className="flex items-center gap-1 mt-0.5">
+                <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)}
+                  className="bg-foreground/[0.03] border border-foreground/[0.08] rounded px-2 py-1 text-sm w-32" />
+                <button onClick={handleSaveDueDate} className="p-1 text-emerald-500 hover:text-emerald-400"><Check className="w-4 h-4" /></button>
+                <button onClick={() => setEditingDate(false)} className="p-1 text-foreground/30 hover:text-foreground"><X className="w-4 h-4" /></button>
+              </div>
+            ) : (
+              <p className="text-sm font-bold inline-flex items-center gap-1.5 group cursor-pointer"
+                onClick={() => { setNewDueDate(invoice.due_date || ''); setEditingDate(true); }}>
+                {invoice.due_date || '-'}
+                <Pencil className="w-3 h-3 text-foreground/20 group-hover:text-rentr-primary transition-colors" />
+              </p>
+            )}
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Tax</p>
+            <p className="text-sm font-bold">{'\u20B9'}{fmt(invoice.tax)}</p>
+          </div>
         </div>
       </div>
 
-      {/* Quick Links */}
-      {(invoice.order || invoice.contract) && (
-        <div className="flex flex-wrap gap-2">
-          {invoice.order && (
-            <button onClick={() => navigate(`/orders/${invoice.order.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
-              Order: {invoice.order.order_number} <ExternalLink size={12} />
-            </button>
-          )}
-          {invoice.contract && (
-            <button onClick={() => navigate(`/contracts/${invoice.contract.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
-              Contract: {invoice.contract.contract_number} <ExternalLink size={12} />
-            </button>
+      {/* Inline tab buttons */}
+      <div className="flex gap-1 border-b border-foreground/[0.05] overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 ${tab === t.key ? 'border-rentr-primary text-rentr-primary' : 'border-transparent text-foreground/25 hover:text-foreground/50'}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {tab === 'details' && (
+        <div className="glass rounded-2xl overflow-hidden">
+          <div className="divide-y divide-foreground/[0.03]">
+            <div className="px-6 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Customer</p>
+                <p className="text-sm font-bold mt-0.5">{invoice.customer_name || '-'}</p>
+              </div>
+              {invoice.customer_email && (
+                <button onClick={() => navigate(`/customers/${encodeURIComponent(invoice.customer_email)}`)}
+                  className="inline-flex items-center gap-1 text-xs text-rentr-primary hover:underline">
+                  View <ExternalLink size={12} />
+                </button>
+              )}
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Email</p>
+              <p className="text-sm font-bold mt-0.5">{invoice.customer_email || '-'}</p>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Invoice Number</p>
+              <p className="text-sm font-bold mt-0.5">{invoice.invoice_number}</p>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Status</p>
+              <div className="mt-0.5"><StatusBadge status={invoice.status} /></div>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Due Date</p>
+              <p className="text-sm font-bold mt-0.5">{invoice.due_date || '-'}</p>
+            </div>
+            {invoice.subtotal != null && (
+              <div className="px-6 py-4">
+                <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Subtotal</p>
+                <p className="text-sm font-bold mt-0.5">{'\u20B9'}{fmt(invoice.subtotal)}</p>
+              </div>
+            )}
+            {invoice.tax != null && (
+              <div className="px-6 py-4">
+                <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Tax</p>
+                <p className="text-sm font-bold mt-0.5">{'\u20B9'}{fmt(invoice.tax)}</p>
+              </div>
+            )}
+            <div className="px-6 py-4">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Total</p>
+              <p className="text-lg font-bold mt-0.5">{'\u20B9'}{fmt(invoice.total)}</p>
+            </div>
+            {invoice.notes && (
+              <div className="px-6 py-4">
+                <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Notes</p>
+                <p className="text-sm text-foreground/60 mt-0.5">{invoice.notes}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'items' && (
+        <div className="glass rounded-2xl overflow-hidden">
+          {invoice.items && invoice.items.length > 0 ? (
+            <>
+              <div className="divide-y divide-foreground/[0.03]">
+                {invoice.items.map((item, i) => (
+                  <div key={i} className="px-6 py-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold">{item.description}</p>
+                      <p className="text-xs text-foreground/30">
+                        Qty: {item.quantity} &times; {'\u20B9'}{fmt(item.unit_price)}
+                      </p>
+                    </div>
+                    <p className="text-sm font-bold">{'\u20B9'}{fmt((item.quantity || 0) * (item.unit_price || 0))}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-foreground/[0.06] px-6 py-4 space-y-1 text-right">
+                {invoice.subtotal != null && (
+                  <p className="text-xs text-foreground/40">Subtotal: {'\u20B9'}{fmt(invoice.subtotal)}</p>
+                )}
+                {invoice.tax != null && (
+                  <p className="text-xs text-foreground/40">Tax: {'\u20B9'}{fmt(invoice.tax)}</p>
+                )}
+                <p className="text-base font-bold text-foreground">Total: {'\u20B9'}{fmt(invoice.total)}</p>
+              </div>
+            </>
+          ) : (
+            <p className="px-6 py-8 text-center text-foreground/20 text-xs italic">No line items</p>
           )}
         </div>
       )}
 
-      {/* Tabs */}
-      <DetailTabs tabs={[
-        {
-          key: 'details',
-          label: 'Details & Line Items',
-          content: (
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-                <Field label="Customer" value={invoice.customer_name} />
-                <Field label="Email" value={invoice.customer_email} />
-                <div>
-                  <span className="text-xs text-foreground/40 block mb-0.5">Due Date</span>
-                  {editingDate ? (
-                    <div className="flex items-center gap-1">
-                      <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)}
-                        className="bg-foreground/[0.03] border border-foreground/[0.08] rounded px-2 py-1 text-sm" />
-                      <button onClick={handleSaveDueDate} className="p-1 text-emerald-500 hover:text-emerald-400"><Check className="w-4 h-4" /></button>
-                      <button onClick={() => setEditingDate(false)} className="p-1 text-foreground/30 hover:text-foreground"><X className="w-4 h-4" /></button>
-                    </div>
-                  ) : (
-                    <span className="text-sm font-medium text-foreground inline-flex items-center gap-1.5 group cursor-pointer"
-                      onClick={() => { setNewDueDate(invoice.due_date || ''); setEditingDate(true); }}>
-                      {invoice.due_date || '-'}
-                      <Pencil className="w-3 h-3 text-foreground/20 group-hover:text-rentr-primary transition-colors" />
-                    </span>
-                  )}
-                </div>
-                <Field label="Status" value={invoice.status?.replace(/_/g, ' ')} />
-              </div>
-
-              {invoice.items && invoice.items.length > 0 && (
-                <div className="border-t border-foreground/[0.06] pt-4">
-                  <h3 className="text-sm font-semibold text-foreground mb-3">Line Items</h3>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-left border-b border-foreground/[0.06]">
-                        <th className="text-xs text-foreground/40 pb-2">Description</th>
-                        <th className="text-xs text-foreground/40 pb-2">Qty</th>
-                        <th className="text-xs text-foreground/40 pb-2">Unit Price</th>
-                        <th className="text-xs text-foreground/40 pb-2 text-right">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {invoice.items.map((item, i) => (
-                        <tr key={i} className="border-b border-foreground/[0.04] last:border-0">
-                          <td className="py-2">{item.description}</td>
-                          <td className="py-2">{item.quantity}</td>
-                          <td className="py-2">₹{fmt(item.unit_price)}</td>
-                          <td className="py-2 text-right">₹{fmt((item.quantity || 0) * (item.unit_price || 0))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="mt-3 text-sm space-y-1 text-right border-t border-foreground/[0.06] pt-3">
-                    {invoice.subtotal != null && <div className="text-foreground/50">Subtotal: ₹{fmt(invoice.subtotal)}</div>}
-                    {invoice.tax != null && <div className="text-foreground/50">Tax: ₹{fmt(invoice.tax)}</div>}
-                    <div className="font-bold text-foreground text-base">Total: ₹{fmt(invoice.total)}</div>
+      {tab === 'payments' && (
+        <div className="glass rounded-2xl overflow-hidden">
+          {invoice.payments && invoice.payments.length > 0 ? (
+            <div className="divide-y divide-foreground/[0.03]">
+              {invoice.payments.map((p, i) => (
+                <div key={i} className="px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold">{'\u20B9'}{fmt(p.amount)}</p>
+                    <p className="text-xs text-foreground/30">
+                      {(p.method || '').replace(/_/g, ' ')}
+                      {p.transaction_id ? ` \u00b7 ${p.transaction_id}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="text-xs text-foreground/30">
+                      {p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN') : '-'}
+                    </p>
+                    <StatusBadge status={p.status} />
                   </div>
                 </div>
-              )}
+              ))}
             </div>
-          ),
-        },
-        {
-          key: 'payments',
-          label: 'Payments',
-          count: invoice.payments?.length || 0,
-          content: (
-            <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-              <h2 className="text-base font-semibold text-foreground mb-4">Payment History</h2>
-              <DataTable
-                columns={[
-                  { key: 'amount', label: 'Amount', render: (v) => `₹${fmt(v)}` },
-                  { key: 'method', label: 'Method', render: (v) => (v || '').replace(/_/g, ' ') },
-                  { key: 'transaction_id', label: 'Transaction ID' },
-                  { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                  { key: 'created_at', label: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
-                ]}
-                data={invoice.payments || []}
-                loading={false}
-                emptyMessage="No payments recorded."
-              />
-            </div>
-          ),
-        },
-      ]} />
+          ) : (
+            <p className="px-6 py-8 text-center text-foreground/20 text-xs italic">No payments recorded</p>
+          )}
+        </div>
+      )}
 
       {/* Payment Modal */}
       <Modal isOpen={paymentModal} onClose={() => setPaymentModal(false)} title="Record Payment"
@@ -291,15 +378,6 @@ export default function InvoiceDetail() {
           </div>
         </div>
       </Modal>
-    </motion.div>
-  );
-}
-
-function Field({ label, value }) {
-  return (
-    <div>
-      <span className="text-xs text-foreground/40 block mb-0.5">{label}</span>
-      <span className="text-sm font-medium text-foreground">{value || '-'}</span>
     </div>
   );
 }

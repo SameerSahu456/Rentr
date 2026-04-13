@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, FileText, ArrowRight, RotateCcw, LifeBuoy, History, ShieldCheck, Download, AlertTriangle, ExternalLink } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, Package, FileText, ArrowRight, RotateCcw, LifeBuoy, History, ShieldCheck, Download, ExternalLink } from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import TagsManager from '../components/TagsManager';
-import DetailTabs from '../components/DetailTabs';
 
 const gradeColors = {
   A: 'bg-emerald-500/10 text-emerald-400', B: 'bg-blue-500/10 text-blue-400',
@@ -34,6 +32,7 @@ export default function AssetDetail() {
   const [transitioning, setTransitioning] = useState(false);
   const [tags, setTags] = useState([]);
   const [dataWipeStatus, setDataWipeStatus] = useState('');
+  const [tab, setTab] = useState('overview');
 
   useEffect(() => {
     api.get(`/assets/${id}`)
@@ -83,233 +82,308 @@ export default function AssetDetail() {
     } catch { /* ignore */ }
   };
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl">&nbsp;</div>)}</div>;
   if (error) return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <button onClick={() => navigate('/assets')} className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground"><ArrowLeft className="w-4 h-4" /> Back</button>
+    <div className="space-y-6">
+      <button onClick={() => navigate('/assets')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors"><ArrowLeft className="w-4 h-4" /> Back to Assets</button>
       <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 text-red-400 text-sm">{error}</div>
     </div>
   );
-  if (!asset) return null;
+  if (!asset) return <p className="text-foreground/30">Asset not found</p>;
 
   const validStates = asset.valid_transitions || ['in_warehouse', 'staged', 'in_transit', 'deployed', 'return_initiated', 'in_repair', 'retired'];
   const events = asset.events || asset.lifecycle_events || [];
   const warrantyInfo = getWarrantyInfo(asset.warranty_expiry);
   const specsStr = asset.specs && typeof asset.specs === 'object' ? Object.entries(asset.specs).map(([k, v]) => `${k}: ${v}`).join(', ') : (asset.specs || '-');
 
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-foreground/[0.06]">
-        <button onClick={() => navigate('/assets')} className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={asset.status} />
-          {asset.condition_grade && <span className={`px-2 py-0.5 rounded text-xs font-medium ${gradeColors[asset.condition_grade] || ''}`}>Grade {asset.condition_grade}</span>}
-        </div>
-      </div>
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'management', label: 'Management' },
+    { key: 'history', label: `History (${events.length + (asset.returns?.length || 0) + (asset.tickets?.length || 0)})` },
+  ];
 
-      {/* Title */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2 py-0.5 rounded text-xs font-medium bg-rentr-primary/10 text-rentr-primary">{asset.category || 'Asset'}</span>
-            <span className="font-mono text-sm text-foreground/40">{asset.uid}</span>
+  return (
+    <div className="space-y-6">
+      <button onClick={() => navigate('/assets')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Assets
+      </button>
+
+      {/* Header */}
+      <div className="glass rounded-2xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-2xl font-brand font-bold text-foreground">{[asset.oem, asset.model].filter(Boolean).join(' ') || asset.uid}</h1>
+              {asset.condition_grade && (
+                <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${gradeColors[asset.condition_grade] || ''}`}>Grade {asset.condition_grade}</span>
+              )}
+            </div>
+            <p className="text-foreground/30 text-sm">
+              <span className="font-mono">{asset.uid}</span>
+              {asset.serial_number && <> &middot; SN: <span className="font-mono">{asset.serial_number}</span></>}
+            </p>
+            {asset.category && <p className="text-foreground/40 text-xs mt-1">{asset.category}</p>}
           </div>
-          <h1 className="text-2xl font-bold text-foreground">{[asset.oem, asset.model].filter(Boolean).join(' ') || asset.uid}</h1>
+          <StatusBadge status={asset.status} />
         </div>
-        {asset.monthly_rate > 0 && (
-          <div className="text-right">
-            <span className="text-xs text-foreground/40">Monthly Rate</span>
-            <div className="text-xl font-bold text-rentr-primary">₹{fmt(asset.monthly_rate)}</div>
+
+        {/* Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mt-6">
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Monthly Rate</p>
+            <p className="text-lg font-bold text-emerald-500">{asset.monthly_rate > 0 ? `₹${fmt(asset.monthly_rate)}` : '-'}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Acquisition Cost</p>
+            <p className="text-sm font-bold">₹{fmt(asset.acquisition_cost)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Warranty</p>
+            <p className={`text-sm font-bold ${warrantyInfo.color}`}>
+              {warrantyInfo.label}{warrantyInfo.days !== null ? ` (${warrantyInfo.days}d)` : ''}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Warranty Expiry</p>
+            <p className="text-sm font-bold">{asset.warranty_expiry ? new Date(asset.warranty_expiry).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Specs</p>
+            <p className="text-sm font-bold truncate" title={specsStr}>{specsStr}</p>
+          </div>
+          {asset.customer_email && (
+            <div>
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Customer</p>
+              <p className="text-sm font-bold text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/customers/${encodeURIComponent(asset.customer_email)}`)}>{asset.customer_name || asset.customer_email}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Quick Links */}
+        {(asset.order || asset.contract) && (
+          <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-foreground/[0.05]">
+            {asset.order && (
+              <button onClick={() => navigate(`/orders/${asset.order.id}`)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all">
+                <Package size={14} /> Order {asset.order.order_number} <ExternalLink size={12} />
+              </button>
+            )}
+            {asset.contract && (
+              <button onClick={() => navigate(`/contracts/${asset.contract.id}`)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all">
+                <FileText size={14} /> Contract {asset.contract.contract_number} <ExternalLink size={12} />
+              </button>
+            )}
           </div>
         )}
       </div>
 
-      {/* Quick Links */}
-      {(asset.order || asset.contract) && (
-        <div className="flex flex-wrap gap-2">
-          {asset.order && (
-            <button onClick={() => navigate(`/orders/${asset.order.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
-              <Package size={14} /> Order {asset.order.order_number} <ExternalLink size={12} />
-            </button>
-          )}
-          {asset.contract && (
-            <button onClick={() => navigate(`/contracts/${asset.contract.id}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
-              <FileText size={14} /> Contract {asset.contract.contract_number} <ExternalLink size={12} />
-            </button>
-          )}
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-foreground/[0.05] overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 ${tab === t.key ? 'border-rentr-primary text-rentr-primary' : 'border-transparent text-foreground/25 hover:text-foreground/50'}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      {tab === 'overview' && (
+        <div className="glass rounded-2xl overflow-hidden">
+          <div className="divide-y divide-foreground/[0.03]">
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">OEM / Model</p>
+              <p className="text-sm font-bold">{[asset.oem, asset.model].filter(Boolean).join(' / ') || '-'}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Serial Number</p>
+              <p className="text-sm font-bold font-mono">{asset.serial_number || '-'}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Category</p>
+              <p className="text-sm font-bold">{asset.category || '-'}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Specs</p>
+              <p className="text-sm font-bold max-w-[60%] text-right">{specsStr}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Acquisition Cost</p>
+              <p className="text-sm font-bold">₹{fmt(asset.acquisition_cost)}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Monthly Rate</p>
+              <p className="text-sm font-bold text-emerald-500">{asset.monthly_rate > 0 ? `₹${fmt(asset.monthly_rate)}` : '-'}</p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Condition Grade</p>
+              {asset.condition_grade ? (
+                <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${gradeColors[asset.condition_grade] || ''}`}>Grade {asset.condition_grade}</span>
+              ) : (
+                <p className="text-sm font-bold">-</p>
+              )}
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Warranty Status</p>
+              <p className={`text-sm font-bold ${warrantyInfo.color}`}>
+                {warrantyInfo.label}{warrantyInfo.days !== null ? ` (${warrantyInfo.days}d)` : ''}
+              </p>
+            </div>
+            <div className="px-6 py-4 flex items-center justify-between">
+              <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Warranty Expiry</p>
+              <p className="text-sm font-bold">{asset.warranty_expiry ? new Date(asset.warranty_expiry).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</p>
+            </div>
+            {asset.customer_email && (
+              <div className="px-6 py-4 flex items-center justify-between">
+                <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Customer</p>
+                <p className="text-sm font-bold text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/customers/${encodeURIComponent(asset.customer_email)}`)}>{asset.customer_name || asset.customer_email}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Tabs */}
-      <DetailTabs tabs={[
-        {
-          key: 'overview',
-          label: 'Overview',
-          content: (
-            <>
-              {/* Details Grid */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                <h2 className="text-base font-semibold text-foreground mb-4">Asset Details</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <Field label="OEM / Model" value={[asset.oem, asset.model].filter(Boolean).join(' / ')} />
-                  <Field label="Serial Number" value={asset.serial_number} mono />
-                  <Field label="Specs" value={specsStr} />
-                  <Field label="Acquisition Cost" value={`₹${fmt(asset.acquisition_cost)}`} />
-                  <Field label="Warranty Expiry" value={asset.warranty_expiry ? new Date(asset.warranty_expiry).toLocaleDateString('en-IN') : '-'} />
-                  <div>
-                    <span className="text-xs text-foreground/40 block mb-0.5">Warranty Status</span>
-                    <span className={`text-sm font-medium ${warrantyInfo.color}`}>
-                      {warrantyInfo.label}{warrantyInfo.days !== null ? ` (${warrantyInfo.days}d)` : ''}
-                    </span>
-                  </div>
-                  {asset.customer_email && (
-                    <div>
-                      <span className="text-xs text-foreground/40 block mb-0.5">Customer</span>
-                      <span className="text-sm font-medium text-rentr-primary cursor-pointer hover:underline" onClick={() => navigate(`/customers/${encodeURIComponent(asset.customer_email)}`)}>{asset.customer_name || asset.customer_email}</span>
+      {tab === 'management' && (
+        <div className="space-y-4">
+          {/* State Transition */}
+          <div className="glass rounded-2xl p-6">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25 mb-4">State Transition</p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select value={nextState} onChange={(e) => setNextState(e.target.value)}
+                className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm text-foreground/60 focus:outline-none focus:border-rentr-primary/50">
+                <option value="">Select next state...</option>
+                {validStates.filter(s => s !== asset.status).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+              </select>
+              <input type="text" placeholder="Notes (optional)" value={transitionNotes} onChange={(e) => setTransitionNotes(e.target.value)}
+                className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-rentr-primary/50" />
+              <button onClick={handleTransition} disabled={!nextState || transitioning}
+                className="px-4 py-2.5 rounded-lg bg-rentr-primary text-white text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary/80 transition-all disabled:opacity-50">
+                {transitioning ? 'Transitioning...' : 'Transition'}
+              </button>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="glass rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Tags</p>
+              <span className="text-[10px] text-foreground/25">{tags.length} tags</span>
+            </div>
+            <TagsManager tags={tags} onTagsChange={handleTagsChange} />
+          </div>
+
+          {/* Data Wipe */}
+          <div className="glass rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldCheck size={16} className="text-foreground/25" />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Data Wipe Certificate</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <StatusBadge status={dataWipeStatus} />
+                <select value={dataWipeStatus} onChange={(e) => handleDataWipeStatusChange(e.target.value)}
+                  className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60 focus:outline-none focus:border-rentr-primary/50">
+                  <option value="Not Requested">Not Requested</option>
+                  <option value="Requested">Requested</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Issued">Issued</option>
+                  <option value="Delivered">Delivered</option>
+                </select>
+              </div>
+              {(dataWipeStatus === 'Issued' || dataWipeStatus === 'Delivered') && asset.data_wipe_cert_url && (
+                <a href={asset.data_wipe_cert_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
+                  <Download size={14} /> Download
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab === 'history' && (
+        <div className="space-y-4">
+          {/* Lifecycle History */}
+          {events.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-3 border-b border-foreground/[0.03]">
+                <div className="flex items-center gap-2">
+                  <History size={14} className="text-foreground/25" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Lifecycle Events</p>
+                </div>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {events.slice(0, 10).map((event, i) => (
+                  <div key={i} className="px-6 py-4 flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold">{(event.from_state || '').replace(/_/g, ' ')} → {(event.to_state || '').replace(/_/g, ' ')}</p>
+                      {event.triggered_by && <p className="text-[10px] text-foreground/30">by {event.triggered_by}</p>}
                     </div>
-                  )}
-                </div>
-              </div>
-            </>
-          ),
-        },
-        {
-          key: 'management',
-          label: 'Management',
-          content: (
-            <>
-              {/* State Transition */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                <h2 className="text-base font-semibold text-foreground mb-4">State Transition</h2>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <select value={nextState} onChange={(e) => setNextState(e.target.value)}
-                    className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm text-foreground/60">
-                    <option value="">Select next state...</option>
-                    {validStates.filter(s => s !== asset.status).map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
-                  </select>
-                  <input type="text" placeholder="Notes (optional)" value={transitionNotes} onChange={(e) => setTransitionNotes(e.target.value)}
-                    className="flex-1 bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2.5 text-sm" />
-                  <button onClick={handleTransition} disabled={!nextState || transitioning}
-                    className="px-4 py-2.5 rounded-lg bg-foreground text-background text-sm font-medium hover:bg-rentr-primary hover:text-white transition-colors disabled:opacity-50">
-                    {transitioning ? 'Transitioning...' : 'Transition'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Tags */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-semibold text-foreground">Tags</h2>
-                  <span className="text-xs text-foreground/40">{tags.length} tags</span>
-                </div>
-                <TagsManager tags={tags} onTagsChange={handleTagsChange} />
-              </div>
-
-              {/* Data Wipe */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><ShieldCheck size={16} className="text-foreground/40" /> Data Wipe Certificate</h2>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={dataWipeStatus} />
-                    <select value={dataWipeStatus} onChange={(e) => handleDataWipeStatusChange(e.target.value)}
-                      className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">
-                      <option value="Not Requested">Not Requested</option>
-                      <option value="Requested">Requested</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Issued">Issued</option>
-                      <option value="Delivered">Delivered</option>
-                    </select>
+                    <span className="text-[10px] text-foreground/25 shrink-0">{event.timestamp ? new Date(event.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
                   </div>
-                  {(dataWipeStatus === 'Issued' || dataWipeStatus === 'Delivered') && asset.data_wipe_cert_url && (
-                    <a href={asset.data_wipe_cert_url} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors">
-                      <Download size={14} /> Download
-                    </a>
-                  )}
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Linked Returns */}
+          {asset.returns && asset.returns.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-3 border-b border-foreground/[0.03]">
+                <div className="flex items-center gap-2">
+                  <RotateCcw size={14} className="text-foreground/25" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Linked Returns</p>
                 </div>
               </div>
-            </>
-          ),
-        },
-        {
-          key: 'history',
-          label: 'History & Related',
-          count: events.length + (asset.returns?.length || 0) + (asset.tickets?.length || 0),
-          content: (
-            <>
-              {/* Lifecycle History */}
-              {events.length > 0 && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><History size={16} className="text-foreground/40" /> History</h2>
-                  <div className="space-y-2">
-                    {events.slice(0, 10).map((event, i) => (
-                      <div key={i} className="flex items-center gap-3 py-2 border-b border-foreground/[0.04] last:border-0">
-                        <div className="w-2 h-2 rounded-full bg-rentr-primary shrink-0" />
-                        <span className="text-sm text-foreground/70">{(event.from_state || '').replace(/_/g, ' ')} → {(event.to_state || '').replace(/_/g, ' ')}</span>
-                        {event.triggered_by && <span className="text-xs text-foreground/30">by {event.triggered_by}</span>}
-                        <span className="text-xs text-foreground/30 ml-auto">{event.timestamp ? new Date(event.timestamp).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}</span>
-                      </div>
-                    ))}
+              <div className="divide-y divide-foreground/[0.03]">
+                {asset.returns.map((ret) => (
+                  <div key={ret.id} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors" onClick={() => navigate(`/returns/${ret.id}`)}>
+                    <p className="text-sm font-bold">#{ret.return_number || ret.id}</p>
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={ret.status} />
+                      <ArrowRight size={14} className="text-foreground/20" />
+                    </div>
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Linked Returns */}
-              {asset.returns && asset.returns.length > 0 && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><RotateCcw size={16} className="text-foreground/40" /> Linked Returns</h2>
-                  {asset.returns.map((ret) => (
-                    <button key={ret.id} onClick={() => navigate(`/returns/${ret.id}`)}
-                      className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
-                      <div className="flex items-center gap-3 text-sm">
-                        <span className="font-medium">#{ret.return_number || ret.id}</span>
-                        <StatusBadge status={ret.status} />
-                      </div>
+          {/* Linked Tickets */}
+          {asset.tickets && asset.tickets.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-3 border-b border-foreground/[0.03]">
+                <div className="flex items-center gap-2">
+                  <LifeBuoy size={14} className="text-foreground/25" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Linked Tickets</p>
+                </div>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {asset.tickets.map((t) => (
+                  <div key={t.id} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors" onClick={() => navigate(`/support/${t.id}`)}>
+                    <div>
+                      <p className="text-sm font-bold">#{t.ticket_number || t.id}</p>
+                      <p className="text-xs text-foreground/30">{t.subject}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <StatusBadge status={t.status} />
                       <ArrowRight size={14} className="text-foreground/20" />
-                    </button>
-                  ))}
-                </div>
-              )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Linked Tickets */}
-              {asset.tickets && asset.tickets.length > 0 && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.06] rounded-xl p-5">
-                  <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2"><LifeBuoy size={16} className="text-foreground/40" /> Linked Tickets</h2>
-                  {asset.tickets.map((t) => (
-                    <button key={t.id} onClick={() => navigate(`/support/${t.id}`)}
-                      className="w-full flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-foreground/[0.03] transition-colors text-left">
-                      <div className="flex items-center gap-3 text-sm">
-                        <span className="font-medium">#{t.ticket_number || t.id}</span>
-                        <span className="text-foreground/60">{t.subject}</span>
-                        <StatusBadge status={t.status} />
-                      </div>
-                      <ArrowRight size={14} className="text-foreground/20" />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {events.length === 0 && (!asset.returns || asset.returns.length === 0) && (!asset.tickets || asset.tickets.length === 0) && (
-                <div className="text-center py-12 text-foreground/30 text-sm">No history or related items yet.</div>
-              )}
-            </>
-          ),
-        },
-      ]} />
-    </motion.div>
-  );
-}
-
-function Field({ label, value, mono }) {
-  return (
-    <div>
-      <span className="text-xs text-foreground/40 block mb-0.5">{label}</span>
-      <span className={`text-sm font-medium text-foreground ${mono ? 'font-mono' : ''}`}>{value || '-'}</span>
+          {events.length === 0 && (!asset.returns || asset.returns.length === 0) && (!asset.tickets || asset.tickets.length === 0) && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <p className="px-6 py-8 text-center text-foreground/20 text-xs italic">No history or related items yet.</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

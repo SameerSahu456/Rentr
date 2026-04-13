@@ -1,5 +1,6 @@
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 
 const sizeClasses = {
   sm: 'text-xl',
@@ -8,9 +9,13 @@ const sizeClasses = {
   xl: 'text-7xl',
 };
 
-export function Logo({ className, size = 'md', showTagline = false }) {
+export function Logo({ className, size = 'md', showTagline = false, clickable = false }) {
+  const navigate = useNavigate();
   return (
-    <div className={cn('flex flex-col font-brand font-black uppercase tracking-[-0.05em] leading-none select-none cursor-default group', className)}>
+    <div
+      className={cn('flex flex-col font-brand font-black uppercase tracking-[-0.05em] leading-none select-none group', clickable ? 'cursor-pointer' : 'cursor-default', className)}
+      onClick={clickable ? () => navigate('/') : undefined}
+    >
       <div className={cn('flex items-baseline overflow-hidden', sizeClasses[size])}>
         <motion.span
           initial={{ y: '100%' }}

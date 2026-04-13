@@ -274,14 +274,16 @@ def get_contract(
                 "id": order_obj.id, "order_number": order_obj.order_number,
                 "status": order_obj.status, "customer_name": order_obj.customer_name,
                 "total_monthly": order_obj.total_monthly, "rental_months": order_obj.rental_months,
+                "items": order_obj.items,
             }
 
-        # Linked assets for this order
+        # Linked assets for this order with pricing
         assets = db.query(Asset).filter(Asset.order_id == contract.order_id).all()
         contract_dict["assets"] = [
             {"id": a.id, "uid": a.uid, "oem": a.oem, "model": a.model,
-             "category": a.category, "status": a.status,
-             "condition_grade": a.condition_grade, "monthly_rate": a.monthly_rate}
+             "category": a.category, "status": a.status, "serial_number": a.serial_number,
+             "condition_grade": a.condition_grade, "monthly_rate": a.monthly_rate,
+             "acquisition_cost": a.acquisition_cost}
             for a in assets
         ]
 
@@ -327,6 +329,23 @@ def get_contract(
         contract_dict["returns"] = []
         contract_dict["tickets"] = []
         contract_dict["payments"] = []
+
+    # Version history: all contracts for same order
+    if contract.order_id:
+        all_versions = (
+            db.query(Contract)
+            .filter(Contract.order_id == contract.order_id)
+            .order_by(Contract.version.asc())
+            .all()
+        )
+        contract_dict["version_history"] = [
+            {"id": v.id, "contract_number": v.contract_number, "version": v.version,
+             "status": v.status, "start_date": v.start_date, "end_date": v.end_date,
+             "created_at": v.created_at}
+            for v in all_versions
+        ]
+    else:
+        contract_dict["version_history"] = []
 
     return contract_dict
 
@@ -465,6 +484,116 @@ def regenerate_contract_pdf(
     db.commit()
     db.refresh(contract)
     return contract
+
+
+@router.post("/{contract_id}/renew")
+def renew_contract(
+    contract_id: int,
+    db: Session = Depends(get_db),
+    current_user: AdminUser = Depends(get_current_user),
+):
+    """Create a new version of an expired/terminated contract for the same order."""
+    from dateutil.relativedelta import relativedelta
+
+    old = db.query(Contract).filter(Contract.id == contract_id).first()
+    if not old:
+        raise HTTPException(status_code=404, detail="Contract not found")
+
+    # Get the highest version for this order
+    max_version = (
+        db.query(Contract.version)
+        .filter(Contract.order_id == old.order_id)
+        .order_by(Contract.version.desc())
+        .first()
+    )
+    new_version = (max_version[0] if max_version else 0) + 1
+
+    new_start = date.today()
+    # Determine rental months from order or default to 12
+    rental_months = 12
+    if old.order_id:
+        order = db.query(Order).filter(Order.order_number == old.order_id).first()
+        if order and order.rental_months:
+            rental_months = order.rental_months
+
+    new_contract = Contract(
+        contract_number=_generate_contract_number(db),
+        customer_name=old.customer_name,
+        customer_email=old.customer_email,
+        order_id=old.order_id,
+        type=old.type,
+        version=new_version,
+        parent_contract_id=old.id,
+        start_date=new_start,
+        end_date=new_start + relativedelta(months=rental_months),
+        terms=old.terms,
+        status="draft",
+    )
+    db.add(new_contract)
+    db.commit()
+    db.refresh(new_contract)
+    return {c.name: getattr(new_contract, c.name) for c in Contract.__table__.columns}
+
+
+@router.post("/{contract_id}/send")
+def send_contract_to_customer(
+    contract_id: int,
+    db: Session = Depends(get_db),
+    current_user: AdminUser = Depends(get_current_user),
+):
+    """Send contract to customer via email with signing link."""
+    contract = db.query(Contract).filter(Contract.id == contract_id).first()
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+
+    # Generate signing token if missing
+    if not contract.signing_token:
+        contract.signing_token = str(uuid.uuid4())
+
+    # Set status to pending_signature
+    if contract.status == "draft":
+        contract.status = "pending_signature"
+
+    db.commit()
+    db.refresh(contract)
+
+    # Send email
+    from app.services.email_service import send_email
+    signing_url = f"https://rentr-india.vercel.app/sign/{contract.signing_token}"
+    subject = f"Contract {contract.contract_number} - Please Sign"
+    body_text = (
+        f"Dear {contract.customer_name},\n\n"
+        f"Your rental contract {contract.contract_number} is ready for signature.\n\n"
+        f"Contract Period: {contract.start_date} to {contract.end_date}\n"
+        f"Type: {contract.type.title()}\n\n"
+        f"Please sign the contract at: {signing_url}\n\n"
+        f"Best regards,\nRentr Team"
+    )
+    body_html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #1e40af; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+            <h2 style="margin: 0;">Contract Ready for Signature</h2>
+        </div>
+        <div style="padding: 24px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+            <p>Dear <strong>{contract.customer_name}</strong>,</p>
+            <p>Your rental contract <strong>{contract.contract_number}</strong> is ready for your signature.</p>
+            <div style="background: #f0f9ff; border-left: 4px solid #1e40af; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+                <p style="margin: 0;"><strong>Period:</strong> {contract.start_date} to {contract.end_date}</p>
+                <p style="margin: 4px 0 0;"><strong>Type:</strong> {contract.type.title()}</p>
+            </div>
+            <a href="{signing_url}" style="display: inline-block; background: #1e40af; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 16px;">Sign Contract</a>
+            <p style="margin-top: 24px;">Best regards,<br><strong>Rentr Team</strong></p>
+        </div>
+    </div>
+    """
+    email_sent = send_email(contract.customer_email, subject, body_text, body_html)
+
+    return {
+        "status": "sent" if email_sent else "pending",
+        "signing_token": contract.signing_token,
+        "contract_status": contract.status,
+        "recipient": contract.customer_email,
+    }
 
 
 # ── Contract Reminder endpoints ────────────────────────────────────────────

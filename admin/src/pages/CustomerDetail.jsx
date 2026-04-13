@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, FileText, ScrollText, Mail, CreditCard, HardDrive, RotateCcw, LifeBuoy, ShieldCheck, Building2, TrendingUp, Clock, CheckCircle, XCircle, Upload, Trash2, Eye, Download } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, Mail, ShieldCheck, Building2, TrendingUp, CheckCircle, XCircle, Upload, Trash2, Eye, FileText } from 'lucide-react';
 import api from '../services/api';
-import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
-import DetailTabs from '../components/DetailTabs';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 
@@ -17,6 +14,7 @@ export default function CustomerDetail() {
   const [partner, setPartner] = useState(null);
   const [kyc, setKyc] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('profile');
   const [approveModal, setApproveModal] = useState(false);
   const [rejectModal, setRejectModal] = useState(false);
   const [creditLimit, setCreditLimit] = useState('');
@@ -38,7 +36,6 @@ export default function CustomerDetail() {
         setPartner(partData);
         setKyc(partData.kyc || null);
       }
-      // If no partner data, try to find KYC by email
       if (!partData) {
         api.get('/kyc/').then((kycData) => {
           const items = kycData.items || kycData || [];
@@ -118,13 +115,7 @@ export default function CustomerDetail() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-2 border-rentr-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="skeleton h-20 rounded-2xl">&nbsp;</div>)}</div>;
 
   if (!customer && !partner) return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -148,412 +139,419 @@ export default function CustomerDetail() {
   const returns = customer?.returns || partner?.returns || [];
   const tickets = customer?.tickets || partner?.tickets || [];
 
-  const ordersAssetsCount = orders.length + assets.length;
-  const billingCount = invoices.length + contracts.length;
-  const supportCount = returns.length + tickets.length;
+  const tabs = [
+    { key: 'profile', label: 'Profile & KYC' },
+    { key: 'orders', label: `Orders & Assets (${orders.length + assets.length})` },
+    { key: 'billing', label: `Billing (${invoices.length + contracts.length})` },
+    { key: 'support', label: `Support (${returns.length + tickets.length})` },
+  ];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-6xl mx-auto space-y-10">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-foreground/[0.05] pb-6">
-        <button onClick={() => navigate('/customers')} className="group flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-foreground/30 hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Customers
-        </button>
-        <div className="flex items-center gap-2">
-          {customer?.customer_type && (
-            <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
-              customer.customer_type === 'partner'
-                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/15'
-                : 'bg-blue-500/10 text-blue-400 border border-blue-500/15'
-            }`}>
-              {customer.customer_type === 'partner' ? 'Partner' : 'Customer'}
-            </span>
-          )}
-          {tier && (
-            <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
-              tier === 'Platinum' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/15' :
-              tier === 'Gold' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/15' :
-              'bg-foreground/[0.05] text-foreground/40'
-            }`}>
-              {tier}
-            </span>
-          )}
-          {kyc && <StatusBadge status={kyc.status} />}
+    <div className="space-y-6">
+      {/* Back button */}
+      <button onClick={() => navigate('/customers')} className="flex items-center gap-2 text-xs text-foreground/30 hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Customers
+      </button>
+
+      {/* Glass card header */}
+      <div className="glass rounded-2xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-brand font-bold text-foreground">
+              {companyName || name}
+            </h1>
+            <p className="text-foreground/30 text-sm">
+              {companyName && name !== companyName ? `${name} \u00b7 ` : ''}{email}
+            </p>
+            {(profile.account_type || kyc?.account_type) && (
+              <p className="text-foreground/40 text-xs mt-1 capitalize">{(profile.account_type || kyc?.account_type || '').replace(/_/g, ' ')}</p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {customer?.customer_type && (
+              <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                customer.customer_type === 'partner'
+                  ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/15'
+                  : 'bg-blue-500/10 text-blue-400 border border-blue-500/15'
+              }`}>
+                {customer.customer_type === 'partner' ? 'Partner' : 'Customer'}
+              </span>
+            )}
+            {tier && (
+              <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                tier === 'Platinum' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/15' :
+                tier === 'Gold' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/15' :
+                'bg-foreground/[0.05] text-foreground/40'
+              }`}>
+                {tier}
+              </span>
+            )}
+            {kyc && <StatusBadge status={kyc.status} />}
+          </div>
+        </div>
+
+        {/* Metrics grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Orders</p>
+            <p className="text-lg font-bold">{customer?.total_orders || metrics.total_orders || 0}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Revenue</p>
+            <p className="text-lg font-bold">{`\u20B9${fmt(customer?.total_monthly_value || metrics.total_revenue || 0)}`}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Credit Limit</p>
+            <p className="text-lg font-bold">{kyc?.credit_limit ? `\u20B9${fmt(kyc.credit_limit)}` : '\u2014'}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-foreground/25 uppercase tracking-widest">{partner ? 'Outstanding' : 'Total Paid'}</p>
+            <p className={`text-lg font-bold ${partner ? 'text-amber-500' : ''}`}>
+              {partner ? `\u20B9${fmt(metrics.outstanding || 0)}` : `\u20B9${fmt(customer?.total_paid || 0)}`}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="px-2 py-1 rounded-md bg-rentr-primary/10 text-rentr-primary text-[9px] font-bold uppercase tracking-widest border border-rentr-primary/20">
-              {partner ? 'Partner' : 'Customer'}
-            </span>
-            <span className="text-[10px] font-mono text-foreground/20">{email}</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-5xl font-brand font-black tracking-tighter text-foreground uppercase leading-none">
-            {companyName || name}
-          </h1>
-          {companyName && name !== companyName && (
-            <p className="text-sm text-foreground/40 flex items-center gap-1 mt-2">
-              <Mail size={14} /> {name} • {email}
-            </p>
-          )}
-          {!companyName && (
-            <p className="text-sm text-foreground/40 flex items-center gap-1 mt-2">
-              <Mail size={14} /> {email}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Overview Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] overflow-hidden">
-        {[
-          { label: 'Orders', value: customer?.total_orders || metrics.total_orders || 0 },
-          { label: 'Revenue', value: `₹${fmt(customer?.total_monthly_value || metrics.total_revenue || 0)}` },
-          { label: 'Credit Limit', value: kyc?.credit_limit ? `₹${fmt(kyc.credit_limit)}` : '—' },
-          { label: 'Outstanding', value: partner ? `₹${fmt(metrics.outstanding || 0)}` : `₹${fmt(customer?.total_paid || 0)}` },
-        ].map((s, i) => (
-          <div key={s.label} className={`p-4 sm:p-6 lg:p-8 flex flex-col gap-3 sm:gap-4 lg:gap-6 group hover:bg-foreground/[0.02] transition-colors duration-700 ${i < 3 ? 'border-r border-foreground/[0.05]' : ''}`}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/20">{s.label}</span>
-            <h3 className="text-3xl lg:text-4xl font-brand font-black tracking-tighter text-foreground group-hover:text-rentr-primary transition-colors duration-500">{s.value}</h3>
-          </div>
+      {/* Inline tab buttons */}
+      <div className="flex gap-1 border-b border-foreground/[0.05] overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-colors border-b-2 ${tab === t.key ? 'border-rentr-primary text-rentr-primary' : 'border-transparent text-foreground/25 hover:text-foreground/50'}`}>
+            {t.label}
+          </button>
         ))}
       </div>
 
-      {/* Tabbed Content */}
-      <DetailTabs tabs={[
-        {
-          key: 'profile',
-          label: 'Profile & KYC',
-          content: (
-            <>
-              {/* Company Profile (if partner/KYC data exists) */}
-              {(kyc || partner) && (
-                <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6 flex items-center gap-3">
-                    <Building2 size={20} className="text-rentr-primary" />
-                    Company Profile & KYC
-                  </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 text-sm">
-                    {companyName && <InfoItem label="Company" value={companyName} />}
-                    <InfoItem label="Contact" value={name} />
-                    <InfoItem label="Email" value={email} />
-                    {(profile.account_type || kyc?.account_type) && (
-                      <InfoItem label="Account Type" value={(profile.account_type || kyc?.account_type || '').replace(/_/g, ' ')} />
-                    )}
-                    {(profile.gstin || kyc?.gstin) && <InfoItem label="GSTIN" value={profile.gstin || kyc?.gstin || '—'} />}
-                    {(profile.pan || kyc?.pan) && <InfoItem label="PAN" value={profile.pan || kyc?.pan || '—'} />}
-                    {kyc?.credit_limit != null && <InfoItem label="Credit Limit" value={`₹${fmt(kyc.credit_limit)}`} />}
-                    {kyc?.credit_used != null && <InfoItem label="Credit Used" value={`₹${fmt(kyc.credit_used)}`} />}
-                    {kyc && <InfoItem label="Credit Available" value={`₹${fmt((kyc.credit_limit || 0) - (kyc.credit_used || 0))}`} highlight />}
-                  </div>
-
-                  {/* KYC Review Actions */}
-                  {isPendingKyc && (
-                    <div className="mt-8 pt-6 border-t border-foreground/[0.05] flex gap-3">
-                      <button
-                        onClick={() => setApproveModal(true)}
-                        className="flex items-center gap-2 px-6 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
-                      >
-                        <CheckCircle size={16} /> Approve KYC
-                      </button>
-                      <button
-                        onClick={() => setRejectModal(true)}
-                        className="flex items-center gap-2 px-6 py-3 rounded-full border border-foreground/[0.05] text-foreground/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-400 hover:border-red-500/20 transition-all duration-500"
-                      >
-                        <XCircle size={16} /> Reject
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Review info (if already reviewed) */}
-                  {kyc && !isPendingKyc && (kyc.reviewer || kyc.review_notes || kyc.rejection_reason) && (
-                    <div className="mt-6 pt-6 border-t border-foreground/[0.05] grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-                      {kyc.reviewer && <InfoItem label="Reviewed By" value={kyc.reviewer} />}
-                      {kyc.reviewed_at && <InfoItem label="Reviewed At" value={new Date(kyc.reviewed_at).toLocaleDateString('en-IN')} />}
-                      {kyc.review_notes && <InfoItem label="Notes" value={kyc.review_notes} />}
-                      {kyc.rejection_reason && <InfoItem label="Rejection Reason" value={kyc.rejection_reason} highlight />}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* KYC Documents & Upload */}
-              <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] p-4 sm:p-6 lg:p-8">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground border-b border-foreground/[0.05] pb-4 mb-6 flex items-center gap-3">
-                  <ShieldCheck size={20} className="text-rentr-primary" />
-                  Documents (KYC / KYP)
-                </h2>
-
-                {/* Upload Section */}
-                <div className="mb-6">
-                  <div className="flex flex-wrap items-end gap-3 mb-4">
-                    <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-2">Document Type</label>
-                      <select
-                        value={docType}
-                        onChange={(e) => setDocType(e.target.value)}
-                        className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all"
-                      >
-                        {['PAN Card', 'Aadhaar Card', 'GST Certificate', 'Company PAN', 'Certificate of Incorporation', 'Bank Statement', 'Address Proof', 'Identity Proof', 'Passport', 'Utility Bill', 'Other'].map(t => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <label className="flex items-center gap-2 px-5 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:bg-rentr-primary hover:text-white transition-all duration-500">
-                      <Upload size={14} />
-                      {uploading ? 'Uploading...' : 'Upload Files'}
-                      <input
-                        type="file"
-                        multiple
-                        className="hidden"
-                        disabled={uploading}
-                        onChange={(e) => handleUpload(e.target.files)}
-                      />
-                    </label>
-                  </div>
-
-                  {/* Drag & Drop Zone */}
-                  <div
-                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                    onDragLeave={() => setDragOver(false)}
-                    onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}
-                    className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-300 ${
-                      dragOver
-                        ? 'border-rentr-primary bg-rentr-primary/5 text-rentr-primary'
-                        : 'border-foreground/[0.08] text-foreground/20'
-                    }`}
-                  >
-                    <Upload size={24} className="mx-auto mb-2 opacity-40" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest">
-                      Drag & drop files here
-                    </p>
-                  </div>
+      {/* ========== Profile & KYC Tab ========== */}
+      {tab === 'profile' && (
+        <div className="space-y-6">
+          {/* Company Profile */}
+          {(kyc || partner) && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05] flex items-center gap-3">
+                <Building2 size={18} className="text-rentr-primary" />
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Company Profile & KYC</h2>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 text-sm">
+                  {companyName && <InfoItem label="Company" value={companyName} />}
+                  <InfoItem label="Contact" value={name} />
+                  <InfoItem label="Email" value={email} />
+                  {(profile.gstin || kyc?.gstin) && <InfoItem label="GSTIN" value={profile.gstin || kyc?.gstin || '\u2014'} />}
+                  {(profile.pan || kyc?.pan) && <InfoItem label="PAN" value={profile.pan || kyc?.pan || '\u2014'} />}
+                  {kyc?.credit_limit != null && <InfoItem label="Credit Limit" value={`\u20B9${fmt(kyc.credit_limit)}`} />}
+                  {kyc?.credit_used != null && <InfoItem label="Credit Used" value={`\u20B9${fmt(kyc.credit_used)}`} />}
+                  {kyc && <InfoItem label="Credit Available" value={`\u20B9${fmt((kyc.credit_limit || 0) - (kyc.credit_used || 0))}`} highlight />}
                 </div>
 
-                {/* Document List */}
-                {documents.length > 0 ? (
-                  <div className="space-y-3">
-                    {documents.map((doc, i) => (
-                      <div key={i} className="flex items-center justify-between py-4 px-4 bg-foreground/[0.01] rounded-2xl border border-foreground/[0.04] group">
-                        <div className="flex items-center gap-3">
-                          <FileText size={18} className="text-foreground/20" />
-                          <div>
-                            <span className="text-sm font-medium text-foreground">{doc.type || doc.document_type || 'Document'}</span>
-                            <span className="block text-[10px] text-foreground/30">{doc.filename || doc.file_name || '—'}</span>
-                            {doc.note && <span className="block text-[10px] text-foreground/30 italic mt-0.5">{doc.note}</span>}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {doc.status && <StatusBadge status={doc.status} />}
-                          {doc.url && (
-                            <a
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 rounded-lg hover:bg-foreground/[0.05] text-foreground/30 hover:text-foreground transition-all"
-                              title="View document"
-                            >
-                              <Eye size={14} />
-                            </a>
-                          )}
-                          {doc.status !== 'approved' && (
-                            <button
-                              onClick={() => handleDocStatus(i, 'approved')}
-                              className="p-2 rounded-lg hover:bg-emerald-500/10 text-foreground/20 hover:text-emerald-400 transition-all"
-                              title="Approve document"
-                            >
-                              <CheckCircle size={14} />
-                            </button>
-                          )}
-                          {doc.status !== 'rejected' && (
-                            <button
-                              onClick={() => handleDocStatus(i, 'rejected')}
-                              className="p-2 rounded-lg hover:bg-red-500/10 text-foreground/20 hover:text-red-400 transition-all"
-                              title="Reject document"
-                            >
-                              <XCircle size={14} />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteDoc(i)}
-                            className="p-2 rounded-lg hover:bg-red-500/10 text-foreground/20 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
-                            title="Delete document"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                {/* KYC Review Actions */}
+                {isPendingKyc && (
+                  <div className="mt-6 pt-6 border-t border-foreground/[0.05] flex gap-3">
+                    <button
+                      onClick={() => setApproveModal(true)}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest hover:bg-rentr-primary hover:text-white transition-all duration-500"
+                    >
+                      <CheckCircle size={14} /> Approve KYC
+                    </button>
+                    <button
+                      onClick={() => setRejectModal(true)}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/[0.05] text-foreground/40 text-[10px] font-bold uppercase tracking-widest hover:text-red-400 hover:border-red-500/20 transition-all duration-500"
+                    >
+                      <XCircle size={14} /> Reject
+                    </button>
                   </div>
-                ) : (
-                  <p className="text-foreground/20 text-sm text-center py-4">No documents uploaded yet. Upload KYC/KYP documents above.</p>
+                )}
+
+                {/* Review info (if already reviewed) */}
+                {kyc && !isPendingKyc && (kyc.reviewer || kyc.review_notes || kyc.rejection_reason) && (
+                  <div className="mt-6 pt-6 border-t border-foreground/[0.05] grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                    {kyc.reviewer && <InfoItem label="Reviewed By" value={kyc.reviewer} />}
+                    {kyc.reviewed_at && <InfoItem label="Reviewed At" value={new Date(kyc.reviewed_at).toLocaleDateString('en-IN')} />}
+                    {kyc.review_notes && <InfoItem label="Notes" value={kyc.review_notes} />}
+                    {kyc.rejection_reason && <InfoItem label="Rejection Reason" value={kyc.rejection_reason} highlight />}
+                  </div>
                 )}
               </div>
+            </div>
+          )}
 
-              {/* Partner Performance (if partner) */}
-              {partner && metrics && (
+          {/* KYC Documents & Upload */}
+          <div className="glass rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-foreground/[0.05] flex items-center gap-3">
+              <ShieldCheck size={18} className="text-rentr-primary" />
+              <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Documents (KYC / KYP)</h2>
+            </div>
+            <div className="p-6">
+              {/* Upload Section */}
+              <div className="flex flex-wrap items-end gap-3 mb-4">
                 <div>
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground mb-6 flex items-center gap-3">
-                    <TrendingUp size={20} className="text-rentr-primary" />
-                    Performance
-                  </h2>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 border border-foreground/[0.05] rounded-xl sm:rounded-[2rem] overflow-hidden">
-                    {[
-                      { label: 'Total Revenue', value: `₹${fmt(metrics.total_revenue)}` },
-                      { label: 'Monthly Recurring', value: `₹${fmt(metrics.monthly_recurring)}` },
-                      { label: 'Deployed Assets', value: metrics.deployed_assets || 0 },
-                      { label: 'On-Time Payment', value: metrics.on_time_payment_rate != null ? `${metrics.on_time_payment_rate}%` : '—' },
-                    ].map((s, i) => (
-                      <div key={s.label} className={`p-4 sm:p-6 lg:p-8 flex flex-col gap-3 sm:gap-4 lg:gap-6 group hover:bg-foreground/[0.02] transition-colors duration-700 ${i < 3 ? 'border-r border-foreground/[0.05]' : ''}`}>
-                        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/20">{s.label}</span>
-                        <h3 className="text-3xl font-brand font-black tracking-tighter text-foreground group-hover:text-rentr-primary transition-colors duration-500">{s.value}</h3>
-                      </div>
+                  <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-2">Document Type</label>
+                  <select
+                    value={docType}
+                    onChange={(e) => setDocType(e.target.value)}
+                    className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all"
+                  >
+                    {['PAN Card', 'Aadhaar Card', 'GST Certificate', 'Company PAN', 'Certificate of Incorporation', 'Bank Statement', 'Address Proof', 'Identity Proof', 'Passport', 'Utility Bill', 'Other'].map(t => (
+                      <option key={t} value={t}>{t}</option>
                     ))}
-                  </div>
+                  </select>
                 </div>
-              )}
-            </>
-          ),
-        },
-        {
-          key: 'orders',
-          label: 'Orders & Assets',
-          count: ordersAssetsCount || undefined,
-          content: (
-            <>
-              {/* Orders */}
-              <Section title="Orders" data={orders}>
-                <DataTable
-                  columns={[
-                    { key: 'order_number', label: 'Order #' },
-                    { key: 'total_monthly', label: 'Monthly', render: (v) => `₹${fmt(v)}` },
-                    { key: 'rental_months', label: 'Tenure', render: (v) => `${v}mo` },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'created_at', label: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
-                  ]}
-                  data={orders}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/orders/${row.id}`)}
-                  emptyMessage="No orders."
-                />
-              </Section>
+                <label className="flex items-center gap-2 px-5 py-3 rounded-full bg-foreground text-background text-[10px] font-bold uppercase tracking-widest cursor-pointer hover:bg-rentr-primary hover:text-white transition-all duration-500">
+                  <Upload size={14} />
+                  {uploading ? 'Uploading...' : 'Upload Files'}
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => handleUpload(e.target.files)}
+                  />
+                </label>
+              </div>
 
-              {/* Assets */}
-              <Section title="Assets" data={assets}>
-                <DataTable
-                  columns={[
-                    { key: 'uid', label: 'UID', render: (v) => <span className="font-mono font-bold">{v}</span> },
-                    { key: 'oem', label: 'OEM / Model', render: (_, row) => [row.oem, row.model].filter(Boolean).join(' / ') || '-' },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'condition_grade', label: 'Grade' },
-                    { key: 'monthly_rate', label: 'Rate', render: (v) => v ? `₹${fmt(v)}` : '-' },
-                  ]}
-                  data={assets}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/assets/${row.id}`)}
-                  emptyMessage="No assets."
-                />
-              </Section>
+              {/* Drag & Drop Zone */}
+              <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}
+                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-300 mb-4 ${
+                  dragOver
+                    ? 'border-rentr-primary bg-rentr-primary/5 text-rentr-primary'
+                    : 'border-foreground/[0.08] text-foreground/20'
+                }`}
+              >
+                <Upload size={24} className="mx-auto mb-2 opacity-40" />
+                <p className="text-[10px] font-bold uppercase tracking-widest">
+                  Drag & drop files here
+                </p>
+              </div>
+            </div>
 
-              {orders.length === 0 && assets.length === 0 && (
-                <p className="text-foreground/20 text-sm text-center py-8">No orders or assets found.</p>
-              )}
-            </>
-          ),
-        },
-        {
-          key: 'billing',
-          label: 'Billing',
-          count: billingCount || undefined,
-          content: (
-            <>
-              {/* Invoices */}
-              <Section title="Invoices" data={invoices}>
-                <DataTable
-                  columns={[
-                    { key: 'invoice_number', label: 'Invoice #' },
-                    { key: 'total', label: 'Amount', render: (v) => `₹${fmt(v)}` },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'due_date', label: 'Due Date', render: (v) => v || '-' },
-                  ]}
-                  data={invoices}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/invoices/${row.id}`)}
-                  emptyMessage="No invoices."
-                />
-              </Section>
+            {/* Document List */}
+            {documents.length > 0 ? (
+              <div className="divide-y divide-foreground/[0.03]">
+                {documents.map((doc, i) => (
+                  <div key={i} className="px-6 py-4 flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <FileText size={18} className="text-foreground/20" />
+                      <div>
+                        <p className="text-sm font-bold">{doc.type || doc.document_type || 'Document'}</p>
+                        <p className="text-[10px] text-foreground/30">{doc.filename || doc.file_name || '\u2014'}</p>
+                        {doc.note && <p className="text-[10px] text-foreground/30 italic mt-0.5">{doc.note}</p>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {doc.status && <StatusBadge status={doc.status} />}
+                      {doc.url && (
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg hover:bg-foreground/[0.05] text-foreground/30 hover:text-foreground transition-all" title="View document">
+                          <Eye size={14} />
+                        </a>
+                      )}
+                      {doc.status !== 'approved' && (
+                        <button onClick={() => handleDocStatus(i, 'approved')} className="p-2 rounded-lg hover:bg-emerald-500/10 text-foreground/20 hover:text-emerald-400 transition-all" title="Approve document">
+                          <CheckCircle size={14} />
+                        </button>
+                      )}
+                      {doc.status !== 'rejected' && (
+                        <button onClick={() => handleDocStatus(i, 'rejected')} className="p-2 rounded-lg hover:bg-red-500/10 text-foreground/20 hover:text-red-400 transition-all" title="Reject document">
+                          <XCircle size={14} />
+                        </button>
+                      )}
+                      <button onClick={() => handleDeleteDoc(i)} className="p-2 rounded-lg hover:bg-red-500/10 text-foreground/20 hover:text-red-400 transition-all opacity-0 group-hover:opacity-100" title="Delete document">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="px-6 py-8 text-center text-foreground/20 text-xs italic">No documents uploaded yet. Upload KYC/KYP documents above.</p>
+            )}
+          </div>
 
-              {/* Contracts */}
-              <Section title="Contracts" data={contracts}>
-                <DataTable
-                  columns={[
-                    { key: 'contract_number', label: 'Contract #' },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'start_date', label: 'Start', render: (v) => v || '-' },
-                    { key: 'end_date', label: 'End', render: (v) => v || '-' },
-                  ]}
-                  data={contracts}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/contracts/${row.id}`)}
-                  emptyMessage="No contracts."
-                />
-              </Section>
+          {/* Partner Performance */}
+          {partner && metrics && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05] flex items-center gap-3">
+                <TrendingUp size={18} className="text-rentr-primary" />
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Performance</h2>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-6">
+                <div>
+                  <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Total Revenue</p>
+                  <p className="text-lg font-bold">{`\u20B9${fmt(metrics.total_revenue)}`}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Monthly Recurring</p>
+                  <p className="text-lg font-bold">{`\u20B9${fmt(metrics.monthly_recurring)}`}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Deployed Assets</p>
+                  <p className="text-lg font-bold">{metrics.deployed_assets || 0}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-foreground/25 uppercase tracking-widest">On-Time Payment</p>
+                  <p className="text-lg font-bold">{metrics.on_time_payment_rate != null ? `${metrics.on_time_payment_rate}%` : '\u2014'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-              {invoices.length === 0 && contracts.length === 0 && (
-                <p className="text-foreground/20 text-sm text-center py-8">No invoices or contracts found.</p>
-              )}
-            </>
-          ),
-        },
-        {
-          key: 'support',
-          label: 'Support',
-          count: supportCount || undefined,
-          content: (
-            <>
-              {/* Returns */}
-              <Section title="Returns" data={returns}>
-                <DataTable
-                  columns={[
-                    { key: 'return_number', label: 'Return #' },
-                    { key: 'reason', label: 'Reason' },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'created_at', label: 'Date', render: (v) => v ? new Date(v).toLocaleDateString('en-IN') : '-' },
-                  ]}
-                  data={returns}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/returns/${row.id}`)}
-                  emptyMessage="No returns."
-                />
-              </Section>
+      {/* ========== Orders & Assets Tab ========== */}
+      {tab === 'orders' && (
+        <div className="space-y-6">
+          {orders.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Orders</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {orders.map(o => (
+                  <div key={o.id || o.order_number} onClick={() => navigate(`/orders/${o.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold">{o.order_number}</p>
+                      <p className="text-xs text-foreground/30">{o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN') : ''} {o.rental_months ? `\u00b7 ${o.rental_months}mo` : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-right">
+                      <p className="text-sm">{`\u20B9${fmt(o.total_monthly)}/mo`}</p>
+                      <StatusBadge status={o.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-              {/* Tickets */}
-              <Section title="Support Tickets" data={tickets}>
-                <DataTable
-                  columns={[
-                    { key: 'ticket_number', label: 'Ticket #' },
-                    { key: 'subject', label: 'Subject' },
-                    { key: 'priority', label: 'Priority', render: (v) => <StatusBadge status={v} /> },
-                    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
-                  ]}
-                  data={tickets}
-                  loading={false}
-                  onRowClick={(row) => navigate(`/support/${row.id}`)}
-                  emptyMessage="No tickets."
-                />
-              </Section>
+          {assets.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Assets</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {assets.map(a => (
+                  <div key={a.id || a.uid} onClick={() => navigate(`/assets/${a.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold font-mono">{a.uid}</p>
+                      <p className="text-xs text-foreground/30">{[a.oem, a.model].filter(Boolean).join(' / ') || '-'} {a.condition_grade ? `\u00b7 ${a.condition_grade}` : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-right">
+                      {a.monthly_rate && <p className="text-sm">{`\u20B9${fmt(a.monthly_rate)}/mo`}</p>}
+                      <StatusBadge status={a.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-              {returns.length === 0 && tickets.length === 0 && (
-                <p className="text-foreground/20 text-sm text-center py-8">No returns or support tickets found.</p>
-              )}
-            </>
-          ),
-        },
-      ]} />
+          {orders.length === 0 && assets.length === 0 && (
+            <p className="text-foreground/20 text-sm text-center py-8">No orders or assets found.</p>
+          )}
+        </div>
+      )}
+
+      {/* ========== Billing Tab ========== */}
+      {tab === 'billing' && (
+        <div className="space-y-6">
+          {invoices.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Invoices</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {invoices.map(inv => (
+                  <div key={inv.id || inv.invoice_number} onClick={() => navigate(`/invoices/${inv.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold">{inv.invoice_number}</p>
+                      <p className="text-xs text-foreground/30">{inv.due_date ? `Due ${inv.due_date}` : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm">{`\u20B9${fmt(inv.total)}`}</p>
+                      <StatusBadge status={inv.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {contracts.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Contracts</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {contracts.map(c => (
+                  <div key={c.id || c.contract_number} onClick={() => navigate(`/contracts/${c.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold">{c.contract_number}</p>
+                      <p className="text-xs text-foreground/30">{c.start_date || ''} {c.start_date && c.end_date ? '-' : ''} {c.end_date || ''}</p>
+                    </div>
+                    <StatusBadge status={c.status} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {invoices.length === 0 && contracts.length === 0 && (
+            <p className="text-foreground/20 text-sm text-center py-8">No invoices or contracts found.</p>
+          )}
+        </div>
+      )}
+
+      {/* ========== Support Tab ========== */}
+      {tab === 'support' && (
+        <div className="space-y-6">
+          {returns.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Returns</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {returns.map(r => (
+                  <div key={r.id || r.return_number} onClick={() => navigate(`/returns/${r.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold">{r.return_number}</p>
+                      <p className="text-xs text-foreground/30">{r.reason || ''} {r.created_at ? `\u00b7 ${new Date(r.created_at).toLocaleDateString('en-IN')}` : ''}</p>
+                    </div>
+                    <StatusBadge status={r.status} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {tickets.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-foreground/[0.05]">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Support Tickets</h2>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {tickets.map(t => (
+                  <div key={t.id || t.ticket_number} onClick={() => navigate(`/support/${t.id}`)} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors">
+                    <div>
+                      <p className="text-sm font-bold">{t.ticket_number}</p>
+                      <p className="text-xs text-foreground/30">{t.subject || ''}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={t.priority} />
+                      <StatusBadge status={t.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {returns.length === 0 && tickets.length === 0 && (
+            <p className="text-foreground/20 text-sm text-center py-8">No returns or support tickets found.</p>
+          )}
+        </div>
+      )}
 
       {/* Approve Modal */}
       <Modal isOpen={approveModal} onClose={() => setApproveModal(false)} title="Approve KYC" footer={
@@ -564,7 +562,7 @@ export default function CustomerDetail() {
       }>
         <div className="space-y-4">
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-2">Credit Limit (₹)</label>
+            <label className="block text-[9px] font-bold uppercase tracking-widest text-foreground/20 mb-2">Credit Limit (\u20B9)</label>
             <input type="number" min="0" value={creditLimit} onChange={(e) => setCreditLimit(e.target.value)} className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10" placeholder="Enter credit limit" />
           </div>
           <div>
@@ -586,7 +584,7 @@ export default function CustomerDetail() {
           <textarea required value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)} rows={4} className="w-full bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl py-4 px-4 text-sm focus:outline-none focus:border-rentr-primary/50 transition-all placeholder:text-foreground/10" placeholder="Reason for rejection..." />
         </div>
       </Modal>
-    </motion.div>
+    </div>
   );
 }
 
@@ -595,18 +593,6 @@ function InfoItem({ label, value, highlight }) {
     <div>
       <span className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 block">{label}</span>
       <span className={`text-sm font-bold ${highlight ? 'text-emerald-400' : 'text-foreground'}`}>{value}</span>
-    </div>
-  );
-}
-
-function Section({ title, data, children }) {
-  if (!data || data.length === 0) return null;
-  return (
-    <div>
-      <h2 className="text-lg sm:text-xl lg:text-2xl font-brand font-black uppercase tracking-tight text-foreground mb-6">{title}</h2>
-      <div className="border-t border-foreground/[0.05]">
-        {children}
-      </div>
     </div>
   );
 }

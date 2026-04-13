@@ -146,6 +146,8 @@ class Contract(Base):
     customer_email = Column(String(255), nullable=False)
     order_id = Column(String(100), index=True)
     type = Column(String(50), default="rental")  # rental/lease
+    version = Column(Integer, default=1)  # contract version (1, 2, 3...)
+    parent_contract_id = Column(Integer, ForeignKey("contracts.id", ondelete="SET NULL"), nullable=True, index=True)
     start_date = Column(Date)
     end_date = Column(Date)
     original_end_date = Column(Date)  # before any extensions
@@ -162,6 +164,8 @@ class Contract(Base):
     updated_at = Column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    parent_contract = relationship("Contract", remote_side="Contract.id", foreign_keys=[parent_contract_id])
 
 
 class ContractReminder(Base):

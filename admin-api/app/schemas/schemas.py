@@ -312,6 +312,8 @@ class ContractResponse(BaseModel):
     customer_email: str
     order_id: Optional[str] = None
     type: str
+    version: int = 1
+    parent_contract_id: Optional[int] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     original_end_date: Optional[date] = None
