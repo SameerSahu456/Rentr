@@ -1,6 +1,5 @@
-// API base URL — admin-api serves at /api (NOT /api/v1)
 const _env = import.meta.env.VITE_ADMIN_API_URL || '';
-const BASE_URL = _env.replace(/\/api\/v1\b/, '/api') || '/api';
+const BASE_URL = _env || '/api';
 
 function getToken() {
   return localStorage.getItem('rentr_admin_token');
