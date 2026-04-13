@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Users, Search, ShieldCheck, CreditCard, ShoppingCart, HardDrive } from 'lucide-react';
+import { Users, Search, ShieldCheck, CreditCard, ShoppingCart, HardDrive, Building2 } from 'lucide-react';
 import api from '../services/api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
@@ -22,8 +22,10 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState([]);
   const [partners, setPartners] = useState([]);
   const [kycRecords, setKycRecords] = useState([]);
+  const [distributors, setDistributors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     setLoading(true);
@@ -34,10 +36,12 @@ export default function CustomersPage() {
       api.get(customerUrl).catch(() => ({ items: [] })),
       api.get(partnerUrl).catch(() => ({ items: [] })),
       api.get('/kyc/').catch(() => ({ items: [] })),
-    ]).then(([custData, partData, kycData]) => {
+      api.get(`/distributors/?search=${search}`).catch(() => ({ items: [] })),
+    ]).then(([custData, partData, kycData, distData]) => {
       setCustomers(custData.items || []);
       setPartners(partData.items || []);
       setKycRecords(kycData.items || kycData || []);
+      setDistributors(distData.items || []);
     }).finally(() => setLoading(false));
   }, [search]);
 
@@ -215,18 +219,64 @@ export default function CustomersPage() {
         ))}
       </motion.div>
 
+      {/* Tabs */}
+      <motion.div variants={item} className="flex items-center gap-2">
+        {[
+          { key: 'all', label: 'All Customers' },
+          { key: 'customers', label: 'Direct' },
+          { key: 'partners', label: 'Partners' },
+          { key: 'distributors', label: `Distributors (${distributors.length})` },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-colors ${
+              activeTab === tab.key
+                ? 'bg-rentr-primary text-white'
+                : 'text-foreground/20 hover:text-foreground'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </motion.div>
+
       {/* List */}
-      <div className="border-t border-foreground/[0.05]">
-        <DataTable
-          columns={columns}
-          data={allCustomers}
-          loading={loading}
-          onRowClick={(row) => navigate(`/customers/${encodeURIComponent(row.email)}`)}
-          emptyMessage="No customers yet."
-          emptyIcon={<Users size={40} className="text-foreground/10" />}
-          exportFilename="rentr-customers"
-        />
-      </div>
+      {activeTab !== 'distributors' ? (
+        <div className="border-t border-foreground/[0.05]">
+          <DataTable
+            columns={columns}
+            data={activeTab === 'all' ? allCustomers : activeTab === 'partners' ? allCustomers.filter(c => c.is_partner || c.customer_type === 'partner') : allCustomers.filter(c => !c.is_partner && c.customer_type !== 'partner')}
+            loading={loading}
+            onRowClick={(row) => navigate(`/customers/${encodeURIComponent(row.email)}`)}
+            emptyMessage="No customers yet."
+            emptyIcon={<Users size={40} className="text-foreground/10" />}
+            exportFilename="rentr-customers"
+          />
+        </div>
+      ) : (
+        <div className="border-t border-foreground/[0.05]">
+          <DataTable
+            columns={[
+              { key: 'company_name', label: 'Company' },
+              { key: 'name', label: 'Contact' },
+              { key: 'email', label: 'Email' },
+              { key: 'total_customers', label: 'Customers', render: (v) => v || 0 },
+              { key: 'total_orders', label: 'Orders', render: (v) => v || 0 },
+              { key: 'total_revenue', label: 'Revenue', render: (v) => `₹${fmt(v || 0)}` },
+              { key: 'monthly_spread', label: 'Spread/mo', render: (v) => <span className="text-emerald-500 font-bold">₹{fmt(v || 0)}</span> },
+              { key: 'credit_limit', label: 'Credit Limit', render: (v) => v ? `₹${fmt(v)}` : '-' },
+              { key: 'is_active', label: 'Status', render: (v) => <StatusBadge status={v ? 'active' : 'cancelled'} /> },
+            ]}
+            data={distributors}
+            loading={loading}
+            onRowClick={(row) => navigate(`/distributors/${row.id}`)}
+            emptyMessage="No distributors yet."
+            emptyIcon={<Building2 size={40} className="text-foreground/10" />}
+            exportFilename="rentr-distributors"
+          />
+        </div>
+      )}
 
     </motion.div>
   );
