@@ -19,6 +19,8 @@ class Settings(BaseSettings):
         "http://localhost:4000",
         "http://localhost:4100",
         "https://rentr-admin-phi.vercel.app",
+        "https://distributor-sameersahu456s-projects.vercel.app",
+        "https://rentr-india.vercel.app",
     ]
 
     # OTP settings (mock for now)

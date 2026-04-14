@@ -8,12 +8,8 @@ export default defineConfig({
     port: 4000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
-        rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
-      },
-      '/saleor': {
         target: 'http://localhost:8000',
-        rewrite: (path) => path.replace(/^\/saleor/, ''),
+        rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
       },
     },
   },
