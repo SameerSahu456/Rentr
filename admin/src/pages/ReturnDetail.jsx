@@ -62,20 +62,20 @@ export default function ReturnDetail() {
       </button>
 
       {/* Header Card */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-rentr-primary/10 text-rentr-primary">Return</span>
               <span className="font-mono text-xs text-foreground/25">#{ret.return_number || ret.id}</span>
             </div>
-            <h1 className="text-2xl font-brand font-bold text-foreground cursor-pointer hover:text-rentr-primary transition-colors"
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground cursor-pointer hover:text-rentr-primary transition-colors"
               onClick={() => ret.customer_email && navigate(`/customers/${encodeURIComponent(ret.customer_email)}`)}>
               {ret.customer_name || 'Return'}
             </h1>
-            {ret.customer_email && <p className="text-foreground/30 text-sm">{ret.customer_email}</p>}
+            {ret.customer_email && <p className="text-foreground/30 text-sm truncate">{ret.customer_email}</p>}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <StatusBadge status={ret.status} />
             <select value={ret.status} onChange={(e) => handleStatusChange(e.target.value)}
               className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-xs text-foreground/60">
@@ -199,7 +199,7 @@ export default function ReturnDetail() {
             </div>
           ) : null}
 
-          {(ret.damage_charges > 0 || ret.damage_report) && (
+          {(ret.damage_charges > 0 || (ret.damage_report && Object.keys(ret.damage_report).length > 0)) && (
             <div className="glass rounded-2xl overflow-hidden">
               <div className="px-6 py-4 border-b border-foreground/[0.03]">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/50 flex items-center gap-2">
@@ -209,15 +209,19 @@ export default function ReturnDetail() {
               <div className="px-6 py-4">
                 <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Damage Charges</p>
                 <p className="text-lg font-bold text-red-500">₹{Number(ret.damage_charges || 0).toLocaleString('en-IN')}</p>
-                {ret.damage_report && (
-                  <p className="text-sm text-foreground/60 mt-2">{ret.damage_report}</p>
+                {ret.damage_report && Object.keys(ret.damage_report).length > 0 && (
+                  <div className="mt-2 text-sm text-foreground/60">
+                    {typeof ret.damage_report === 'string' ? ret.damage_report : (
+                      <pre className="whitespace-pre-wrap text-xs bg-foreground/[0.03] p-3 rounded-lg">{JSON.stringify(ret.damage_report, null, 2)}</pre>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
           )}
 
-          {(!ret.linked_assets || ret.linked_assets.length === 0) && (!ret.asset_uids || ret.asset_uids.length === 0) && !ret.damage_charges && !ret.damage_report && (
-            <div className="glass rounded-2xl p-8 text-center text-foreground/20 text-xs italic">No assets or damage data.</div>
+          {(!ret.linked_assets || ret.linked_assets.length === 0) && (!ret.asset_uids || ret.asset_uids.length === 0) && !ret.damage_charges && (!ret.damage_report || Object.keys(ret.damage_report).length === 0) && (
+            <div className="glass rounded-2xl p-8 text-center text-foreground/20 text-xs italic">No assets or damage data available for this return.</div>
           )}
         </div>
       )}

@@ -21,28 +21,34 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No d
   if (loading) {
     return (
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px]">
+        <table className="w-full min-w-[480px]">
           <thead>
             <tr className="border-b border-foreground/[0.05]">
-              {onRowClick && <th className="w-12 px-4 lg:px-6 py-4" />}
+              {onRowClick && <th className="w-10 lg:w-12 px-2 sm:px-4 lg:px-6 py-3 lg:py-4" />}
               {columns.map((col) => (
-                <th key={col.key} className="text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-4 lg:px-6 py-4 whitespace-nowrap">
+                <th key={col.key} className={cn(
+                  "text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-2 sm:px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap",
+                  col.hideOnMobile && "hidden sm:table-cell"
+                )}>
                   {col.label}
                 </th>
               ))}
-              {onRowClick && <th className="w-12 px-4 lg:px-6 py-4" />}
+              {onRowClick && <th className="w-10 lg:w-12 px-2 sm:px-4 lg:px-6 py-3 lg:py-4" />}
             </tr>
           </thead>
           <tbody>
             {[...Array(5)].map((_, i) => (
               <tr key={i} className="border-b border-foreground/[0.03]">
-                {onRowClick && <td className="px-4 lg:px-6 py-5" />}
+                {onRowClick && <td className="px-2 sm:px-4 lg:px-6 py-4 lg:py-5" />}
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 lg:px-6 py-5">
+                  <td key={col.key} className={cn(
+                    "px-2 sm:px-4 lg:px-6 py-4 lg:py-5",
+                    col.hideOnMobile && "hidden sm:table-cell"
+                  )}>
                     <div className="skeleton h-4 w-3/4">&nbsp;</div>
                   </td>
                 ))}
-                {onRowClick && <td className="px-4 lg:px-6 py-5" />}
+                {onRowClick && <td className="px-2 sm:px-4 lg:px-6 py-4 lg:py-5" />}
               </tr>
             ))}
           </tbody>
@@ -85,18 +91,21 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No d
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px]">
+        <table className="w-full min-w-[480px]">
           <thead>
             <tr className="border-b border-foreground/[0.05]">
               {onRowClick && (
-                <th className="w-12 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-4 lg:px-6 py-4" />
+                <th className="w-10 lg:w-12 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-2 sm:px-4 lg:px-6 py-3 lg:py-4" />
               )}
               {columns.map((col) => (
-                <th key={col.key} className="text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-4 lg:px-6 py-4 whitespace-nowrap">
+                <th key={col.key} className={cn(
+                  "text-left text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 px-2 sm:px-4 lg:px-6 py-3 lg:py-4 whitespace-nowrap",
+                  col.hideOnMobile && "hidden sm:table-cell"
+                )}>
                   {col.label}
                 </th>
               ))}
-              {onRowClick && <th className="w-12 px-4 lg:px-6 py-4" />}
+              {onRowClick && <th className="w-10 lg:w-12 px-2 sm:px-4 lg:px-6 py-3 lg:py-4" />}
             </tr>
           </thead>
           <motion.tbody variants={container} initial="hidden" animate="show">
@@ -111,22 +120,23 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No d
                 )}
               >
                 {onRowClick && (
-                  <td className="px-4 lg:px-6 py-4 lg:py-5 w-12 text-[10px] font-mono text-foreground/10 group-hover:text-rentr-primary transition-colors">
+                  <td className="px-2 sm:px-4 lg:px-6 py-3 lg:py-5 w-10 lg:w-12 text-[10px] font-mono text-foreground/10 group-hover:text-rentr-primary transition-colors">
                     {String(page * PAGE_SIZE + i + 1).padStart(3, '0')}
                   </td>
                 )}
                 {columns.map((col, ci) => (
                   <td key={col.key} className={cn(
-                    'px-4 lg:px-6 py-4 lg:py-5 text-sm whitespace-nowrap transition-colors duration-300',
+                    'px-2 sm:px-4 lg:px-6 py-3 lg:py-5 text-sm whitespace-nowrap transition-colors duration-300',
                     ci === 0
                       ? 'font-bold text-foreground group-hover:text-rentr-primary'
-                      : 'text-foreground/40 group-hover:text-foreground/60'
+                      : 'text-foreground/40 group-hover:text-foreground/60',
+                    col.hideOnMobile && "hidden sm:table-cell"
                   )}>
                     {col.render ? col.render(row[col.key], row) : (row[col.key] ?? '-')}
                   </td>
                 ))}
                 {onRowClick && (
-                  <td className="px-4 lg:px-6 py-4 lg:py-5 w-12 text-right">
+                  <td className="px-2 sm:px-4 lg:px-6 py-3 lg:py-5 w-10 lg:w-12 text-right">
                     <ArrowRight className="w-4 h-4 text-foreground/[0.06] group-hover:text-rentr-primary group-hover:translate-x-1 transition-all duration-500 inline-block" />
                   </td>
                 )}
@@ -138,7 +148,7 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No d
 
       {/* Pagination & Export Footer */}
       {(totalPages > 1 || exportFilename) && (
-        <div className="flex items-center justify-between px-4 lg:px-6 py-4 border-t border-foreground/[0.05]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-t border-foreground/[0.05]">
           <div className="flex items-center gap-4">
             <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/20">
               {data.length} total &middot; Page {page + 1} of {totalPages}
@@ -178,7 +188,7 @@ export default function DataTable({ columns, data, loading, emptyMessage = 'No d
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
                     className={cn(
-                      'w-8 h-8 rounded-lg text-[10px] font-bold transition-all',
+                      'w-8 h-8 rounded-lg text-[10px] font-bold transition-all hidden sm:flex items-center justify-center',
                       page === pageNum
                         ? 'bg-rentr-primary text-white'
                         : 'text-foreground/30 hover:text-foreground hover:bg-foreground/[0.03]'

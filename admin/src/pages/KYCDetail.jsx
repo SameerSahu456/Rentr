@@ -89,22 +89,22 @@ export default function KYCDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${accountTypeBadge(kyc.account_type)}`}>
                 {kyc.account_type === 'channel_partner' ? 'Channel Partner' : kyc.account_type === 'direct_enterprise' ? 'Direct Enterprise' : kyc.account_type || '-'}
               </span>
             </div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">
               {kyc.customer_email ? (
                 <span className="text-rentr-primary hover:underline cursor-pointer" onClick={() => navigate(`/customers/${encodeURIComponent(kyc.customer_email)}`)}>
                   {kyc.company_name || kyc.company || 'KYC Review'}
                 </span>
               ) : (kyc.company_name || kyc.company || 'KYC Review')}
             </h1>
-            <p className="text-foreground/30 text-sm">{kyc.customer_name} &middot; {kyc.customer_email}</p>
+            <p className="text-foreground/30 text-sm truncate">{kyc.customer_name} &middot; {kyc.customer_email}</p>
           </div>
           <StatusBadge status={kyc.status} />
         </div>

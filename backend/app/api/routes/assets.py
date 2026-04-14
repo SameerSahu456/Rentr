@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
@@ -11,6 +11,7 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.rental import (
     Asset, AssetStatus, AssetLifecycleEvent, Contract, Return, SupportTicket,
+    Replacement,
 )
 from app.models.order import Order
 
@@ -49,15 +50,49 @@ def get_asset_stats(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    now = datetime.now(timezone.utc)
     total = db.query(func.count(Asset.id)).scalar() or 0
     deployed = db.query(func.count(Asset.id)).filter(Asset.status == AssetStatus.deployed).scalar() or 0
     in_warehouse = db.query(func.count(Asset.id)).filter(Asset.status == AssetStatus.in_warehouse).scalar() or 0
     in_repair = db.query(func.count(Asset.id)).filter(Asset.status == AssetStatus.in_repair).scalar() or 0
+
+    # By status breakdown
+    status_q = db.query(Asset.status, func.count(Asset.id)).group_by(Asset.status).all()
+    by_status = {str(s.value if hasattr(s, "value") else s): c for s, c in status_q}
+
+    # By category breakdown
+    cat_q = db.query(Asset.category, func.count(Asset.id)).group_by(Asset.category).all()
+    by_category = {str(c.value if hasattr(c, "value") else c): n for c, n in cat_q}
+
+    # Idle assets (in warehouse > 30 days)
+    thirty_days_ago = now - timedelta(days=30)
+    idle_q = (
+        db.query(Asset)
+        .filter(Asset.status == AssetStatus.in_warehouse, Asset.created_at < thirty_days_ago)
+        .limit(20)
+        .all()
+    )
+    idle_assets = [
+        {
+            "id": a.id,
+            "serial_number": a.serial_number,
+            "name": f"{a.oem} {a.model}",
+            "status": str(a.status.value if hasattr(a.status, "value") else a.status),
+            "idle_days": (now - a.created_at.replace(tzinfo=timezone.utc)).days if a.created_at else 0,
+        }
+        for a in idle_q
+    ]
+
     return {
         "total_assets": total,
+        "total": total,
         "deployed": deployed,
         "in_warehouse": in_warehouse,
         "in_repair": in_repair,
+        "in_transit": by_status.get("in_transit", 0),
+        "by_status": by_status,
+        "by_category": by_category,
+        "idle_assets": idle_assets,
     }
 
 
@@ -162,6 +197,20 @@ def get_asset(
 
     tickets = db.query(SupportTicket).filter(SupportTicket.asset_uid == asset.uid).all() if asset.uid else []
 
+    replacements = []
+    if asset.uid:
+        replacements = (
+            db.query(Replacement)
+            .filter(
+                or_(
+                    Replacement.faulty_asset_uid == asset.uid,
+                    Replacement.replacement_asset_uid == asset.uid,
+                )
+            )
+            .order_by(Replacement.created_at.desc())
+            .all()
+        )
+
     return {
         "id": asset.id,
         "uid": asset.uid,
@@ -207,6 +256,21 @@ def get_asset(
              "priority": t.priority.value if t.priority else None,
              "status": t.status.value if t.status else None}
             for t in tickets
+        ],
+        "replacements": [
+            {
+                "id": rpl.id,
+                "replacement_number": rpl.replacement_number,
+                "faulty_asset_uid": rpl.faulty_asset_uid,
+                "replacement_asset_uid": rpl.replacement_asset_uid,
+                "faulty_reason": rpl.faulty_reason,
+                "status": rpl.status.value if rpl.status else None,
+                "damage_charges": rpl.damage_charges,
+                "customer_name": rpl.customer_name,
+                "replacement_type": rpl.replacement_type.value if rpl.replacement_type else None,
+                "created_at": rpl.created_at.isoformat() if rpl.created_at else None,
+            }
+            for rpl in replacements
         ],
     }
 

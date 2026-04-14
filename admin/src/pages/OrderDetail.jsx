@@ -79,22 +79,22 @@ export default function OrderDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-brand font-bold text-foreground">{order.order_number}</h1>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{order.order_number}</h1>
               <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${order.source === 'crm' ? 'bg-orange-500/10 text-orange-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
                 {order.source === 'crm' ? 'CRM' : 'Website'}
               </span>
               {order.customer_type === 'partner' && <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-purple-500/10 text-purple-400">Partner</span>}
             </div>
-            <p className="text-foreground/30 text-sm">
+            <p className="text-foreground/30 text-sm truncate">
               <span className="text-rentr-primary hover:underline cursor-pointer" onClick={() => navigate(`/customers/${encodeURIComponent(order.customer_email)}`)}>{order.customer_name}</span>
               {' '}&middot; {order.customer_email}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <StatusBadge status={order.status} />
             <select value={order.status} onChange={(e) => handleStatusChange(e.target.value)}
               className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-rentr-primary/50 text-foreground/40">
@@ -104,7 +104,7 @@ export default function OrderDetail() {
         </div>
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
           <div>
             <p className="text-[10px] text-foreground/25 uppercase tracking-widest">Monthly Rent</p>
             <p className="text-lg font-bold text-emerald-500">₹{fmt(order.total_monthly)}</p>
@@ -149,9 +149,9 @@ export default function OrderDetail() {
 
       {/* Order Items Summary */}
       {order.items && order.items.length > 0 && (
-        <div className="glass rounded-2xl p-6">
+        <div className="glass rounded-2xl p-4 sm:p-6 overflow-x-auto">
           <p className="text-[10px] text-foreground/25 uppercase tracking-widest mb-3">Order Items</p>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[400px]">
             <thead><tr className="text-left border-b border-foreground/[0.05]"><th className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 pb-2">Product</th><th className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 pb-2 text-center">Qty</th><th className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 pb-2 text-right">Rate/mo</th><th className="text-[9px] font-bold uppercase tracking-widest text-foreground/20 pb-2 text-right">Subtotal/mo</th></tr></thead>
             <tbody>
               {order.items.map((item, i) => (

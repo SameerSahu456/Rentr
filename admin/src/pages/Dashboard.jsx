@@ -130,7 +130,7 @@ export default function Dashboard() {
       </section>
 
       {/* Secondary Stats */}
-      <section className="grid grid-cols-3 border-b border-foreground/[0.05]">
+      <section className="grid grid-cols-1 sm:grid-cols-3 border-b border-foreground/[0.05]">
         {[
           { label: 'Active Contracts', value: loading ? '...' : (stats?.active_contracts ?? 0), icon: ScrollText, onClick: () => navigate('/contracts') },
           { label: 'Open Tickets', value: loading ? '...' : (stats?.open_tickets ?? 0), icon: LifeBuoy, onClick: () => navigate('/support'), alert: (stats?.open_tickets ?? 0) > 0 },
@@ -142,7 +142,7 @@ export default function Dashboard() {
             onClick={s.onClick}
             className={cn(
               'p-4 sm:p-6 lg:p-10 flex flex-col gap-3 sm:gap-4 lg:gap-6 group hover:bg-foreground/[0.02] transition-colors duration-700 cursor-pointer',
-              i < 2 && 'border-r border-foreground/[0.05]'
+              i < 2 && 'sm:border-r border-b sm:border-b-0 border-foreground/[0.05]'
             )}
           >
             <div className="flex justify-between items-start">

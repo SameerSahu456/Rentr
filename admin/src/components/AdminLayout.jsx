@@ -309,7 +309,7 @@ export default function AdminLayout() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 lg:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
             {/* Search */}
             <div className="relative group hidden md:flex items-center border border-foreground/[0.06] rounded-xl px-3 py-2 hover:border-foreground/[0.1] focus-within:border-rentr-primary/30 transition-colors">
               <Search className="w-3.5 h-3.5 text-foreground/20 group-focus-within:text-rentr-primary transition-colors" />
@@ -325,7 +325,7 @@ export default function AdminLayout() {
             {/* Notifications */}
             <button
               onClick={() => navigate('/notifications')}
-              className="relative w-9 h-9 rounded-xl border border-foreground/[0.06] flex items-center justify-center hover:bg-foreground/[0.03] hover:border-foreground/[0.1] transition-all group"
+              className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-foreground/[0.06] flex items-center justify-center hover:bg-foreground/[0.03] hover:border-foreground/[0.1] transition-all group"
               title="Notifications"
             >
               <Bell className="w-4 h-4 text-foreground/30 group-hover:text-rentr-primary transition-colors" />
@@ -335,7 +335,7 @@ export default function AdminLayout() {
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-xl border border-foreground/[0.06] flex items-center justify-center hover:bg-foreground/[0.03] hover:border-foreground/[0.1] transition-all group"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-foreground/[0.06] flex items-center justify-center hover:bg-foreground/[0.03] hover:border-foreground/[0.1] transition-all group"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {theme === 'dark' ? (
@@ -348,7 +348,7 @@ export default function AdminLayout() {
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className="w-9 h-9 rounded-xl border border-foreground/[0.06] flex items-center justify-center hover:bg-red-500/5 hover:border-red-500/15 transition-all group"
+              className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-foreground/[0.06] items-center justify-center hover:bg-red-500/5 hover:border-red-500/15 transition-all group"
               title="Logout"
             >
               <LogOut className="w-4 h-4 text-foreground/30 group-hover:text-red-400 transition-colors" />

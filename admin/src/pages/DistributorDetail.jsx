@@ -33,11 +33,11 @@ export default function DistributorDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{data.company_name}</h1>
-            <p className="text-foreground/30 text-sm">{data.name} &middot; {data.email}</p>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{data.company_name}</h1>
+            <p className="text-foreground/30 text-sm truncate">{data.name} &middot; {data.email}</p>
             {data.phone && <p className="text-foreground/40 text-xs mt-1">{data.phone}</p>}
           </div>
           <StatusBadge status={data.is_active ? 'active' : 'cancelled'} />

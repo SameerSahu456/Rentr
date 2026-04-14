@@ -23,11 +23,11 @@ export default function CustomerDetail() {
         <ArrowLeft className="w-4 h-4" /> Back to Customers
       </button>
 
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{data.name}</h1>
-            <p className="text-foreground/30 text-sm">{data.email}</p>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{data.name}</h1>
+            <p className="text-foreground/30 text-sm truncate">{data.email}</p>
             {data.company_name && <p className="text-foreground/40 text-sm mt-1">{data.company_name}</p>}
           </div>
           <StatusBadge status={data.kyc_status} />
@@ -47,7 +47,7 @@ export default function CustomerDetail() {
           </div>
           <div className="divide-y divide-foreground/[0.03]">
             {data.orders.map(o => (
-              <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)} className="px-6 py-4 flex items-center justify-between hover:bg-foreground/[0.01] cursor-pointer">
+              <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 hover:bg-foreground/[0.01] cursor-pointer">
                 <div>
                   <p className="text-sm font-bold">{o.order_number}</p>
                   <p className="text-xs text-foreground/30">{o.created_at ? new Date(o.created_at).toLocaleDateString() : ''}</p>
@@ -70,7 +70,7 @@ export default function CustomerDetail() {
           </div>
           <div className="divide-y divide-foreground/[0.03]">
             {data.contracts.map(c => (
-              <div key={c.id} onClick={() => navigate(`/contracts/${c.id}`)} className="px-6 py-4 flex items-center justify-between hover:bg-foreground/[0.01] cursor-pointer">
+              <div key={c.id} onClick={() => navigate(`/contracts/${c.id}`)} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 hover:bg-foreground/[0.01] cursor-pointer">
                 <p className="text-sm font-bold">{c.contract_number}</p>
                 <StatusBadge status={c.status} />
               </div>
@@ -87,7 +87,7 @@ export default function CustomerDetail() {
           </div>
           <div className="divide-y divide-foreground/[0.03]">
             {data.invoices.map(i => (
-              <div key={i.id} onClick={() => navigate(`/invoices/${i.id}`)} className="px-6 py-4 flex items-center justify-between hover:bg-foreground/[0.01] cursor-pointer">
+              <div key={i.id} onClick={() => navigate(`/invoices/${i.id}`)} className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 hover:bg-foreground/[0.01] cursor-pointer">
                 <div>
                   <p className="text-sm font-bold">{i.invoice_number}</p>
                   <p className="text-xs text-foreground/30">Due: {i.due_date || '-'}</p>

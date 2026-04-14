@@ -71,8 +71,8 @@ export default function InvoicesPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowForm(false)}>
-          <div className="bg-background border border-foreground/[0.08] rounded-2xl p-8 w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowForm(false)}>
+          <div className="bg-background border border-foreground/[0.08] rounded-2xl p-5 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-brand font-bold mb-6">New Invoice</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -83,7 +83,7 @@ export default function InvoicesPage() {
                   {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-foreground/30 mb-1">Subtotal</label>
                   <input type="number" value={form.subtotal} onChange={(e) => { const s = parseFloat(e.target.value) || 0; setForm({ ...form, subtotal: s, total: s + form.tax }); }}

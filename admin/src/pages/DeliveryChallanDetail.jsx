@@ -48,16 +48,16 @@ export default function DeliveryChallanDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-mono text-xs text-foreground/30">{dc.dc_number}</span>
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400">{(dc.challan_type || '').replace(/_/g, ' ')}</span>
             </div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{dc.customer_name}</h1>
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{dc.customer_name}</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <StatusBadge status={dc.status} />
             <select value={dc.status} onChange={(e) => handleStatusChange(e.target.value)}
               className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-3 py-2 text-sm text-foreground/60">

@@ -1,15 +1,19 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, SessionLocal
+
+logger = logging.getLogger(__name__)
 
 # Import all models so Base.metadata knows about them
 from app.models import user, product, order, cart, rental  # noqa: F401
 
-from app.api.routes import auth, users, products, cart as cart_router, orders, search, dashboard
+from app.api.routes import auth, users, products, cart as cart_router, orders, search, dashboard, analytics
 from app.api.routes import (
     customers,
     partners,
@@ -31,11 +35,49 @@ from app.api.routes import (
 )
 
 
+async def _daily_billing_task():
+    """Background task that runs billing invoice generation once per day."""
+    from app.api.routes.billing import generate_billing_invoices
+
+    while True:
+        try:
+            db = SessionLocal()
+            try:
+                result = generate_billing_invoices(db)
+                if result["total_invoices_created"] > 0:
+                    logger.info(
+                        "Daily billing: created %d invoices totalling %.2f",
+                        result["total_invoices_created"],
+                        result["total_amount"],
+                    )
+                else:
+                    logger.debug("Daily billing: no invoices due today")
+            finally:
+                db.close()
+        except Exception:
+            logger.exception("Daily billing task failed")
+
+        # Sleep for 24 hours
+        await asyncio.sleep(86_400)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Create tables on startup (use Alembic migrations in production)
     Base.metadata.create_all(bind=engine)
+
+    # Start daily billing background task
+    billing_task = asyncio.create_task(_daily_billing_task())
+    logger.info("Daily billing background task started")
+
     yield
+
+    # Cancel on shutdown
+    billing_task.cancel()
+    try:
+        await billing_task
+    except asyncio.CancelledError:
+        pass
 
 
 app = FastAPI(
@@ -79,6 +121,7 @@ app.include_router(notifications.router, prefix=settings.API_V1_PREFIX)
 app.include_router(audit_trail.router, prefix=settings.API_V1_PREFIX)
 app.include_router(billing.router, prefix=settings.API_V1_PREFIX)
 app.include_router(reports.router, prefix=settings.API_V1_PREFIX)
+app.include_router(analytics.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

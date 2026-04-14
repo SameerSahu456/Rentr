@@ -23,11 +23,11 @@ export default function ContractDetail() {
         <ArrowLeft className="w-4 h-4" /> Back to Contracts
       </button>
 
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-brand font-bold">{data.contract_number}</h1>
-            <p className="text-foreground/30 text-sm">{data.customer_name} &middot; {data.customer_email}</p>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-6">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold">{data.contract_number}</h1>
+            <p className="text-foreground/30 text-sm truncate">{data.customer_name} &middot; {data.customer_email}</p>
           </div>
           <StatusBadge status={data.status} />
         </div>

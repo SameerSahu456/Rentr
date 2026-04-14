@@ -200,15 +200,15 @@ export default function TicketDetail() {
       </button>
 
       {/* Header Card */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-rentr-primary/10 text-rentr-primary">Ticket</span>
               <span className="font-mono text-xs text-foreground/25">{ticket.ticket_number}</span>
             </div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{ticket.subject}</h1>
-            <p className="text-foreground/30 text-sm">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{ticket.subject}</h1>
+            <p className="text-foreground/30 text-sm truncate">
               <span className="cursor-pointer hover:text-rentr-primary transition-colors" onClick={() => navigate(`/customers/${encodeURIComponent(ticket.customer_email)}`)}>
                 {ticket.customer_name}
               </span>

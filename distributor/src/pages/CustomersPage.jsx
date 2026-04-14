@@ -80,8 +80,8 @@ export default function CustomersPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowForm(false)}>
-          <div className="bg-background border border-foreground/[0.08] rounded-2xl p-8 w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowForm(false)}>
+          <div className="bg-background border border-foreground/[0.08] rounded-2xl p-5 sm:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-brand font-bold mb-6">Add Customer</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               {['name', 'email', 'phone', 'company_name', 'gstin', 'pan'].map(field => (

@@ -105,14 +105,14 @@ export default function PartnerDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-foreground/30">{profile.email}</span>
+              <span className="text-xs text-foreground/30 truncate">{profile.email}</span>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold ${tierStyles[tier] || tierStyles.Silver}`}>{tier}</span>
             </div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{profile.company_name || profile.name}</h1>
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{profile.company_name || profile.name}</h1>
             {profile.name && profile.company_name && <p className="text-foreground/30 text-sm">{profile.name}</p>}
           </div>
           <StatusBadge status={kyc.status} />

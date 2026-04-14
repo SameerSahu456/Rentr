@@ -48,14 +48,14 @@ const item = {
 
 function MetricGrid({ metrics }) {
   return (
-    <section className="grid grid-cols-2 lg:grid-cols-3 border-b border-foreground/[0.05]">
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-b border-foreground/[0.05]">
       {metrics.map((s, i) => (
         <motion.div
           key={s.label}
           variants={item}
           className={cn(
-            'p-6 lg:p-12 flex flex-col gap-4 lg:gap-8 group hover:bg-foreground/[0.02] transition-colors duration-700',
-            i < metrics.length - 1 && 'border-r border-foreground/[0.05]'
+            'p-4 sm:p-6 lg:p-12 flex flex-col gap-3 sm:gap-4 lg:gap-8 group hover:bg-foreground/[0.02] transition-colors duration-700',
+            i < metrics.length - 1 && 'border-b sm:border-b-0 sm:border-r border-foreground/[0.05]'
           )}
         >
           <div className="flex justify-between items-start">
@@ -74,7 +74,7 @@ function MetricGrid({ metrics }) {
 }
 
 function CompactGrid({ metrics }) {
-  const cols = metrics.length <= 3 ? 'grid-cols-3' : metrics.length === 4 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2 lg:grid-cols-4';
+  const cols = metrics.length <= 3 ? 'grid-cols-1 sm:grid-cols-3' : metrics.length === 4 ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2 lg:grid-cols-4';
   return (
     <section className={cn('grid border-b border-foreground/[0.05]', cols)}>
       {metrics.map((s, i) => (
@@ -653,9 +653,11 @@ export default function AnalyticsPage() {
     Promise.all([
       api.get('/assets/stats').catch(() => null),
       api.get('/dashboard/stats').catch(() => null),
-    ]).then(([assets, dashboard]) => {
-      setAssetStats(assets);
-      setDashboardStats(dashboard?.stats || dashboard);
+      api.get('/analytics/').catch(() => null),
+    ]).then(([assets, dashboard, analytics]) => {
+      setAssetStats({ ...(assets || {}), ...(analytics?.fleet || {}) });
+      const dStats = dashboard?.stats || dashboard || {};
+      setDashboardStats({ ...dStats, ...(analytics || {}) });
     }).finally(() => setLoading(false));
   }, []);
 

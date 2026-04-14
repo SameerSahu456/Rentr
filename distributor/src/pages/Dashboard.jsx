@@ -86,13 +86,13 @@ export default function Dashboard() {
             <div
               key={o.id}
               onClick={() => navigate(`/orders/${o.id}`)}
-              className="px-6 py-4 flex items-center justify-between hover:bg-foreground/[0.01] cursor-pointer transition-colors"
+              className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 hover:bg-foreground/[0.01] cursor-pointer transition-colors"
             >
-              <div>
-                <p className="text-sm font-bold text-foreground">{o.order_number}</p>
-                <p className="text-xs text-foreground/30">{o.customer_name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-foreground truncate">{o.order_number}</p>
+                <p className="text-xs text-foreground/30 truncate">{o.customer_name}</p>
               </div>
-              <div className="text-right flex items-center gap-4">
+              <div className="text-right flex items-center gap-2 sm:gap-4 shrink-0">
                 <div>
                   <p className="text-sm font-bold text-foreground">₹{(o.total_monthly || 0).toLocaleString('en-IN')}/mo</p>
                   <p className="text-[10px] text-emerald-500 font-bold">+₹{(o.spread || 0).toLocaleString('en-IN')} spread</p>
@@ -120,13 +120,13 @@ export default function Dashboard() {
             <div
               key={inv.id}
               onClick={() => navigate(`/invoices/${inv.id}`)}
-              className="px-6 py-4 flex items-center justify-between hover:bg-foreground/[0.01] cursor-pointer transition-colors"
+              className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 hover:bg-foreground/[0.01] cursor-pointer transition-colors"
             >
-              <div>
-                <p className="text-sm font-bold text-foreground">{inv.invoice_number}</p>
-                <p className="text-xs text-foreground/30">{inv.customer_name}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-foreground truncate">{inv.invoice_number}</p>
+                <p className="text-xs text-foreground/30 truncate">{inv.customer_name}</p>
               </div>
-              <div className="text-right flex items-center gap-4">
+              <div className="text-right flex items-center gap-2 sm:gap-4 shrink-0">
                 <p className="text-sm font-bold text-foreground">₹{(inv.total || 0).toLocaleString('en-IN')}</p>
                 <StatusBadge status={inv.status} />
               </div>

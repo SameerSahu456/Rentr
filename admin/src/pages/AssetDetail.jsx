@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, FileText, ArrowRight, RotateCcw, LifeBuoy, History, ShieldCheck, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Package, FileText, ArrowRight, RotateCcw, LifeBuoy, History, ShieldCheck, Download, ExternalLink, RefreshCw } from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import TagsManager from '../components/TagsManager';
@@ -43,6 +43,7 @@ export default function AssetDetail() {
         a.contract = data.contract || null;
         a.returns = data.returns || [];
         a.tickets = data.tickets || [];
+        a.replacements = data.replacements || [];
         setAsset(a);
         setTags(a.tags || []);
         setDataWipeStatus(a.data_wipe_status || 'Not Requested');
@@ -63,6 +64,7 @@ export default function AssetDetail() {
       a.contract = refreshed.contract || null;
       a.returns = refreshed.returns || [];
       a.tickets = refreshed.tickets || [];
+      a.replacements = refreshed.replacements || [];
       setAsset(a);
       setNextState('');
       setTransitionNotes('');
@@ -99,7 +101,7 @@ export default function AssetDetail() {
   const tabs = [
     { key: 'overview', label: 'Overview' },
     { key: 'management', label: 'Management' },
-    { key: 'history', label: `History (${events.length + (asset.returns?.length || 0) + (asset.tickets?.length || 0)})` },
+    { key: 'history', label: `History (${events.length + (asset.returns?.length || 0) + (asset.tickets?.length || 0) + (asset.replacements?.length || 0)})` },
   ];
 
   return (
@@ -109,11 +111,11 @@ export default function AssetDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-brand font-bold text-foreground">{[asset.oem, asset.model].filter(Boolean).join(' ') || asset.uid}</h1>
+              <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{[asset.oem, asset.model].filter(Boolean).join(' ') || asset.uid}</h1>
               {asset.condition_grade && (
                 <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest border ${gradeColors[asset.condition_grade] || ''}`}>Grade {asset.condition_grade}</span>
               )}
@@ -377,7 +379,45 @@ export default function AssetDetail() {
             </div>
           )}
 
-          {events.length === 0 && (!asset.returns || asset.returns.length === 0) && (!asset.tickets || asset.tickets.length === 0) && (
+          {/* Replacements */}
+          {asset.replacements && asset.replacements.length > 0 && (
+            <div className="glass rounded-2xl overflow-hidden">
+              <div className="px-6 py-3 border-b border-foreground/[0.03]">
+                <div className="flex items-center gap-2">
+                  <RefreshCw size={14} className="text-foreground/25" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/25">Replacements</p>
+                </div>
+              </div>
+              <div className="divide-y divide-foreground/[0.03]">
+                {asset.replacements.map((rpl) => {
+                  const isFaulty = rpl.faulty_asset_uid === asset.uid;
+                  const role = isFaulty ? 'Faulty Asset' : 'Replacement Asset';
+                  const otherUid = isFaulty ? rpl.replacement_asset_uid : rpl.faulty_asset_uid;
+                  return (
+                    <div key={rpl.id} className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-foreground/[0.02] transition-colors" onClick={() => navigate(`/replacements/${rpl.id}`)}>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold">#{rpl.replacement_number || rpl.id}</p>
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${isFaulty ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>{role}</span>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                          {otherUid && <p className="text-[10px] text-foreground/30">{isFaulty ? 'Replaced by' : 'Replaced'}: <span className="font-mono">{otherUid}</span></p>}
+                          {rpl.faulty_reason && <p className="text-[10px] text-foreground/30 truncate max-w-[200px]">{rpl.faulty_reason}</p>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        {rpl.damage_charges > 0 && <span className="text-[10px] text-amber-400 font-bold">₹{fmt(rpl.damage_charges)}</span>}
+                        <StatusBadge status={rpl.status} />
+                        <ArrowRight size={14} className="text-foreground/20" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {events.length === 0 && (!asset.returns || asset.returns.length === 0) && (!asset.tickets || asset.tickets.length === 0) && (!asset.replacements || asset.replacements.length === 0) && (
             <div className="glass rounded-2xl overflow-hidden">
               <p className="px-6 py-8 text-center text-foreground/20 text-xs italic">No history or related items yet.</p>
             </div>

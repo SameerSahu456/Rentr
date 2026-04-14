@@ -154,20 +154,20 @@ export default function CustomerDetail() {
       </button>
 
       {/* Glass card header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">
               {companyName || name}
             </h1>
-            <p className="text-foreground/30 text-sm">
+            <p className="text-foreground/30 text-sm truncate">
               {companyName && name !== companyName ? `${name} \u00b7 ` : ''}{email}
             </p>
             {(profile.account_type || kyc?.account_type) && (
               <p className="text-foreground/40 text-xs mt-1 capitalize">{(profile.account_type || kyc?.account_type || '').replace(/_/g, ' ')}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {customer?.customer_type && (
               <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
                 customer.customer_type === 'partner'

@@ -220,7 +220,7 @@ export default function CustomersPage() {
       </motion.div>
 
       {/* Tabs */}
-      <motion.div variants={item} className="flex items-center gap-2">
+      <motion.div variants={item} className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         {[
           { key: 'all', label: 'All Customers' },
           { key: 'customers', label: 'Direct' },
@@ -230,7 +230,7 @@ export default function CustomersPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-colors ${
+            className={`px-4 sm:px-5 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-colors whitespace-nowrap shrink-0 ${
               activeTab === tab.key
                 ? 'bg-rentr-primary text-white'
                 : 'text-foreground/20 hover:text-foreground'

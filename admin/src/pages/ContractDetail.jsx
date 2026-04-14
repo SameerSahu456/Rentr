@@ -162,14 +162,14 @@ export default function ContractDetail() {
       </button>
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-brand font-bold text-foreground">{contract.contract_number}</h1>
+              <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{contract.contract_number}</h1>
               <span className="px-2 py-0.5 rounded-md bg-rentr-primary/10 text-rentr-primary text-[9px] font-bold uppercase tracking-widest border border-rentr-primary/20">v{contract.version || 1}</span>
             </div>
-            <p className="text-foreground/30 text-sm">
+            <p className="text-foreground/30 text-sm truncate">
               <span className="text-rentr-primary hover:underline cursor-pointer" onClick={() => navigate(`/customers/${encodeURIComponent(contract.customer_email)}`)}>{contract.customer_name}</span>
               {' '}&middot; {contract.customer_email}
             </p>
@@ -179,7 +179,7 @@ export default function ContractDetail() {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <StatusBadge status={contract.status} />
             <select
               value={contract.status}
@@ -221,16 +221,12 @@ export default function ContractDetail() {
 
         {/* Action buttons */}
         <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-foreground/[0.05]">
-          {contract.document_url && (
-            <>
-              <button onClick={handleViewPdf} disabled={pdfLoading} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all disabled:opacity-50">
-                <Eye size={14} /> Preview
-              </button>
-              <button onClick={handleDownloadPdf} disabled={pdfLoading} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all disabled:opacity-50">
-                <Download size={14} /> Download
-              </button>
-            </>
-          )}
+          <button onClick={handleViewPdf} disabled={pdfLoading} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all disabled:opacity-50">
+            <Eye size={14} /> {pdfLoading ? 'Loading...' : 'Preview PDF'}
+          </button>
+          <button onClick={handleDownloadPdf} disabled={pdfLoading} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all disabled:opacity-50">
+            <Download size={14} /> Download PDF
+          </button>
           <button onClick={() => navigate(`/contracts/${id}/edit`)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 text-foreground/60 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground/10 transition-all">
             <Pencil size={14} /> Edit
           </button>

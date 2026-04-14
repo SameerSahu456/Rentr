@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Send, Pencil, Check, X, ExternalLink, CreditCard, CalendarDays, Receipt, Banknote } from 'lucide-react';
+import { ArrowLeft, Download, Send, Pencil, Check, X, ExternalLink, CreditCard, CalendarDays, Receipt, Banknote, Eye } from 'lucide-react';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import Modal from '../components/Modal';
@@ -21,6 +21,9 @@ export default function InvoiceDetail() {
   const [sending, setSending] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
   const [newDueDate, setNewDueDate] = useState('');
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
     api.get(`/invoices/${id}`)
@@ -51,22 +54,35 @@ export default function InvoiceDetail() {
     } catch { /* ignore */ }
   };
 
-  const handleDownloadPdf = async () => {
+  const fetchPdfBlob = async () => {
+    setPdfLoading(true);
     try {
       const token = api.getToken();
       const res = await fetch(`${BASE_URL.replace(/\/api\/v1\b/, '/api')}/invoices/${id}/pdf`, {
         headers: { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' },
       });
-      if (!res.ok) throw new Error('Failed to generate PDF');
+      if (!res.ok) throw new Error('Failed to fetch PDF');
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
+      return URL.createObjectURL(blob);
+    } catch (err) {
+      console.error('PDF fetch failed:', err);
+      return null;
+    } finally { setPdfLoading(false); }
+  };
+
+  const handleViewPdf = async () => {
+    const url = pdfBlobUrl || await fetchPdfBlob();
+    if (url) { setPdfBlobUrl(url); setPdfViewerOpen(true); }
+  };
+
+  const handleDownloadPdf = async () => {
+    const url = pdfBlobUrl || await fetchPdfBlob();
+    if (url) {
+      setPdfBlobUrl(url);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${invoice.invoice_number}.pdf`;
       a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('PDF download failed:', err);
     }
   };
 
@@ -125,16 +141,16 @@ export default function InvoiceDetail() {
       </button>
 
       {/* Glass card header */}
-      <div className="glass rounded-2xl p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-brand font-bold text-foreground">{invoice.invoice_number}</h1>
-            <p className="text-foreground/30 text-sm">
+      <div className="glass rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-brand font-bold text-foreground">{invoice.invoice_number}</h1>
+            <p className="text-foreground/30 text-sm truncate">
               {invoice.customer_name || 'Unknown Customer'}
               {invoice.customer_email ? ` \u00b7 ${invoice.customer_email}` : ''}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <StatusBadge status={invoice.status} />
             <select value={invoice.status} onChange={(e) => handleStatusChange(e.target.value)}
               className="bg-foreground/[0.03] border border-foreground/[0.08] rounded-lg px-2 py-1.5 text-xs text-foreground/60">
@@ -167,8 +183,12 @@ export default function InvoiceDetail() {
             </>
           )}
           {!(invoice.order || invoice.contract) && <div className="flex-1" />}
-          <button onClick={handleDownloadPdf}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-foreground/[0.08] text-xs text-foreground/50 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors">
+          <button onClick={handleViewPdf} disabled={pdfLoading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-foreground/[0.08] text-xs text-foreground/50 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors disabled:opacity-50">
+            <Eye className="w-3.5 h-3.5" /> {pdfLoading ? 'Loading...' : 'Preview'}
+          </button>
+          <button onClick={handleDownloadPdf} disabled={pdfLoading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-foreground/[0.08] text-xs text-foreground/50 hover:text-rentr-primary hover:border-rentr-primary/30 transition-colors disabled:opacity-50">
             <Download className="w-3.5 h-3.5" /> PDF
           </button>
           <button onClick={handleSendInvoice} disabled={sending}
@@ -378,6 +398,19 @@ export default function InvoiceDetail() {
           </div>
         </div>
       </Modal>
+
+      {/* PDF Viewer Modal */}
+      {pdfViewerOpen && pdfBlobUrl && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onClick={() => setPdfViewerOpen(false)}>
+          <div className="bg-background rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-foreground/[0.05]">
+              <h3 className="text-sm font-bold">Invoice PDF Preview</h3>
+              <button onClick={() => setPdfViewerOpen(false)} className="text-foreground/30 hover:text-foreground"><X size={20} /></button>
+            </div>
+            <iframe src={pdfBlobUrl} className="flex-1 w-full" title="Invoice PDF" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
